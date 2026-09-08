@@ -24,5 +24,16 @@ try{
 }finally{
   fs.rmdirSync=original;fs.rmSync(dir,{recursive:true,force:true});
 }
+const originalRm=fs.rmSync;
+try{
+  let attempts=0;
+  fs.rmSync=()=>{attempts++;throw Object.assign(new Error('busy'),{code:'ENOTEMPTY'});};
+  await assert.rejects(removeProfile(dir),{code:'ENOTEMPTY'});
+  assert.equal(attempts,6,'retry budget must be bounded');
+  attempts=0;
+  fs.rmSync=()=>{attempts++;throw Object.assign(new Error('denied'),{code:'EACCES'});};
+  await assert.rejects(removeProfile(dir),{code:'EACCES'});
+  assert.equal(attempts,1,'other failures must not be hidden');
+}finally{fs.rmSync=originalRm;}
 console.log('browser profile cleanup: late-write ENOTEMPTY recovered and absent directory safe');
 })().catch(error=>{console.error(error);process.exitCode=1;});
