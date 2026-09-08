@@ -245,4 +245,4 @@ body .timebar{overflow:visible;max-height:none}
 body #mobileControls{font-size:12px;order:3;margin-left:auto}
 body #mobileMeasure{display:block}
 body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow,body[data-mode=exposure] .time-controls,body[data-mode=exposure] .scrubrow{display:none}
-@media(min-width:901px){.detail #placeName{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0 8px;margin-top:0;box-shadow:0 -20px 0 var(--panel)}}
+@media(min-width:901px){.detail #placeName{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0 8px;margin-top:0}}

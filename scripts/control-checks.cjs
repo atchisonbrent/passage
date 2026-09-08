@@ -4,6 +4,11 @@ const path=require('node:path');
 exports.checkControls=async({call,js,click,delay,out,width,height})=>{
   const geometry=()=>js("(()=>{const r=document.getElementById('globe').getBoundingClientRect();return {height:r.height,width:r.width}})()");
   const before=await geometry();
+  if(width>=901){
+    assert.equal(await js("getComputedStyle(document.getElementById('placeName')).boxShadow"),'none','sticky title must not paint over the resting place label');
+    assert.ok(await js("(()=>{const a=document.getElementById('placeKind').getBoundingClientRect(),b=document.getElementById('placeName').getBoundingClientRect();return a.height>0&&a.bottom<=b.top+1})()"));
+    fs.writeFileSync(path.join(out,`resting-${width}-${height}.png`),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  }
   await click('#mobileControls');
   assert.equal(await js("document.getElementById('timelineSettings').hidden"),false);
   assert.deepEqual(await geometry(),before,'settings must not resize the globe');
@@ -18,6 +23,9 @@ exports.checkControls=async({call,js,click,delay,out,width,height})=>{
   assert.deepEqual(await geometry(),before,'More must not resize the globe');
   await click('#sources');assert.equal(await js("document.getElementById('sourceDialog').open"),true);
   await click('#closeDialog');
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+  assert.equal(await js("document.body.classList.contains('explore-open')"),false);
 };
 exports.checkLenses=async({call,js,click,navigate,delay,until,base,out})=>{
   await call('Emulation.setDeviceMetricsOverride',{width:1210,height:702,deviceScaleFactor:1,mobile:false});
