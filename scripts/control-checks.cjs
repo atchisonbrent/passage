@@ -37,6 +37,52 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
       Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
     );
   }
+  assert.ok(
+    await js("document.getElementById('browseToggle').getBoundingClientRect().width>0"),
+    'Search is visible at every viewport',
+  );
+  await click('#browseToggle');
+  assert.equal(await js("document.getElementById('browseDialog').open"), true);
+  await click('#closeBrowse');
+  // Real pointer hover and selection at dense-port zoom, then restore landing.
+  for (let i = 0; i < 26; i++) await click('#zoomin');
+  assert.equal(await js('state.zoom'), 32);
+  const points = await js(
+    `(() => {const b=document.getElementById('globe').getBoundingClientRect();return hitpoints.filter(p=>!p.id.startsWith('country-')&&p.x>20&&p.y>20&&p.x<b.width-20&&p.y<b.height-20).slice(0,3).map(p=>({...p,x:p.x+b.left,y:p.y+b.top}));})()`,
+  );
+  assert.ok(points.length >= 2, 'dense Singapore view exposes multiple selectable ports');
+  for (const point of points) {
+    await call('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y });
+    await delay(80);
+    assert.equal(await js("document.getElementById('globe').style.cursor"), 'pointer');
+    assert.ok(await js("!document.getElementById('mapHover').hidden"));
+    fs.writeFileSync(
+      path.join(out, `hover-${width}-${height}.png`),
+      Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+    );
+    await call('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x: point.x,
+      y: point.y,
+      button: 'left',
+      clickCount: 1,
+    });
+    await call('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x: point.x,
+      y: point.y,
+      button: 'left',
+      clickCount: 1,
+    });
+    await delay(80);
+    assert.equal(await js('state.selected'), point.id);
+  }
+  fs.writeFileSync(
+    path.join(out, `dense-map-${width}-${height}.png`),
+    Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await js("choose(places.find(p=>p.name==='Singapore').id)");
+  await delay(100);
   await click('#mobileControls');
   assert.equal(await js("document.getElementById('timelineSettings').hidden"), false);
   assert.notEqual(
@@ -209,6 +255,25 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
     path.join(out, `random-${width}-${height}.png`),
     Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
   );
+  assert.ok(
+    await js(
+      `(() => {const c=document.querySelector('.event-close').getBoundingClientRect(),d=document.querySelector('#eventContext details').getBoundingClientRect();return c.left>=d.right;})()`,
+    ),
+    'close button owns a separate column from all event text',
+  );
+  assert.ok(
+    await js(
+      `(() => {const d=document.querySelector('#eventContext details'),b=d.querySelector('button');return d.getBoundingClientRect().bottom-b.getBoundingClientRect().bottom>=12;})()`,
+    ),
+    'Locate on globe has bottom breathing room',
+  );
+  if (width >= 1680)
+    assert.ok(
+      await js(
+        `(() => {const a=document.getElementById('analysisWorkspace').getBoundingClientRect(),v=document.querySelector('.view-switch').getBoundingClientRect(),h=document.querySelector('header');return Math.abs(a.left-v.left)<2&&Math.abs(parseFloat(getComputedStyle(h).paddingLeft)-a.left)<2;})()`,
+      ),
+      'wide header and view controls align with analysis',
+    );
   const comparisonBefore = await js(
     'JSON.stringify([comparison.ids,...comparisonValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])',
   );

@@ -131,6 +131,7 @@ async function until(fn) {
       [1366, 1024],
       [1440, 900],
       [1920, 1080],
+      [2560, 1440],
     ]) {
       await call('Emulation.setDeviceMetricsOverride', {
         width,

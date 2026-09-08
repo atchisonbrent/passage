@@ -1,5 +1,6 @@
 /* Pointer input only: data, rendering and page zoom remain separate. */
 (function (root) {
+  const clampZoom = (value) => Math.min(32, Math.max(0.7, value));
   function attach(canvas, { getView, setView, onTap }) {
     const pointers = new Map();
     let drag = null,
@@ -27,7 +28,7 @@
       if (!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (pointers.size >= 2 && pinch) {
-        setView({ zoom: Math.min(2.5, Math.max(0.7, (pinch.zoom * distance()) / pinch.distance)) });
+        setView({ zoom: clampZoom((pinch.zoom * distance()) / pinch.distance) });
         return;
       }
       if (!drag) return;
@@ -61,6 +62,6 @@
     canvas.onpointercancel = (e) => finish(e, true);
     return { down, move, up: (e) => finish(e), cancel: (e) => finish(e, true) };
   }
-  if (typeof module !== 'undefined') module.exports = { attach };
-  else root.PassageGestures = { attach };
+  if (typeof module !== 'undefined') module.exports = { attach, clampZoom };
+  else root.PassageGestures = { attach, clampZoom };
 })(typeof window !== 'undefined' ? window : globalThis);

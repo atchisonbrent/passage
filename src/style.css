@@ -835,7 +835,9 @@ body:not(.analyst) .reference-controls label {
   min-width: 40px;
 }
 #browseToggle {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .browse-dialog-heading {
   display: flex;
@@ -2259,23 +2261,42 @@ body[data-mode='exposure'] .scrubrow {
   align-items: center;
   gap: 7px;
 }
-#eventContext {
-  position: relative;
+#analysisWorkspace #eventContext {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: start;
+}
+#analysisWorkspace #eventContext[hidden] {
+  display: none;
+}
+#analysisWorkspace #eventContext details {
+  margin: 0;
+  min-width: 0;
+  padding-bottom: 12px;
 }
 #eventContext summary {
-  padding-right: 48px;
   white-space: normal;
-  min-height: 32px;
 }
-.event-close {
-  position: absolute;
-  top: 0;
-  right: 0;
+#analysisWorkspace .event-close {
+  position: static;
+  margin: 0;
   width: 44px;
   height: 44px;
   padding: 0;
   font-size: 24px;
   line-height: 1;
+}
+.map-hover {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  max-width: min(280px, calc(100vw - 16px));
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--up);
+  border-radius: 6px;
+  font-size: 13px;
 }
 #randomEvent svg {
   width: 18px;
@@ -2290,5 +2311,32 @@ body[data-mode='exposure'] .scrubrow {
   .view-switch button {
     justify-content: center;
     white-space: nowrap;
+  }
+}
+
+/* Keep analysis navigation on the same rail as its centered content. */
+@media (min-width: 1680px) {
+  body.analysis-open header {
+    padding-left: calc((100% - 1600px) / 2);
+    padding-right: calc((100% - 1600px) / 2);
+  }
+  body.analysis-open .view-switch {
+    width: 1600px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  body.analysis-open #freshness {
+    padding-left: calc((100% - 1600px) / 2);
+    padding-right: calc((100% - 1600px) / 2);
+  }
+}
+
+@media (min-width: 1441px) {
+  header .header-actions {
+    margin-left: 0;
+  }
+  header #browseToggle {
+    margin-left: auto;
   }
 }

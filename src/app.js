@@ -1044,12 +1044,52 @@ function bind() {
     globe();
   };
   const zoom = (f) => {
-    state.zoom = Math.min(2.5, Math.max(0.7, state.zoom * f));
+    state.zoom = PassageGestures.clampZoom(state.zoom * f);
     globe();
   };
   $('zoomin').onclick = () => zoom(1.15);
   $('zoomout').onclick = () => zoom(1 / 1.15);
   const c = $('globe');
+  const tooltip = element('div', 'map-hover');
+  tooltip.id = 'mapHover';
+  tooltip.hidden = true;
+  document.body.append(tooltip);
+  function mapTarget(e) {
+    const b = c.getBoundingClientRect(),
+      x = e.clientX - b.left,
+      y = e.clientY - b.top;
+    return hitpoints
+      .filter((p) => !p.id.startsWith('country-'))
+      .sort((a, b) => Math.hypot(x - a.x, y - a.y) - Math.hypot(x - b.x, y - b.y))
+      .find((p) => Math.hypot(x - p.x, y - p.y) < p.size + (e.pointerType === 'touch' ? 8 : 4));
+  }
+  function clearHover() {
+    tooltip.hidden = true;
+    c.style.cursor = '';
+  }
+  c.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch' || e.buttons) {
+      clearHover();
+      return;
+    }
+    const target = mapTarget(e),
+      port = target && (placeById[target.id] || network?.nodes[target.id]);
+    if (!port) {
+      clearHover();
+      return;
+    }
+    c.style.cursor = 'pointer';
+    tooltip.textContent = port.name + (port.country ? ' · ' + port.country : '');
+    tooltip.hidden = false;
+    tooltip.style.left =
+      Math.max(8, Math.min(innerWidth - tooltip.offsetWidth - 8, e.clientX + 14)) + 'px';
+    tooltip.style.top =
+      Math.max(8, Math.min(innerHeight - tooltip.offsetHeight - 8, e.clientY + 14)) + 'px';
+  });
+  c.addEventListener('pointerleave', clearHover);
+  c.addEventListener('pointerdown', clearHover);
+  c.addEventListener('wheel', clearHover);
+
   PassageGestures.attach(c, {
     getView: () => state,
     setView: (changes) => {
@@ -1057,13 +1097,7 @@ function bind() {
       globe();
     },
     onTap: (e) => {
-      const b = c.getBoundingClientRect(),
-        x = e.clientX - b.left,
-        y = e.clientY - b.top,
-        p = hitpoints
-          .filter((p) => !p.id.startsWith('country-'))
-          .sort((a, b) => Math.hypot(x - a.x, y - a.y) - Math.hypot(x - b.x, y - b.y))
-          .find((p) => Math.hypot(x - p.x, y - p.y) < p.size + 8);
+      const p = mapTarget(e);
       if (p) choose(p.id, false);
     },
   });
@@ -1214,11 +1248,6 @@ function bind() {
   });
   reduced.addEventListener('change', startRouteMotion);
   new ResizeObserver(() => {
-    if (
-      !matchMedia('(max-width:1280px), (max-width:1440px) and (any-pointer:coarse)').matches &&
-      $('browseDialog').open
-    )
-      $('browseDialog').close();
     refresh();
   }).observe(document.querySelector('.map-panel'));
 }
