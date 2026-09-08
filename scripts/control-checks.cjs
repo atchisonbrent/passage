@@ -36,6 +36,9 @@ exports.checkLenses=async({call,js,click,navigate,delay,until,base,out})=>{
   const zoom=await js('state.zoom');await click('#zoomin');assert.ok(await js('state.zoom')>zoom);await click('#reset');assert.equal(await js('state.zoom'),1);
   await click('#browseToggle');await call('Input.insertText',{text:'Jebel Ali'});await delay(300);await click('#locations button');
   assert.equal(await js('passageSnapshot().place'),'Jebel Ali');
+  const latestAvailable=await js('dates.filter((_,i)=>Number.isFinite(series[state.selected]?.[i]?.[state.metric])).at(-1)');
+  await click('#latest');assert.equal(await js('passageSnapshot().date'),latestAvailable);
+  assert.ok(latestAvailable<=await js('manifest.Daily_Ports_Data_latest'));
   await click('#pin');assert.equal(await js('state.pins.length'),1);
   await click('#share');const shared=await js('location.hash');await navigate(base+shared);assert.equal(await js('state.pins.length'),1);
   await click('#clearPins');assert.equal(await js('state.pins.length'),0);
