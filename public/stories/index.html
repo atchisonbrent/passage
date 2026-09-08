@@ -2768,8 +2768,6 @@ const passageEvents = [
 ];
 if (typeof module !== 'undefined') module.exports = passageEvents;
 
-const passageShifts=[{"id":"chokepoint6:2026-03-02","place":"chokepoint6","name":"Strait of Hormuz","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":2.5714285714285716,"reference":77.25,"difference":-74.67857142857143,"percent":-96.67128987517337,"context":{"place":"chokepoint6","start":"2026-03-02","end":"2026-03-08","source":"IMF PortWatch","url":"https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1","published":null,"reportedDate":"2026-02-28","summary":"IMF PortWatch reports reduced Hormuz traffic from February 28 amid attacks on commercial ships, with warnings about GPS jamming, AIS spoofing and vessels going dark.","caveat":"The rolling reference includes February 28\u2013March 1; it is not a wholly pre-conflict baseline. Recorded calls do not establish complete physical closure or causal impact."},"qualifies":true,"recent":false},{"id":"port744:2026-03-02","place":"port744","name":"Jebel Ali","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":1.4285714285714286,"reference":23.857142857142858,"difference":-22.42857142857143,"percent":-94.0119760479042,"context":{"place":"port744","start":"2026-03-02","end":"2026-03-08","source":"Inchcape Shipping Services \u00b7 port advisory","url":"https://www.iss-shipping.com/wp-content/uploads/2026/03/Middle-East-Port-Advisory-02032026-1800.pdf","published":"2026-03-02","reportedDate":"2026-03-02","summary":"Inchcape's March 2 advisory described Jebel Ali terminal operations as normal while reporting sharply reduced commercial traffic through Hormuz amid regional risk.","caveat":"This corroborates regional disruption, not a week-long Jebel Ali closure. Lower measured calls and normal terminal operations can coexist; no causal attribution is established."},"qualifies":true,"recent":false},{"id":"chokepoint27:2026-05-11","place":"chokepoint27","name":"Mindoro Strait","start":"2026-05-11","end":"2026-05-17","referenceStart":"2026-04-13","referenceEnd":"2026-05-10","mean":57.0,"reference":37.82142857142857,"difference":19.17857142857143,"percent":50.70821529745043,"context":null,"qualifies":true,"recent":false},{"id":"port1253:2026-07-08","place":"port1253","name":"Suzhou (Taicang)","start":"2026-07-08","end":"2026-07-14","referenceStart":"2026-06-10","referenceEnd":"2026-07-07","mean":5.428571428571429,"reference":21.035714285714285,"difference":-15.607142857142856,"percent":-74.19354838709677,"context":{"place":"port1253","start":"2026-07-08","end":"2026-07-14","source":"Kuehne+Nagel \u00b7 dated operational updates","url":"https://mykn.kuehne-nagel.com/news/article/two-tropical-storms-strengthen-china","published":"2026-07-14","reportedDate":"2026-07-09","summary":"Kuehne+Nagel's July 9 update reported Taicang restrictions; its July 11 update listed Taicang among suspended barge and feeder locations during Typhoon Bavi. July 14 reported regional operations resuming.","caveat":"The advisory supplies contemporaneous operational context. It does not quantify how much of the weekly call decline was caused by the storm or establish this port's exact reopening time."},"qualifies":true,"recent":false},{"id":"port494:2026-03-18","place":"port494","name":"Incheon","start":"2026-03-18","end":"2026-03-24","referenceStart":"2026-02-18","referenceEnd":"2026-03-17","mean":9.428571428571429,"reference":20.964285714285715,"difference":-11.535714285714286,"percent":-55.02555366269165,"context":null,"qualifies":true,"recent":false}];
-
 /* Chart scrubbing: horizontal intent; vertical browser panning stays native. */
 (function (root) {
   const bounds = (width) => ({ left: 48, right: Math.max(49, width - 10) });
@@ -2868,6 +2866,7 @@ const passageShifts=[{"id":"chokepoint6:2026-03-02","place":"chokepoint6","name"
   else root.PassageChartInput = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
+const passageShifts=[{"id":"chokepoint6:2026-03-02","place":"chokepoint6","name":"Strait of Hormuz","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":2.5714285714285716,"reference":77.25,"difference":-74.67857142857143,"percent":-96.67128987517337,"context":{"place":"chokepoint6","start":"2026-03-02","end":"2026-03-08","source":"IMF PortWatch","url":"https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1","published":null,"reportedDate":"2026-02-28","summary":"IMF PortWatch reports reduced Hormuz traffic from February 28 amid attacks on commercial ships, with warnings about GPS jamming, AIS spoofing and vessels going dark.","caveat":"The rolling reference includes February 28\u2013March 1; it is not a wholly pre-conflict baseline. Recorded calls do not establish complete physical closure or causal impact."},"qualifies":true,"recent":false},{"id":"port744:2026-03-02","place":"port744","name":"Jebel Ali","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":1.4285714285714286,"reference":23.857142857142858,"difference":-22.42857142857143,"percent":-94.0119760479042,"context":{"place":"port744","start":"2026-03-02","end":"2026-03-08","source":"Inchcape Shipping Services \u00b7 port advisory","url":"https://www.iss-shipping.com/wp-content/uploads/2026/03/Middle-East-Port-Advisory-02032026-1800.pdf","published":"2026-03-02","reportedDate":"2026-03-02","summary":"Inchcape's March 2 advisory described Jebel Ali terminal operations as normal while reporting sharply reduced commercial traffic through Hormuz amid regional risk.","caveat":"This corroborates regional disruption, not a week-long Jebel Ali closure. Lower measured calls and normal terminal operations can coexist; no causal attribution is established."},"qualifies":true,"recent":false},{"id":"chokepoint27:2026-05-11","place":"chokepoint27","name":"Mindoro Strait","start":"2026-05-11","end":"2026-05-17","referenceStart":"2026-04-13","referenceEnd":"2026-05-10","mean":57.0,"reference":37.82142857142857,"difference":19.17857142857143,"percent":50.70821529745043,"context":null,"qualifies":true,"recent":false},{"id":"port1253:2026-07-08","place":"port1253","name":"Suzhou (Taicang)","start":"2026-07-08","end":"2026-07-14","referenceStart":"2026-06-10","referenceEnd":"2026-07-07","mean":5.428571428571429,"reference":21.035714285714285,"difference":-15.607142857142856,"percent":-74.19354838709677,"context":{"place":"port1253","start":"2026-07-08","end":"2026-07-14","source":"Kuehne+Nagel \u00b7 dated operational updates","url":"https://mykn.kuehne-nagel.com/news/article/two-tropical-storms-strengthen-china","published":"2026-07-14","reportedDate":"2026-07-09","summary":"Kuehne+Nagel's July 9 update reported Taicang restrictions; its July 11 update listed Taicang among suspended barge and feeder locations during Typhoon Bavi. July 14 reported regional operations resuming.","caveat":"The advisory supplies contemporaneous operational context. It does not quantify how much of the weekly call decline was caused by the storm or establish this port's exact reopening time."},"qualifies":true,"recent":false},{"id":"port494:2026-03-18","place":"port494","name":"Incheon","start":"2026-03-18","end":"2026-03-24","referenceStart":"2026-02-18","referenceEnd":"2026-03-17","mean":9.428571428571429,"reference":20.964285714285715,"difference":-11.535714285714286,"percent":-55.02555366269165,"context":null,"qualifies":true,"recent":false}];
 'use strict';
 const $ = (id) => document.getElementById(id),
   M = PassageMath;
@@ -3000,7 +2999,7 @@ function choose(id, recenter = true) {
   refresh();
 }
 async function setMode(mode) {
-  if (aw.open) awOpen(false);
+  if (comparison.open) comparisonOpen(false);
   stop();
   state.mode = mode;
   state.story = null;
@@ -3687,7 +3686,7 @@ function render() {
   );
   if (activity) {
     activityDetail();
-    awGlobeContext();
+    comparisonGlobeContext();
   } else if (state.mode === 'connections') networkDetail();
   else exposureDetail();
   $('story').hidden = !state.story;
@@ -3983,8 +3982,8 @@ function bind() {
       sector: $('sector').value,
       trade: $('trade').value,
       pins: state.pins.join(','),
-      context: aw.event || '',
-      shift: aw.signal || '',
+      context: comparison.event || '',
+      shift: comparison.signal || '',
       event: $('eventStart').value,
       threshold: $('recoveryThreshold').value,
       sustain: $('recoveryDays').value,
@@ -4172,7 +4171,7 @@ async function boot() {
         refresh();
       }
     } else if (location.pathname.startsWith('/stories') && !location.hash) {
-      awOpen();
+      comparisonOpen();
       $('eventCatalog').open = true;
     }
     document.body.classList.add('snapshot-ready');
@@ -4197,7 +4196,6 @@ async function boot() {
     for (const b of document.querySelectorAll('button,input,select')) b.disabled = true;
   }
 }
-boot();
 
 function updateFreshness() {
   if (!manifest) return;
@@ -4665,7 +4663,7 @@ function plot(canvas, items) {
     }
     ctx.stroke();
   }
-  if (canvas.id === 'chart') awGlobeAnnotation(ctx, left, right, top, bottom);
+  if (canvas.id === 'chart') comparisonGlobeAnnotation(ctx, left, right, top, bottom);
   const x = xAt(state.index);
   ctx.strokeStyle = '#f4c397';
   ctx.lineWidth = 1;
@@ -4711,8 +4709,8 @@ function bindCharts() {
 }
 
 /* Comparison-first workspace; same observations, separate historical clock. */
-const AW = PassageWorkspaceMath;
-const aw = {
+const comparisonMath = PassageWorkspaceMath;
+const comparison = {
   ids: [],
   event: null,
   signal: null,
@@ -4725,8 +4723,8 @@ const aw = {
   rows: {},
   busy: false,
 };
-const awColors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
-const awValueIds = [
+const comparisonColors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
+const comparisonValueIds = [
   'analysisStart',
   'analysisEnd',
   'analysisRefStart',
@@ -4740,7 +4738,7 @@ const awValueIds = [
   'analysisThreshold',
   'analysisSustain',
 ];
-const awLabels = [
+const comparisonLabels = [
   'All calls',
   'Tanker calls',
   'Container calls',
@@ -4749,31 +4747,31 @@ const awLabels = [
   'Estimated exports',
   'Passage capacity',
 ];
-function awUnit() {
+function comparisonUnit() {
   return Number($('analysisMetric').value) < 4 ? 'calls' : 'estimated tonnes';
 }
-function awCompatible(id) {
+function comparisonCompatible(id) {
   const m = Number($('analysisMetric').value);
   return m < 4 || (m < 6 ? placeById[id]?.kind === 'port' : placeById[id]?.kind === 'chokepoint');
 }
-function awReference() {
+function comparisonReference() {
   const start = $('analysisStart').value,
     end = $('analysisEnd').value;
-  if (!AW.validDate(start) || !AW.validDate(end)) return;
+  if (!comparisonMath.validDate(start) || !comparisonMath.validDate(end)) return;
   if ($('analysisReference').value === 'prior') {
-    $('analysisRefStart').value = AW.shift(start, -28);
-    $('analysisRefEnd').value = AW.shift(start, -1);
+    $('analysisRefStart').value = comparisonMath.shift(start, -28);
+    $('analysisRefEnd').value = comparisonMath.shift(start, -1);
   }
   if ($('analysisReference').value === 'year') {
     const prev = (d) => {
       let s = Number(d.slice(0, 4)) - 1 + d.slice(4);
-      return AW.validDate(s) ? s : s.slice(0, 8) + '28';
+      return comparisonMath.validDate(s) ? s : s.slice(0, 8) + '28';
     };
     $('analysisRefStart').value = prev(start);
     $('analysisRefEnd').value = prev(end);
   }
 }
-function awTable(id, caption, heads, rows) {
+function comparisonTable(id, caption, heads, rows) {
   const table = $(id);
   table.replaceChildren(element('caption', '', caption));
   const head = document.createElement('thead'),
@@ -4796,32 +4794,528 @@ function awTable(id, caption, heads, rows) {
   }
   table.append(head, body);
 }
-function awInvalidate() {
+function comparisonInvalidate() {
   $('randomEvent').disabled =
-    aw.busy || !PassageDiscovery.candidates(passageEvents, passageShifts, places).length;
+    comparison.busy || !PassageDiscovery.candidates(passageEvents, passageShifts, places).length;
   text('analysisShare', 'Copy link');
-  aw.key = '';
-  aw.page = 0;
+  comparison.key = '';
+  comparison.page = 0;
   renderWorkspace();
 }
-function awOpen(open = true) {
+function comparisonOpen(open = true) {
   stop();
-  aw.open = open;
+  comparison.open = open;
   document.body.classList.toggle('analysis-open', open);
   $('analysisWorkspace').hidden = !open;
   $('exploreView').setAttribute('aria-pressed', String(!open));
   $('analyzeView').setAttribute('aria-pressed', String(open));
   $('eventsView').setAttribute('aria-expanded', String(open && $('eventCatalog').open));
   document.querySelector('main').scrollTop = 0;
-  awInvalidate();
+  comparisonInvalidate();
   refresh();
 }
-function awEvent(id) {
+
+function comparisonSearch() {
+  const q = $('analysisSearch').value.trim().toLowerCase();
+  $('analysisMatches').replaceChildren();
+  if (!q) return;
+  const matches = places
+    .filter(
+      (p) => !comparison.ids.includes(p.id) && (p.name + ' ' + p.country).toLowerCase().includes(q),
+    )
+    .slice(0, 8);
+  for (const p of matches) {
+    const b = element('button', '', p.name + ' · ' + p.country);
+    b.disabled = comparison.ids.length >= 4;
+    b.onclick = () => {
+      if (comparison.ids.length >= 4 || comparison.ids.includes(p.id)) return;
+      comparison.ids.push(p.id);
+      state.pins = [...comparison.ids];
+      $('analysisSearch').value = '';
+      comparisonSearch();
+      comparisonInvalidate();
+    };
+    $('analysisMatches').append(b);
+  }
+  if (!matches.length)
+    $('analysisMatches').append(element('p', 'hint', 'No additional matching places.'));
+}
+function comparisonPins() {
+  $('analysisPins').replaceChildren(
+    ...comparison.ids.map((id, i) => {
+      const b = element('button', '', `${i + 1}. ${placeById[id].name} ×`);
+      b.style.borderColor = comparisonColors[i];
+      b.setAttribute('aria-label', 'Remove ' + placeById[id].name);
+      b.onclick = () => {
+        comparison.ids = comparison.ids.filter((x) => x !== id);
+        state.pins = [...comparison.ids];
+        comparisonInvalidate();
+      };
+      return b;
+    }),
+  );
+}
+
+function comparisonDaily() {
+  const col = Number($('analysisMetric').value) + 1,
+    maps = comparison.ids.map(
+      (id) => new Map((comparison.rows[id] || []).map((r) => [r[0], r[col]])),
+    ),
+    pages = Math.max(1, Math.ceil(comparison.axis.length / 50));
+  comparison.page = Math.min(comparison.page, pages - 1);
+  const rows = comparison.axis
+    .slice(comparison.page * 50, (comparison.page + 1) * 50)
+    .map((d) => [
+      d,
+      d >= $('analysisStart').value
+        ? 'Observation'
+        : d >= $('analysisRefStart').value && d <= $('analysisRefEnd').value
+          ? 'Reference'
+          : d < $('analysisRefStart').value
+            ? 'Before reference'
+            : 'Between periods',
+      ...comparison.ids.map((id, i) =>
+        comparisonCompatible(id) && Number.isFinite(maps[i].get(d))
+          ? fmt(maps[i].get(d))
+          : 'Unavailable',
+      ),
+    ]);
+  comparisonTable(
+    'analysisDaily',
+    'Raw daily observations · ' + comparisonUnit() + ' · not indexed',
+    ['Date', 'Period', ...comparison.ids.map((id) => placeById[id].name)],
+    rows,
+  );
+  $('analysisPrev').disabled = comparison.page === 0;
+  $('analysisNext').disabled = comparison.page >= pages - 1;
+  text(
+    'analysisPage',
+    `Page ${comparison.page + 1} / ${pages} · ${comparison.axis.length} calendar days`,
+  );
+}
+function comparisonRecovery() {
+  const start = $('analysisEventStart').value,
+    end = $('analysisEnd').value,
+    col = Number($('analysisMetric').value) + 1;
+  const valid = comparisonMath.validDate(start) && start >= '2019-01-01' && start <= end;
+  comparisonTable(
+    'recoveryResults',
+    'Pre-disruption reference and follow-up · means per day; cumulative totals in ' +
+      comparisonUnit(),
+    [
+      'Place',
+      'Reference mean',
+      'Coverage',
+      'Days below',
+      'Recovery confirmation',
+      'Shortfall',
+      'Net deviation',
+    ],
+    comparison.ids.map((id) => {
+      if (!valid || !comparisonCompatible(id))
+        return [
+          placeById[id].name,
+          'Choose a valid start and compatible measure',
+          '',
+          '',
+          '',
+          '',
+          '',
+        ];
+      const v = M.eventStudy(
+        comparison.rows[id],
+        col,
+        start,
+        end,
+        Number($('analysisThreshold').value),
+        Number($('analysisSustain').value),
+      );
+      return [
+        placeById[id].name,
+        fmt(v.baseline),
+        `${v.observedDays}/${v.expectedDays}`,
+        v.baseline > 0 ? v.belowDays : 'Unavailable',
+        v.baseline === null
+          ? 'Incomplete pre-event reference'
+          : v.baseline === 0
+            ? 'Undefined for zero reference'
+            : v.recovery ||
+              (!v.observedDays
+                ? 'No follow-up'
+                : v.belowDays
+                  ? 'Not confirmed in follow-up'
+                  : 'No observed decline'),
+        fmt(v.shortfall),
+        fmt(v.netDeviation),
+      ];
+    }),
+  );
+}
+function renderWorkspace() {
+  if (!comparison.open || !manifest) return;
+  const start = $('analysisStart').value,
+    end = $('analysisEnd').value,
+    rs = $('analysisRefStart').value,
+    re = $('analysisRefEnd').value,
+    col = Number($('analysisMetric').value) + 1;
+  const key = [
+    ...comparisonValueIds.map((id) => $(id).value),
+    comparison.ids.join(','),
+    comparison.event,
+    comparison.signal,
+    comparison.busy,
+    $('analysisSetup').open,
+    comparison.ids.map((id) => [!!historyCache[id], !!historyRequests[id], historyErrors[id]]),
+    innerWidth,
+    innerHeight,
+  ].join('|');
+  if (key === comparison.key) return;
+  comparison.key = key;
+  comparisonPins();
+  comparisonEventContext();
+  const valid =
+    [start, end].every(
+      (d) => comparisonMath.validDate(d) && d >= '2019-01-01' && d <= dates.at(-1),
+    ) && start <= end;
+  text(
+    'analysisSetupSummary',
+    `Edit comparison · ${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} · ${comparisonLabels[col - 1]}`,
+  );
+  const plotStart =
+    $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
+      ? rs < '2019-01-01'
+        ? '2019-01-01'
+        : rs
+      : start;
+  comparison.axis = valid ? comparisonMath.days(plotStart, end) : [];
+  comparison.rows = Object.fromEntries(comparison.ids.map((id) => [id, combinedHistory(id)]));
+  comparison.summaries = comparison.ids.map((id) =>
+    comparisonMath.summary(
+      comparisonCompatible(id) ? comparison.rows[id] : [],
+      col,
+      start,
+      end,
+      rs,
+      re,
+    ),
+  );
+  const eventStart = $('analysisEventStart').value,
+    earliest = [
+      start,
+      rs,
+      comparisonMath.validDate(start) ? comparisonMath.shift(start, -56) : start,
+      comparisonMath.validDate(eventStart) ? comparisonMath.shift(eventStart, -28) : start,
+    ].sort()[0],
+    need = earliest < manifest.start;
+  $('analysisLoad').hidden = !need;
+  $('analysisLoad').disabled =
+    comparison.busy ||
+    !comparison.ids.length ||
+    !need ||
+    comparison.ids.every((id) => historyCache[id]);
+  text(
+    'analysisLoad',
+    comparison.busy
+      ? 'Loading selected historical files…'
+      : need
+        ? 'Load / retry selected historical files'
+        : 'Bundled activity already available',
+  );
+  $('analysisStatus').hidden =
+    valid &&
+    comparison.ids.length > 0 &&
+    !comparison.ids.some(
+      (id) => historyErrors[id] || historyRequests[id] || (need && !historyCache[id]),
+    );
+  text(
+    'analysisStatus',
+    !valid
+      ? 'Choose an observation range within 2019 and the snapshot cutoff; invalid or overlapping references make comparisons unavailable.'
+      : !comparison.ids.length
+        ? 'Add up to four places to compare.'
+        : comparison.ids
+            .map(
+              (id) =>
+                placeById[id].name +
+                ': ' +
+                (historyErrors[id]
+                  ? 'history failed; retry'
+                  : historyRequests[id]
+                    ? 'loading'
+                    : need && !historyCache[id]
+                      ? 'earlier history not loaded'
+                      : 'requested files available'),
+            )
+            .join(' · '),
+  );
+  text(
+    'analysisCoverage',
+    `Snapshot: ports ${manifest.Daily_Ports_Data_latest} · passages ${manifest.Daily_Chokepoints_Data_latest}. ${$('analysisScale').value === 'indexed' ? 'Index: positive complete reference = 100.' : 'Shared absolute scale.'} Missing ≠ zero.`,
+  );
+  comparisonTable(
+    'analysisResults',
+    `${start} → ${end}; reference ${rs} → ${re} · means in ${comparisonUnit()}/day; net deviation in ${comparisonUnit()}`,
+    ['Place', 'Mean', 'Reference', 'Δ / day', 'Δ %', 'Net deviation', 'Coverage obs / ref'],
+    comparison.ids.map((id, i) => {
+      const v = comparison.summaries[i];
+      return [
+        placeById[id].name,
+        fmt(v.mean),
+        fmt(v.reference),
+        fmt(v.difference),
+        fmt(v.percent),
+        fmt(v.net),
+        `${v.count}/${v.expected} · ${v.referenceCount}/${v.referenceExpected}`,
+      ];
+    }),
+  );
+  $('analysisQuality').replaceChildren(
+    ...comparison.ids.map((id, i) => {
+      const v = comparison.summaries[i],
+        latest = comparisonCompatible(id)
+          ? comparison.rows[id].findLast((row) => Number.isFinite(row[col]))?.[0]
+          : null,
+        reason = !comparisonCompatible(id)
+          ? 'Measure not available for this place type'
+          : v.reason +
+            (v.reference > 0 && v.reference < (col <= 4 ? 10 : 1000)
+              ? '; small reference: percentage unstable'
+              : '');
+      return element(
+        'p',
+        '',
+        placeById[id].name + ': ' + reason + '. Latest usable: ' + (latest || 'none') + '.',
+      );
+    }),
+  );
+  const sensitivity = [];
+  if (valid)
+    for (const id of comparison.ids)
+      for (const offset of [0, 7, 28]) {
+        const b = comparisonMath.shift(start, -1 - offset),
+          a = comparisonMath.shift(b, -27),
+          v = comparisonMath.summary(
+            comparisonCompatible(id) ? comparison.rows[id] : [],
+            col,
+            start,
+            end,
+            a,
+            b,
+          );
+        sensitivity.push([
+          placeById[id].name,
+          a + ' → ' + b,
+          fmt(v.reference),
+          fmt(v.percent),
+          v.reason,
+        ]);
+      }
+  comparisonTable(
+    'sensitivityResults',
+    'Fixed observation range; alternative references',
+    ['Place', 'Reference dates', 'Reference mean', 'Δ %', 'Coverage / reason'],
+    sensitivity,
+  );
+  $('analysisChartPanel').hidden =
+    $('analysisDisplay').value !== 'chart' || !comparison.axis.length;
+  $('analysisDailyPanel').hidden = $('analysisDisplay').value !== 'table';
+  $('analysisExport').disabled = !valid || !comparison.ids.length || comparison.busy;
+  comparisonDaily();
+  comparisonRecovery();
+  comparisonRenderChart();
+}
+
+function bindWorkspace(q) {
+  $('analysisStart').value = comparisonMath.shift(dates[state.index], -89);
+  $('analysisEnd').value = dates[state.index];
+  $('analysisMetric').value = String(state.metric);
+  comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
+  comparisonReference();
+  for (const id of [
+    'analysisStart',
+    'analysisEnd',
+    'analysisRefStart',
+    'analysisRefEnd',
+    'analysisEventStart',
+  ]) {
+    $(id).min = id.startsWith('analysisRef') ? '2018-01-01' : '2019-01-01';
+    $(id).max = dates.at(-1);
+  }
+  for (const id of comparisonValueIds) {
+    const v = q.get(id);
+    if (v !== null) {
+      if ($(id).tagName === 'SELECT') {
+        if ([...$(id).options].some((o) => o.value === v)) $(id).value = v;
+      } else if (
+        comparisonMath.validDate(v) &&
+        v >= (id.startsWith('analysisRef') ? '2018-01-01' : '2019-01-01') &&
+        v <= dates.at(-1)
+      )
+        $(id).value = v;
+    }
+  }
+  comparisonReference(); // Re-derive named presets after restoring the observation range.
+  if (q.has('locations'))
+    comparison.ids = [
+      ...new Set(
+        q
+          .get('locations')
+          .split(',')
+          .filter((id) => placeById[id]),
+      ),
+    ].slice(0, 4);
+  if (passageEvents.some((e) => e.id === q.get('context'))) comparison.event = q.get('context');
+  if (passageShifts.some((h) => h.id === q.get('shift'))) {
+    comparison.signal = q.get('shift');
+    comparison.event = null;
+  }
+  comparison.day = Math.max(0, Math.min(30000, Math.floor(Number(q.get('analysisDay'))) || 0));
+  document.querySelectorAll('.event-jumps a').forEach(
+    (link) =>
+      (link.onclick = (e) => {
+        e.preventDefault();
+        $(link.hash.slice(1)).scrollIntoView({ block: 'start' });
+      }),
+  );
+  const discoveryPool = PassageDiscovery.candidates(passageEvents, passageShifts, places);
+  $('randomEvent').disabled = !discoveryPool.length;
+  $('randomEvent').onclick = () => {
+    const current = comparison.signal
+        ? 'shift:' + comparison.signal
+        : comparison.event
+          ? 'event:' + comparison.event
+          : null,
+      next = PassageDiscovery.pick(discoveryPool, current);
+    if (!next) return;
+    if (next.kind === 'event') comparisonEvent(next.id);
+    else comparisonShift(next.id);
+    const details = $('eventContext').querySelector('details');
+    if (details) details.open = true;
+    if (!$('analysisLoad').hidden && !$('analysisLoad').disabled) $('analysisLoad').onclick();
+  };
+  $('shiftPeriod').onchange = comparisonShiftCards;
+  comparisonShiftCards();
+  $('eventCatalog').ontoggle = () => {
+    $('eventsView').setAttribute(
+      'aria-expanded',
+      String(comparison.open && $('eventCatalog').open),
+    );
+  };
+  $('eventCards').replaceChildren(
+    ...passageEvents.map((e) => {
+      const card = element('article', 'event-card');
+      card.append(
+        element(
+          'small',
+          '',
+          (Date.now() - Date.parse(e.date + 'T00:00:00Z')) / 86400000 <= 90
+            ? 'Dated reporting / disruption'
+            : 'Historical context',
+        ),
+        element('h3', '', e.title),
+        element('p', '', e.summary),
+        element('p', 'hint', e.date + ' · ' + e.dateKind),
+      );
+      const b = element('button', '', 'Compare observations');
+      b.dataset.event = e.id;
+      b.onclick = () => comparisonEvent(e.id);
+      card.append(b);
+      return card;
+    }),
+  );
+  $('exploreView').onclick = () => comparisonOpen(false);
+  $('analyzeView').onclick = () => {
+    comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
+    setMode('change');
+    comparisonOpen();
+  };
+  $('eventsView').onclick = () => {
+    setMode('change');
+    comparisonOpen();
+    $('eventCatalog').open = true;
+  };
+  $('analysisSearch').oninput = comparisonSearch;
+  $('analysisSetup').ontoggle = () => {
+    comparison.key = '';
+    renderWorkspace();
+  };
+  $('analysisClear').onclick = () => {
+    comparison.ids = [];
+    state.pins = [];
+    comparisonInvalidate();
+  };
+  for (const id of comparisonValueIds)
+    $(id).onchange = () => {
+      if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) comparisonReference();
+      if (['analysisRefStart', 'analysisRefEnd'].includes(id))
+        $('analysisReference').value = 'custom';
+      comparisonInvalidate();
+    };
+  for (const b of document.querySelectorAll('[data-range]'))
+    b.onclick = () => {
+      const end = $('analysisEnd').value;
+      if (!comparisonMath.validDate(end)) return;
+      $('analysisStart').value =
+        b.dataset.range === 'all'
+          ? '2019-01-01'
+          : comparisonMath.shift(end, 1 - Number(b.dataset.range));
+      comparisonReference();
+      comparison.day = 0;
+      comparisonInvalidate();
+    };
+  $('analysisLoad').onclick = async () => {
+    if (comparison.busy) return;
+    comparison.busy = true;
+    comparisonInvalidate();
+    const ids = [...comparison.ids];
+    try {
+      for (const id of ids) await fetchHistory(id);
+    } finally {
+      comparison.busy = false;
+      comparisonInvalidate();
+    }
+  };
+  $('analysisExport').onclick = comparisonExport;
+  $('analysisPrev').onclick = () => {
+    comparison.page = Math.max(0, comparison.page - 1);
+    comparisonDaily();
+  };
+  $('analysisNext').onclick = () => {
+    comparison.page++;
+    comparisonDaily();
+  };
+  $('analysisShare').onclick = async () => {
+    const url = location.origin + '/#' + comparisonParams();
+    history.replaceState(null, '', '#' + comparisonParams());
+    try {
+      await navigator.clipboard.writeText(url);
+      text('analysisShare', 'Link copied');
+    } catch {
+      text('analysisShare', 'Link in address bar');
+    }
+  };
+  PassageChartInput.attach($('analysisChart'), {
+    count: () => comparison.axis.length,
+    index: () => comparison.day,
+    onSelect: (i) => {
+      comparison.day = i;
+      comparisonRenderChart();
+    },
+  });
+  new ResizeObserver(() => {
+    if (comparison.open) comparisonRenderChart();
+  }).observe($('analysisChart'));
+  if (q.get('view') === 'analysis') comparisonOpen();
+}
+
+/* Comparison view helpers; shared state is owned by workspace.js. */
+
+function comparisonEvent(id) {
   const event = passageEvents.find((e) => e.id === id);
   if (!event) return;
-  aw.event = id;
-  aw.signal = null;
-  aw.ids = [...event.places];
+  comparison.event = id;
+  comparison.signal = null;
+  comparison.ids = [...event.places];
   choose(event.places[0]);
   state.pins = [...event.places];
   setMode('change');
@@ -4832,13 +5326,14 @@ function awEvent(id) {
   $('analysisRefStart').value = event.referenceStart;
   $('analysisRefEnd').value = event.referenceEnd;
   $('analysisEventStart').value = event.id === 'hormuz-2026' ? '2026-02-28' : '';
-  aw.day = 0;
+  comparison.day = 0;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
-  awOpen();
+  comparisonOpen();
 }
-function awEventContext() {
-  const event = awContext(),
+
+function comparisonEventContext() {
+  const event = comparisonContext(),
     panel = $('eventContext');
   const wasOpen = panel.querySelector('details')?.open || false;
   panel.hidden = !event;
@@ -4875,7 +5370,7 @@ function awEventContext() {
         'Reporting is newer than this observation snapshot; post-event effects cannot be displayed.',
       ),
     );
-  if (aw.ids.some((id) => !event.places.includes(id)))
+  if (comparison.ids.some((id) => !event.places.includes(id)))
     details.append(
       element(
         'p',
@@ -4888,692 +5383,25 @@ function awEventContext() {
     choose(event.places[0]);
     setMode('change');
     if (dates.includes(event.date)) setDate(dates.indexOf(event.date));
-    awOpen(false);
+    comparisonOpen(false);
   };
   const clear = element('button', 'event-close', '×');
   clear.type = 'button';
   clear.setAttribute('aria-label', 'Close event');
   clear.title = 'Close event';
   clear.onclick = () => {
-    aw.event = null;
-    aw.signal = null;
-    awInvalidate();
+    comparison.event = null;
+    comparison.signal = null;
+    comparisonInvalidate();
     refresh();
     $('analyzeView').focus({ preventScroll: true });
   };
   details.append(map);
   panel.append(clear);
 }
-function awSearch() {
-  const q = $('analysisSearch').value.trim().toLowerCase();
-  $('analysisMatches').replaceChildren();
-  if (!q) return;
-  const matches = places
-    .filter((p) => !aw.ids.includes(p.id) && (p.name + ' ' + p.country).toLowerCase().includes(q))
-    .slice(0, 8);
-  for (const p of matches) {
-    const b = element('button', '', p.name + ' · ' + p.country);
-    b.disabled = aw.ids.length >= 4;
-    b.onclick = () => {
-      if (aw.ids.length >= 4 || aw.ids.includes(p.id)) return;
-      aw.ids.push(p.id);
-      state.pins = [...aw.ids];
-      $('analysisSearch').value = '';
-      awSearch();
-      awInvalidate();
-    };
-    $('analysisMatches').append(b);
-  }
-  if (!matches.length)
-    $('analysisMatches').append(element('p', 'hint', 'No additional matching places.'));
-}
-function awPins() {
-  $('analysisPins').replaceChildren(
-    ...aw.ids.map((id, i) => {
-      const b = element('button', '', `${i + 1}. ${placeById[id].name} ×`);
-      b.style.borderColor = awColors[i];
-      b.setAttribute('aria-label', 'Remove ' + placeById[id].name);
-      b.onclick = () => {
-        aw.ids = aw.ids.filter((x) => x !== id);
-        state.pins = [...aw.ids];
-        awInvalidate();
-      };
-      return b;
-    }),
-  );
-}
-function awRenderChart() {
-  const canvas = $('analysisChart');
-  if (!$('analysisChartPanel').hidden && aw.axis.length) {
-    const { ctx, w, h } = sizeCanvas(canvas);
-    if (!w || !h) return;
-    const { left, right } = PassageChartInput.bounds(w),
-      top = 20,
-      bottom = h - 35,
-      n = aw.axis.length,
-      indexed = $('analysisScale').value === 'indexed',
-      col = Number($('analysisMetric').value) + 1;
-    const values = aw.ids.map((id, j) => {
-      const map = new Map(aw.rows[id].map((r) => [r[0], r[col]]));
-      return aw.axis.map((d) => {
-        const v = map.get(d);
-        return !awCompatible(id) ? null : indexed ? AW.normalize(v, aw.summaries[j]?.reference) : v;
-      });
-    });
-    let max = 1;
-    for (const row of values) for (const v of row) if (Number.isFinite(v)) max = Math.max(max, v);
-    const x = (i) => left + (i / Math.max(1, n - 1)) * (right - left),
-      y = (v) => bottom - (v / max) * (bottom - top);
-    ctx.clearRect(0, 0, w, h);
-    ctx.font = '11px -apple-system,sans-serif';
-    ctx.textBaseline = 'middle';
-    const rs = $('analysisRefStart').value,
-      re = $('analysisRefEnd').value;
-    let ri = aw.axis.findIndex((d) => d >= rs),
-      rj = aw.axis.findLastIndex((d) => d <= re);
-    if (ri >= 0 && rj >= ri) {
-      ctx.fillStyle = '#85bce825';
-      ctx.fillRect(x(ri), top, Math.max(1, x(rj) - x(ri)), bottom - top);
-    }
-    for (let i = 0; i <= 2; i++) {
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#9cb2ba';
-      ctx.fillText(short((max * i) / 2), left - 7, y((max * i) / 2));
-      ctx.strokeStyle = '#52737b66';
-      ctx.beginPath();
-      ctx.moveTo(left, y((max * i) / 2));
-      ctx.lineTo(right, y((max * i) / 2));
-      ctx.stroke();
-    }
-    const tickCount = Math.max(2, Math.min(6, Math.floor((right - left) / 95)));
-    for (let j = 0; j < tickCount; j++) {
-      const i = Math.round((j / (tickCount - 1)) * (n - 1));
-      ctx.textAlign = j === 0 ? 'left' : j === tickCount - 1 ? 'right' : 'center';
-      ctx.fillStyle = '#9cb2ba';
-      ctx.fillText(aw.axis[i], x(i), h - 12);
-    }
-    values.forEach((row, j) => {
-      ctx.strokeStyle = awColors[j];
-      ctx.setLineDash(j === 0 ? [] : j === 1 ? [7, 3] : j === 2 ? [2, 3] : [9, 3, 2, 3]);
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      let pen = false;
-      row.forEach((v, i) => {
-        if (!Number.isFinite(v)) {
-          pen = false;
-          return;
-        }
-        if (pen) ctx.lineTo(x(i), y(v));
-        else ctx.moveTo(x(i), y(v));
-        pen = true;
-      });
-      ctx.stroke();
-    });
-    ctx.setLineDash([]);
-    const event = awContext(),
-      ei = event ? aw.axis.indexOf(event.date) : -1;
-    if (ei >= 0) {
-      ctx.strokeStyle = '#f4c397';
-      ctx.setLineDash([4, 3]);
-      ctx.beginPath();
-      ctx.moveTo(x(ei), top);
-      ctx.lineTo(x(ei), bottom);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#f4c397';
-      ctx.textAlign = x(ei) > w / 2 ? 'right' : 'left';
-      ctx.fillText(aw.signal ? 'Detected window' : 'Event / report', x(ei), 9);
-    }
-    aw.day = Math.max(0, Math.min(n - 1, aw.day));
-    ctx.strokeStyle = '#e8f0ed';
-    ctx.beginPath();
-    ctx.moveTo(x(aw.day), top);
-    ctx.lineTo(x(aw.day), bottom);
-    ctx.stroke();
-    const reading =
-      aw.axis[aw.day] +
-      ' · ' +
-      aw.ids
-        .map(
-          (id, j) =>
-            `${j + 1}. ${placeById[id].name}: ${Number.isFinite(values[j][aw.day]) ? fmt(values[j][aw.day]) + (indexed ? ' index points' : ' ' + awUnit()) : 'unavailable'}`,
-        )
-        .join(' · ');
-    text('analysisReadout', reading);
-    canvas.setAttribute('aria-valuemin', '0');
-    canvas.setAttribute('aria-valuemax', String(n - 1));
-    canvas.setAttribute('aria-valuenow', String(aw.day));
-    canvas.setAttribute('aria-valuetext', reading);
-  }
-}
-function awDaily() {
-  const col = Number($('analysisMetric').value) + 1,
-    maps = aw.ids.map((id) => new Map((aw.rows[id] || []).map((r) => [r[0], r[col]]))),
-    pages = Math.max(1, Math.ceil(aw.axis.length / 50));
-  aw.page = Math.min(aw.page, pages - 1);
-  const rows = aw.axis
-    .slice(aw.page * 50, (aw.page + 1) * 50)
-    .map((d) => [
-      d,
-      d >= $('analysisStart').value
-        ? 'Observation'
-        : d >= $('analysisRefStart').value && d <= $('analysisRefEnd').value
-          ? 'Reference'
-          : d < $('analysisRefStart').value
-            ? 'Before reference'
-            : 'Between periods',
-      ...aw.ids.map((id, i) =>
-        awCompatible(id) && Number.isFinite(maps[i].get(d)) ? fmt(maps[i].get(d)) : 'Unavailable',
-      ),
-    ]);
-  awTable(
-    'analysisDaily',
-    'Raw daily observations · ' + awUnit() + ' · not indexed',
-    ['Date', 'Period', ...aw.ids.map((id) => placeById[id].name)],
-    rows,
-  );
-  $('analysisPrev').disabled = aw.page === 0;
-  $('analysisNext').disabled = aw.page >= pages - 1;
-  text('analysisPage', `Page ${aw.page + 1} / ${pages} · ${aw.axis.length} calendar days`);
-}
-function awRecovery() {
-  const start = $('analysisEventStart').value,
-    end = $('analysisEnd').value,
-    col = Number($('analysisMetric').value) + 1;
-  const valid = AW.validDate(start) && start >= '2019-01-01' && start <= end;
-  awTable(
-    'recoveryResults',
-    'Pre-disruption reference and follow-up · means per day; cumulative totals in ' + awUnit(),
-    [
-      'Place',
-      'Reference mean',
-      'Coverage',
-      'Days below',
-      'Recovery confirmation',
-      'Shortfall',
-      'Net deviation',
-    ],
-    aw.ids.map((id) => {
-      if (!valid || !awCompatible(id))
-        return [
-          placeById[id].name,
-          'Choose a valid start and compatible measure',
-          '',
-          '',
-          '',
-          '',
-          '',
-        ];
-      const v = M.eventStudy(
-        aw.rows[id],
-        col,
-        start,
-        end,
-        Number($('analysisThreshold').value),
-        Number($('analysisSustain').value),
-      );
-      return [
-        placeById[id].name,
-        fmt(v.baseline),
-        `${v.observedDays}/${v.expectedDays}`,
-        v.baseline > 0 ? v.belowDays : 'Unavailable',
-        v.baseline === null
-          ? 'Incomplete pre-event reference'
-          : v.baseline === 0
-            ? 'Undefined for zero reference'
-            : v.recovery ||
-              (!v.observedDays
-                ? 'No follow-up'
-                : v.belowDays
-                  ? 'Not confirmed in follow-up'
-                  : 'No observed decline'),
-        fmt(v.shortfall),
-        fmt(v.netDeviation),
-      ];
-    }),
-  );
-}
-function renderWorkspace() {
-  if (!aw.open || !manifest) return;
-  const start = $('analysisStart').value,
-    end = $('analysisEnd').value,
-    rs = $('analysisRefStart').value,
-    re = $('analysisRefEnd').value,
-    col = Number($('analysisMetric').value) + 1;
-  const key = [
-    ...awValueIds.map((id) => $(id).value),
-    aw.ids.join(','),
-    aw.event,
-    aw.signal,
-    aw.busy,
-    $('analysisSetup').open,
-    aw.ids.map((id) => [!!historyCache[id], !!historyRequests[id], historyErrors[id]]),
-    innerWidth,
-    innerHeight,
-  ].join('|');
-  if (key === aw.key) return;
-  aw.key = key;
-  awPins();
-  awEventContext();
-  const valid =
-    [start, end].every((d) => AW.validDate(d) && d >= '2019-01-01' && d <= dates.at(-1)) &&
-    start <= end;
-  text(
-    'analysisSetupSummary',
-    `Edit comparison · ${aw.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} · ${awLabels[col - 1]}`,
-  );
-  const plotStart =
-    $('analysisSpan').value === 'reference' && AW.validDate(rs) && rs < start
-      ? rs < '2019-01-01'
-        ? '2019-01-01'
-        : rs
-      : start;
-  aw.axis = valid ? AW.days(plotStart, end) : [];
-  aw.rows = Object.fromEntries(aw.ids.map((id) => [id, combinedHistory(id)]));
-  aw.summaries = aw.ids.map((id) =>
-    AW.summary(awCompatible(id) ? aw.rows[id] : [], col, start, end, rs, re),
-  );
-  const eventStart = $('analysisEventStart').value,
-    earliest = [
-      start,
-      rs,
-      AW.validDate(start) ? AW.shift(start, -56) : start,
-      AW.validDate(eventStart) ? AW.shift(eventStart, -28) : start,
-    ].sort()[0],
-    need = earliest < manifest.start;
-  $('analysisLoad').hidden = !need;
-  $('analysisLoad').disabled =
-    aw.busy || !aw.ids.length || !need || aw.ids.every((id) => historyCache[id]);
-  text(
-    'analysisLoad',
-    aw.busy
-      ? 'Loading selected historical files…'
-      : need
-        ? 'Load / retry selected historical files'
-        : 'Bundled activity already available',
-  );
-  $('analysisStatus').hidden =
-    valid &&
-    aw.ids.length > 0 &&
-    !aw.ids.some((id) => historyErrors[id] || historyRequests[id] || (need && !historyCache[id]));
-  text(
-    'analysisStatus',
-    !valid
-      ? 'Choose an observation range within 2019 and the snapshot cutoff; invalid or overlapping references make comparisons unavailable.'
-      : !aw.ids.length
-        ? 'Add up to four places to compare.'
-        : aw.ids
-            .map(
-              (id) =>
-                placeById[id].name +
-                ': ' +
-                (historyErrors[id]
-                  ? 'history failed; retry'
-                  : historyRequests[id]
-                    ? 'loading'
-                    : need && !historyCache[id]
-                      ? 'earlier history not loaded'
-                      : 'requested files available'),
-            )
-            .join(' · '),
-  );
-  text(
-    'analysisCoverage',
-    `Snapshot: ports ${manifest.Daily_Ports_Data_latest} · passages ${manifest.Daily_Chokepoints_Data_latest}. ${$('analysisScale').value === 'indexed' ? 'Index: positive complete reference = 100.' : 'Shared absolute scale.'} Missing ≠ zero.`,
-  );
-  awTable(
-    'analysisResults',
-    `${start} → ${end}; reference ${rs} → ${re} · means in ${awUnit()}/day; net deviation in ${awUnit()}`,
-    ['Place', 'Mean', 'Reference', 'Δ / day', 'Δ %', 'Net deviation', 'Coverage obs / ref'],
-    aw.ids.map((id, i) => {
-      const v = aw.summaries[i];
-      return [
-        placeById[id].name,
-        fmt(v.mean),
-        fmt(v.reference),
-        fmt(v.difference),
-        fmt(v.percent),
-        fmt(v.net),
-        `${v.count}/${v.expected} · ${v.referenceCount}/${v.referenceExpected}`,
-      ];
-    }),
-  );
-  $('analysisQuality').replaceChildren(
-    ...aw.ids.map((id, i) => {
-      const v = aw.summaries[i],
-        latest = awCompatible(id)
-          ? aw.rows[id].findLast((row) => Number.isFinite(row[col]))?.[0]
-          : null,
-        reason = !awCompatible(id)
-          ? 'Measure not available for this place type'
-          : v.reason +
-            (v.reference > 0 && v.reference < (col <= 4 ? 10 : 1000)
-              ? '; small reference: percentage unstable'
-              : '');
-      return element(
-        'p',
-        '',
-        placeById[id].name + ': ' + reason + '. Latest usable: ' + (latest || 'none') + '.',
-      );
-    }),
-  );
-  const sensitivity = [];
-  if (valid)
-    for (const id of aw.ids)
-      for (const offset of [0, 7, 28]) {
-        const b = AW.shift(start, -1 - offset),
-          a = AW.shift(b, -27),
-          v = AW.summary(awCompatible(id) ? aw.rows[id] : [], col, start, end, a, b);
-        sensitivity.push([
-          placeById[id].name,
-          a + ' → ' + b,
-          fmt(v.reference),
-          fmt(v.percent),
-          v.reason,
-        ]);
-      }
-  awTable(
-    'sensitivityResults',
-    'Fixed observation range; alternative references',
-    ['Place', 'Reference dates', 'Reference mean', 'Δ %', 'Coverage / reason'],
-    sensitivity,
-  );
-  $('analysisChartPanel').hidden = $('analysisDisplay').value !== 'chart' || !aw.axis.length;
-  $('analysisDailyPanel').hidden = $('analysisDisplay').value !== 'table';
-  $('analysisExport').disabled = !valid || !aw.ids.length || aw.busy;
-  awDaily();
-  awRecovery();
-  awRenderChart();
-}
-function awExport() {
-  const col = Number($('analysisMetric').value) + 1,
-    headers = [
-      'section',
-      'place_id',
-      'date_or_key',
-      'value',
-      'measure',
-      'observation_start',
-      'observation_end',
-      'reference_start',
-      'reference_end',
-      'event_id',
-      'snapshot_assembled',
-    ];
-  const rows = [headers];
-  const add = (section, id, key, value) =>
-    rows.push([
-      section,
-      id,
-      key,
-      value,
-      awLabels[col - 1],
-      $('analysisStart').value,
-      $('analysisEnd').value,
-      $('analysisRefStart').value,
-      $('analysisRefEnd').value,
-      aw.event || aw.signal || '',
-      manifest.retrieved,
-    ]);
-  aw.ids.forEach((id, i) => {
-    for (const [key, v] of Object.entries(aw.summaries[i])) add('summary', id, key, v);
-    for (const row of aw.rows[id])
-      if (
-        aw.axis.includes(row[0]) ||
-        (row[0] >= $('analysisRefStart').value && row[0] <= $('analysisRefEnd').value)
-      )
-        add('observation', id, row[0], awCompatible(id) ? (row[col] ?? null) : null);
-    add(
-      'source',
-      id,
-      'activity',
-      manifest.sources[
-        placeById[id].kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data'
-      ],
-    );
-    add('source', id, 'historical_loaded', !!historyCache[id]);
-    if (historyCache[id]) {
-      add(
-        'source',
-        id,
-        'historical_query',
-        historyManifest.sources[
-          placeById[id].kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data'
-        ],
-      );
-      add('source', id, 'history_assembled', historyManifest.assembled);
-      add('source', id, 'history_sha256', historyManifest.files[id].sha256);
-    }
-    const start = $('analysisStart').value,
-      end = $('analysisEnd').value;
-    for (const offset of [0, 7, 28]) {
-      const re = AW.shift(start, -1 - offset),
-        rs = AW.shift(re, -27),
-        v = AW.summary(awCompatible(id) ? aw.rows[id] : [], col, start, end, rs, re);
-      add('sensitivity', id, 'reference_' + offset, rs + ' → ' + re);
-      add('sensitivity', id, 'percent_' + offset, v.percent);
-    }
-    const eventStart = $('analysisEventStart').value;
-    if (
-      AW.validDate(eventStart) &&
-      eventStart <= end &&
-      eventStart >= '2019-01-01' &&
-      awCompatible(id)
-    ) {
-      const v = M.eventStudy(
-        aw.rows[id],
-        col,
-        eventStart,
-        end,
-        Number($('analysisThreshold').value),
-        Number($('analysisSustain').value),
-      );
-      for (const [key, value] of Object.entries(v)) add('recovery', id, key, value);
-    }
-  });
-  const event = awContext();
-  if (event) {
-    add('event', '', event.date, event.title);
-    if (event.url) add('source', '', 'event', event.url);
-    add('event', '', 'date_kind', event.dateKind);
-  }
-  add('method', '', 'index', 'Daily / positive complete reference mean * 100');
-  add(
-    'method',
-    '',
-    'interpretation',
-    'Descriptive reference comparison, not causal impact or lost trade',
-  );
-  download('passage-comparison.csv', rows);
-}
-function awParams() {
-  const q = new URLSearchParams({
-    mode: 'change',
-    place: aw.ids[0] || state.selected,
-    view: 'analysis',
-    locations: aw.ids.join(','),
-    context: aw.event || '',
-    shift: aw.signal || '',
-  });
-  for (const id of awValueIds) q.set(id, $(id).value);
-  q.set('analysisDay', String(aw.day));
-  return q;
-}
-function bindWorkspace(q) {
-  $('analysisStart').value = AW.shift(dates[state.index], -89);
-  $('analysisEnd').value = dates[state.index];
-  $('analysisMetric').value = String(state.metric);
-  aw.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
-  awReference();
-  for (const id of [
-    'analysisStart',
-    'analysisEnd',
-    'analysisRefStart',
-    'analysisRefEnd',
-    'analysisEventStart',
-  ]) {
-    $(id).min = id.startsWith('analysisRef') ? '2018-01-01' : '2019-01-01';
-    $(id).max = dates.at(-1);
-  }
-  for (const id of awValueIds) {
-    const v = q.get(id);
-    if (v !== null) {
-      if ($(id).tagName === 'SELECT') {
-        if ([...$(id).options].some((o) => o.value === v)) $(id).value = v;
-      } else if (
-        AW.validDate(v) &&
-        v >= (id.startsWith('analysisRef') ? '2018-01-01' : '2019-01-01') &&
-        v <= dates.at(-1)
-      )
-        $(id).value = v;
-    }
-  }
-  awReference(); // Re-derive named presets after restoring the observation range.
-  if (q.has('locations'))
-    aw.ids = [
-      ...new Set(
-        q
-          .get('locations')
-          .split(',')
-          .filter((id) => placeById[id]),
-      ),
-    ].slice(0, 4);
-  if (passageEvents.some((e) => e.id === q.get('context'))) aw.event = q.get('context');
-  if (passageShifts.some((h) => h.id === q.get('shift'))) {
-    aw.signal = q.get('shift');
-    aw.event = null;
-  }
-  aw.day = Math.max(0, Math.min(30000, Math.floor(Number(q.get('analysisDay'))) || 0));
-  document.querySelectorAll('.event-jumps a').forEach(
-    (link) =>
-      (link.onclick = (e) => {
-        e.preventDefault();
-        $(link.hash.slice(1)).scrollIntoView({ block: 'start' });
-      }),
-  );
-  const discoveryPool = PassageDiscovery.candidates(passageEvents, passageShifts, places);
-  $('randomEvent').disabled = !discoveryPool.length;
-  $('randomEvent').onclick = () => {
-    const current = aw.signal ? 'shift:' + aw.signal : aw.event ? 'event:' + aw.event : null,
-      next = PassageDiscovery.pick(discoveryPool, current);
-    if (!next) return;
-    if (next.kind === 'event') awEvent(next.id);
-    else awShift(next.id);
-    const details = $('eventContext').querySelector('details');
-    if (details) details.open = true;
-    if (!$('analysisLoad').hidden && !$('analysisLoad').disabled) $('analysisLoad').onclick();
-  };
-  $('shiftPeriod').onchange = awShiftCards;
-  awShiftCards();
-  $('eventCatalog').ontoggle = () => {
-    $('eventsView').setAttribute('aria-expanded', String(aw.open && $('eventCatalog').open));
-  };
-  $('eventCards').replaceChildren(
-    ...passageEvents.map((e) => {
-      const card = element('article', 'event-card');
-      card.append(
-        element(
-          'small',
-          '',
-          (Date.now() - Date.parse(e.date + 'T00:00:00Z')) / 86400000 <= 90
-            ? 'Dated reporting / disruption'
-            : 'Historical context',
-        ),
-        element('h3', '', e.title),
-        element('p', '', e.summary),
-        element('p', 'hint', e.date + ' · ' + e.dateKind),
-      );
-      const b = element('button', '', 'Compare observations');
-      b.dataset.event = e.id;
-      b.onclick = () => awEvent(e.id);
-      card.append(b);
-      return card;
-    }),
-  );
-  $('exploreView').onclick = () => awOpen(false);
-  $('analyzeView').onclick = () => {
-    aw.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
-    setMode('change');
-    awOpen();
-  };
-  $('eventsView').onclick = () => {
-    setMode('change');
-    awOpen();
-    $('eventCatalog').open = true;
-  };
-  $('analysisSearch').oninput = awSearch;
-  $('analysisSetup').ontoggle = () => {
-    aw.key = '';
-    renderWorkspace();
-  };
-  $('analysisClear').onclick = () => {
-    aw.ids = [];
-    state.pins = [];
-    awInvalidate();
-  };
-  for (const id of awValueIds)
-    $(id).onchange = () => {
-      if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) awReference();
-      if (['analysisRefStart', 'analysisRefEnd'].includes(id))
-        $('analysisReference').value = 'custom';
-      awInvalidate();
-    };
-  for (const b of document.querySelectorAll('[data-range]'))
-    b.onclick = () => {
-      const end = $('analysisEnd').value;
-      if (!AW.validDate(end)) return;
-      $('analysisStart').value =
-        b.dataset.range === 'all' ? '2019-01-01' : AW.shift(end, 1 - Number(b.dataset.range));
-      awReference();
-      aw.day = 0;
-      awInvalidate();
-    };
-  $('analysisLoad').onclick = async () => {
-    if (aw.busy) return;
-    aw.busy = true;
-    awInvalidate();
-    const ids = [...aw.ids];
-    try {
-      for (const id of ids) await fetchHistory(id);
-    } finally {
-      aw.busy = false;
-      awInvalidate();
-    }
-  };
-  $('analysisExport').onclick = awExport;
-  $('analysisPrev').onclick = () => {
-    aw.page = Math.max(0, aw.page - 1);
-    awDaily();
-  };
-  $('analysisNext').onclick = () => {
-    aw.page++;
-    awDaily();
-  };
-  $('analysisShare').onclick = async () => {
-    const url = location.origin + '/#' + awParams();
-    history.replaceState(null, '', '#' + awParams());
-    try {
-      await navigator.clipboard.writeText(url);
-      text('analysisShare', 'Link copied');
-    } catch {
-      text('analysisShare', 'Link in address bar');
-    }
-  };
-  PassageChartInput.attach($('analysisChart'), {
-    count: () => aw.axis.length,
-    index: () => aw.day,
-    onSelect: (i) => {
-      aw.day = i;
-      awRenderChart();
-    },
-  });
-  new ResizeObserver(() => {
-    if (aw.open) awRenderChart();
-  }).observe($('analysisChart'));
-  if (q.get('view') === 'analysis') awOpen();
-}
-function awGlobeContext() {
-  const found = awContext(),
+
+function comparisonGlobeContext() {
+  const found = comparisonContext(),
     e = found?.places.includes(state.selected) ? found : null;
   $('globeEventContext').hidden = !e;
   $('globeEventContext').replaceChildren();
@@ -5583,12 +5411,13 @@ function awGlobeContext() {
       '',
       'Violet marker · ' + e.date + ' · ' + e.title + ' · source & comparison',
     );
-    b.onclick = () => awOpen();
+    b.onclick = () => comparisonOpen();
     $('globeEventContext').append(b);
   }
 }
-function awGlobeAnnotation(ctx, left, right, top, bottom) {
-  const event = awContext();
+
+function comparisonGlobeAnnotation(ctx, left, right, top, bottom) {
+  const event = comparisonContext();
   if (!event || !event.places.includes(state.selected)) return;
   const index = dates.indexOf(event.date);
   if (index < 0) return;
@@ -5603,9 +5432,9 @@ function awGlobeAnnotation(ctx, left, right, top, bottom) {
   ctx.restore();
 }
 
-function awContext() {
-  if (aw.signal) {
-    const h = passageShifts.find((s) => s.id === aw.signal);
+function comparisonContext() {
+  if (comparison.signal) {
+    const h = passageShifts.find((s) => s.id === comparison.signal);
     if (!h) return null;
     const c = h.context;
     return {
@@ -5633,14 +5462,15 @@ function awContext() {
         ' Retrospective screening is not a significance test or causal estimate.',
     };
   }
-  return passageEvents.find((e) => e.id === aw.event) || null;
+  return passageEvents.find((e) => e.id === comparison.event) || null;
 }
-function awShift(id) {
+
+function comparisonShift(id) {
   const h = passageShifts.find((s) => s.id === id);
   if (!h) return;
-  aw.signal = id;
-  aw.event = null;
-  aw.ids = [h.place];
+  comparison.signal = id;
+  comparison.event = null;
+  comparison.ids = [h.place];
   state.pins = [h.place];
   choose(h.place);
   setMode('change');
@@ -5653,12 +5483,13 @@ function awShift(id) {
   $('analysisReference').value = 'custom';
   $('analysisEventStart').value = '';
   $('analysisSpan').value = 'reference';
-  aw.day = 28;
+  comparison.day = 28;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
-  awOpen();
+  comparisonOpen();
 }
-function awShiftCards() {
+
+function comparisonShiftCards() {
   const cutoff = [
       manifest.Daily_Ports_Data_latest,
       manifest.Daily_Chokepoints_Data_latest,
@@ -5669,7 +5500,7 @@ function awShiftCards() {
     'shiftPeriodNote',
     recent
       ? 'Windows ending ' +
-          AW.shift(cutoff, -29) +
+          comparisonMath.shift(cutoff, -29) +
           ' → ' +
           cutoff +
           ' · relative to observed coverage, not live news. ' +
@@ -5705,11 +5536,248 @@ function awShiftCards() {
       );
       const b = element('button', '', 'Inspect this shift');
       b.dataset.shift = h.id;
-      b.onclick = () => awShift(h.id);
+      b.onclick = () => comparisonShift(h.id);
       card.append(b);
       return card;
     }),
   );
 }
-</script>
+
+/* Comparison view helpers; shared state is owned by workspace.js. */
+
+function comparisonRenderChart() {
+  const canvas = $('analysisChart');
+  if (!$('analysisChartPanel').hidden && comparison.axis.length) {
+    const { ctx, w, h } = sizeCanvas(canvas);
+    if (!w || !h) return;
+    const { left, right } = PassageChartInput.bounds(w),
+      top = 20,
+      bottom = h - 35,
+      n = comparison.axis.length,
+      indexed = $('analysisScale').value === 'indexed',
+      col = Number($('analysisMetric').value) + 1;
+    const values = comparison.ids.map((id, j) => {
+      const map = new Map(comparison.rows[id].map((r) => [r[0], r[col]]));
+      return comparison.axis.map((d) => {
+        const v = map.get(d);
+        return !comparisonCompatible(id)
+          ? null
+          : indexed
+            ? comparisonMath.normalize(v, comparison.summaries[j]?.reference)
+            : v;
+      });
+    });
+    let max = 1;
+    for (const row of values) for (const v of row) if (Number.isFinite(v)) max = Math.max(max, v);
+    const x = (i) => left + (i / Math.max(1, n - 1)) * (right - left),
+      y = (v) => bottom - (v / max) * (bottom - top);
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = '11px -apple-system,sans-serif';
+    ctx.textBaseline = 'middle';
+    const rs = $('analysisRefStart').value,
+      re = $('analysisRefEnd').value;
+    let ri = comparison.axis.findIndex((d) => d >= rs),
+      rj = comparison.axis.findLastIndex((d) => d <= re);
+    if (ri >= 0 && rj >= ri) {
+      ctx.fillStyle = '#85bce825';
+      ctx.fillRect(x(ri), top, Math.max(1, x(rj) - x(ri)), bottom - top);
+    }
+    for (let i = 0; i <= 2; i++) {
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#9cb2ba';
+      ctx.fillText(short((max * i) / 2), left - 7, y((max * i) / 2));
+      ctx.strokeStyle = '#52737b66';
+      ctx.beginPath();
+      ctx.moveTo(left, y((max * i) / 2));
+      ctx.lineTo(right, y((max * i) / 2));
+      ctx.stroke();
+    }
+    const tickCount = Math.max(2, Math.min(6, Math.floor((right - left) / 95)));
+    for (let j = 0; j < tickCount; j++) {
+      const i = Math.round((j / (tickCount - 1)) * (n - 1));
+      ctx.textAlign = j === 0 ? 'left' : j === tickCount - 1 ? 'right' : 'center';
+      ctx.fillStyle = '#9cb2ba';
+      ctx.fillText(comparison.axis[i], x(i), h - 12);
+    }
+    values.forEach((row, j) => {
+      ctx.strokeStyle = comparisonColors[j];
+      ctx.setLineDash(j === 0 ? [] : j === 1 ? [7, 3] : j === 2 ? [2, 3] : [9, 3, 2, 3]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      let pen = false;
+      row.forEach((v, i) => {
+        if (!Number.isFinite(v)) {
+          pen = false;
+          return;
+        }
+        if (pen) ctx.lineTo(x(i), y(v));
+        else ctx.moveTo(x(i), y(v));
+        pen = true;
+      });
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    const event = comparisonContext(),
+      ei = event ? comparison.axis.indexOf(event.date) : -1;
+    if (ei >= 0) {
+      ctx.strokeStyle = '#f4c397';
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(x(ei), top);
+      ctx.lineTo(x(ei), bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#f4c397';
+      ctx.textAlign = x(ei) > w / 2 ? 'right' : 'left';
+      ctx.fillText(comparison.signal ? 'Detected window' : 'Event / report', x(ei), 9);
+    }
+    comparison.day = Math.max(0, Math.min(n - 1, comparison.day));
+    ctx.strokeStyle = '#e8f0ed';
+    ctx.beginPath();
+    ctx.moveTo(x(comparison.day), top);
+    ctx.lineTo(x(comparison.day), bottom);
+    ctx.stroke();
+    const reading =
+      comparison.axis[comparison.day] +
+      ' · ' +
+      comparison.ids
+        .map(
+          (id, j) =>
+            `${j + 1}. ${placeById[id].name}: ${Number.isFinite(values[j][comparison.day]) ? fmt(values[j][comparison.day]) + (indexed ? ' index points' : ' ' + comparisonUnit()) : 'unavailable'}`,
+        )
+        .join(' · ');
+    text('analysisReadout', reading);
+    canvas.setAttribute('aria-valuemin', '0');
+    canvas.setAttribute('aria-valuemax', String(n - 1));
+    canvas.setAttribute('aria-valuenow', String(comparison.day));
+    canvas.setAttribute('aria-valuetext', reading);
+  }
+}
+
+/* Comparison view helpers; shared state is owned by workspace.js. */
+
+function comparisonExport() {
+  const col = Number($('analysisMetric').value) + 1,
+    headers = [
+      'section',
+      'place_id',
+      'date_or_key',
+      'value',
+      'measure',
+      'observation_start',
+      'observation_end',
+      'reference_start',
+      'reference_end',
+      'event_id',
+      'snapshot_assembled',
+    ];
+  const rows = [headers];
+  const add = (section, id, key, value) =>
+    rows.push([
+      section,
+      id,
+      key,
+      value,
+      comparisonLabels[col - 1],
+      $('analysisStart').value,
+      $('analysisEnd').value,
+      $('analysisRefStart').value,
+      $('analysisRefEnd').value,
+      comparison.event || comparison.signal || '',
+      manifest.retrieved,
+    ]);
+  comparison.ids.forEach((id, i) => {
+    for (const [key, v] of Object.entries(comparison.summaries[i])) add('summary', id, key, v);
+    for (const row of comparison.rows[id])
+      if (
+        comparison.axis.includes(row[0]) ||
+        (row[0] >= $('analysisRefStart').value && row[0] <= $('analysisRefEnd').value)
+      )
+        add('observation', id, row[0], comparisonCompatible(id) ? (row[col] ?? null) : null);
+    add(
+      'source',
+      id,
+      'activity',
+      manifest.sources[
+        placeById[id].kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data'
+      ],
+    );
+    add('source', id, 'historical_loaded', !!historyCache[id]);
+    if (historyCache[id]) {
+      add(
+        'source',
+        id,
+        'historical_query',
+        historyManifest.sources[
+          placeById[id].kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data'
+        ],
+      );
+      add('source', id, 'history_assembled', historyManifest.assembled);
+      add('source', id, 'history_sha256', historyManifest.files[id].sha256);
+    }
+    const start = $('analysisStart').value,
+      end = $('analysisEnd').value;
+    for (const offset of [0, 7, 28]) {
+      const re = comparisonMath.shift(start, -1 - offset),
+        rs = comparisonMath.shift(re, -27),
+        v = comparisonMath.summary(
+          comparisonCompatible(id) ? comparison.rows[id] : [],
+          col,
+          start,
+          end,
+          rs,
+          re,
+        );
+      add('sensitivity', id, 'reference_' + offset, rs + ' → ' + re);
+      add('sensitivity', id, 'percent_' + offset, v.percent);
+    }
+    const eventStart = $('analysisEventStart').value;
+    if (
+      comparisonMath.validDate(eventStart) &&
+      eventStart <= end &&
+      eventStart >= '2019-01-01' &&
+      comparisonCompatible(id)
+    ) {
+      const v = M.eventStudy(
+        comparison.rows[id],
+        col,
+        eventStart,
+        end,
+        Number($('analysisThreshold').value),
+        Number($('analysisSustain').value),
+      );
+      for (const [key, value] of Object.entries(v)) add('recovery', id, key, value);
+    }
+  });
+  const event = comparisonContext();
+  if (event) {
+    add('event', '', event.date, event.title);
+    if (event.url) add('source', '', 'event', event.url);
+    add('event', '', 'date_kind', event.dateKind);
+  }
+  add('method', '', 'index', 'Daily / positive complete reference mean * 100');
+  add(
+    'method',
+    '',
+    'interpretation',
+    'Descriptive reference comparison, not causal impact or lost trade',
+  );
+  download('passage-comparison.csv', rows);
+}
+
+function comparisonParams() {
+  const q = new URLSearchParams({
+    mode: 'change',
+    place: comparison.ids[0] || state.selected,
+    view: 'analysis',
+    locations: comparison.ids.join(','),
+    context: comparison.event || '',
+    shift: comparison.signal || '',
+  });
+  for (const id of comparisonValueIds) q.set(id, $(id).value);
+  q.set('analysisDay', String(comparison.day));
+  return q;
+}
+
+boot();</script>
 </body></html>

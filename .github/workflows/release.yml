@@ -27,6 +27,13 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
+      - name: Check authored source formatting
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          python3 -m pip install --only-binary=:all: -r requirements-dev.txt
+          npm run format:check
+          python3 -m ruff format --check scripts tests
+          python3 -m ruff check scripts tests
       - name: Prepare source-backed candidate
         id: candidate
         run: python3 scripts/prepare-refresh.py --code-release --receipt-dir "$RUNNER_TEMP/receipts"

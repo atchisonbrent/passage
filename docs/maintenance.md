@@ -45,7 +45,6 @@ automatic rollback. No deployment credentials are exposed to pull-request jobs.
 `imf.batchison.dev` is the legacy hostname; migration preserves old links.
 The current bundle retains noindex headers; public accessibility is not authentication.
 
-
 ## Checks
 
 ```sh

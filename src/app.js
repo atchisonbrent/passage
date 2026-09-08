@@ -130,7 +130,7 @@ function choose(id, recenter = true) {
   refresh();
 }
 async function setMode(mode) {
-  if (aw.open) awOpen(false);
+  if (comparison.open) comparisonOpen(false);
   stop();
   state.mode = mode;
   state.story = null;
@@ -817,7 +817,7 @@ function render() {
   );
   if (activity) {
     activityDetail();
-    awGlobeContext();
+    comparisonGlobeContext();
   } else if (state.mode === 'connections') networkDetail();
   else exposureDetail();
   $('story').hidden = !state.story;
@@ -1113,8 +1113,8 @@ function bind() {
       sector: $('sector').value,
       trade: $('trade').value,
       pins: state.pins.join(','),
-      context: aw.event || '',
-      shift: aw.signal || '',
+      context: comparison.event || '',
+      shift: comparison.signal || '',
       event: $('eventStart').value,
       threshold: $('recoveryThreshold').value,
       sustain: $('recoveryDays').value,
@@ -1302,7 +1302,7 @@ async function boot() {
         refresh();
       }
     } else if (location.pathname.startsWith('/stories') && !location.hash) {
-      awOpen();
+      comparisonOpen();
       $('eventCatalog').open = true;
     }
     document.body.classList.add('snapshot-ready');
@@ -1327,7 +1327,6 @@ async function boot() {
     for (const b of document.querySelectorAll('button,input,select')) b.disabled = true;
   }
 }
-boot();
 
 function updateFreshness() {
   if (!manifest) return;

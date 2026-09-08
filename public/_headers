@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'sha256-o7l+nhDMU9XrVCUHkGK6SwCaNhtFmavhQz1Ut7G/d/w=' 'sha256-lWy/jB1EkwxZ6ECW9wGIErdbU9UuDiSERWEUBJPQSBI=' 'sha256-F2jPdjv7NVWi+5VWkHlXdrLBjvYTZP5CgG3/Bds2gUs='; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'sha256-o7l+nhDMU9XrVCUHkGK6SwCaNhtFmavhQz1Ut7G/d/w=' 'sha256-lWy/jB1EkwxZ6ECW9wGIErdbU9UuDiSERWEUBJPQSBI=' 'sha256-raYISitQqjV8+FSA79c8SwLAYCBGQaqO+B6YX7F2RRQ='; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer

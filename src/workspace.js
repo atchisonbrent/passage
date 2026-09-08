@@ -1,6 +1,6 @@
 /* Comparison-first workspace; same observations, separate historical clock. */
-const AW = PassageWorkspaceMath;
-const aw = {
+const comparisonMath = PassageWorkspaceMath;
+const comparison = {
   ids: [],
   event: null,
   signal: null,
@@ -13,8 +13,8 @@ const aw = {
   rows: {},
   busy: false,
 };
-const awColors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
-const awValueIds = [
+const comparisonColors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
+const comparisonValueIds = [
   'analysisStart',
   'analysisEnd',
   'analysisRefStart',
@@ -28,7 +28,7 @@ const awValueIds = [
   'analysisThreshold',
   'analysisSustain',
 ];
-const awLabels = [
+const comparisonLabels = [
   'All calls',
   'Tanker calls',
   'Container calls',
@@ -37,31 +37,31 @@ const awLabels = [
   'Estimated exports',
   'Passage capacity',
 ];
-function awUnit() {
+function comparisonUnit() {
   return Number($('analysisMetric').value) < 4 ? 'calls' : 'estimated tonnes';
 }
-function awCompatible(id) {
+function comparisonCompatible(id) {
   const m = Number($('analysisMetric').value);
   return m < 4 || (m < 6 ? placeById[id]?.kind === 'port' : placeById[id]?.kind === 'chokepoint');
 }
-function awReference() {
+function comparisonReference() {
   const start = $('analysisStart').value,
     end = $('analysisEnd').value;
-  if (!AW.validDate(start) || !AW.validDate(end)) return;
+  if (!comparisonMath.validDate(start) || !comparisonMath.validDate(end)) return;
   if ($('analysisReference').value === 'prior') {
-    $('analysisRefStart').value = AW.shift(start, -28);
-    $('analysisRefEnd').value = AW.shift(start, -1);
+    $('analysisRefStart').value = comparisonMath.shift(start, -28);
+    $('analysisRefEnd').value = comparisonMath.shift(start, -1);
   }
   if ($('analysisReference').value === 'year') {
     const prev = (d) => {
       let s = Number(d.slice(0, 4)) - 1 + d.slice(4);
-      return AW.validDate(s) ? s : s.slice(0, 8) + '28';
+      return comparisonMath.validDate(s) ? s : s.slice(0, 8) + '28';
     };
     $('analysisRefStart').value = prev(start);
     $('analysisRefEnd').value = prev(end);
   }
 }
-function awTable(id, caption, heads, rows) {
+function comparisonTable(id, caption, heads, rows) {
   const table = $(id);
   table.replaceChildren(element('caption', '', caption));
   const head = document.createElement('thead'),
@@ -84,263 +84,77 @@ function awTable(id, caption, heads, rows) {
   }
   table.append(head, body);
 }
-function awInvalidate() {
+function comparisonInvalidate() {
   $('randomEvent').disabled =
-    aw.busy || !PassageDiscovery.candidates(passageEvents, passageShifts, places).length;
+    comparison.busy || !PassageDiscovery.candidates(passageEvents, passageShifts, places).length;
   text('analysisShare', 'Copy link');
-  aw.key = '';
-  aw.page = 0;
+  comparison.key = '';
+  comparison.page = 0;
   renderWorkspace();
 }
-function awOpen(open = true) {
+function comparisonOpen(open = true) {
   stop();
-  aw.open = open;
+  comparison.open = open;
   document.body.classList.toggle('analysis-open', open);
   $('analysisWorkspace').hidden = !open;
   $('exploreView').setAttribute('aria-pressed', String(!open));
   $('analyzeView').setAttribute('aria-pressed', String(open));
   $('eventsView').setAttribute('aria-expanded', String(open && $('eventCatalog').open));
   document.querySelector('main').scrollTop = 0;
-  awInvalidate();
+  comparisonInvalidate();
   refresh();
 }
-function awEvent(id) {
-  const event = passageEvents.find((e) => e.id === id);
-  if (!event) return;
-  aw.event = id;
-  aw.signal = null;
-  aw.ids = [...event.places];
-  choose(event.places[0]);
-  state.pins = [...event.places];
-  setMode('change');
-  $('analysisMetric').value = '0';
-  $('analysisStart').value = event.start;
-  $('analysisEnd').value = event.end;
-  $('analysisReference').value = 'custom';
-  $('analysisRefStart').value = event.referenceStart;
-  $('analysisRefEnd').value = event.referenceEnd;
-  $('analysisEventStart').value = event.id === 'hormuz-2026' ? '2026-02-28' : '';
-  aw.day = 0;
-  $('eventCatalog').open = false;
-  $('analysisSetup').open = false;
-  awOpen();
-}
-function awEventContext() {
-  const event = awContext(),
-    panel = $('eventContext');
-  const wasOpen = panel.querySelector('details')?.open || false;
-  panel.hidden = !event;
-  panel.replaceChildren();
-  if (!event) return;
-  const details = document.createElement('details');
-  details.open = wasOpen;
-  details.append(element('summary', '', event.title + ' · context & sources'));
-  panel.append(details);
-  details.append(
-    element('p', '', event.summary),
-    element(
-      'p',
-      'hint',
-      event.date +
-        ' · ' +
-        event.dateKind +
-        ' · ' +
-        (event.published ? 'Published ' + event.published : 'Publication date not supplied') +
-        ' · reviewed 2026-09-07',
-    ),
-  );
-  const link = element('a', '', event.source + ' · original source ↗');
-  link.href = event.url;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  if (event.url) details.append(link);
-  details.append(element('p', 'hint', event.caveat));
-  if (event.date > dates.at(-1))
-    details.append(
-      element(
-        'p',
-        '',
-        'Reporting is newer than this observation snapshot; post-event effects cannot be displayed.',
-      ),
-    );
-  if (aw.ids.some((id) => !event.places.includes(id)))
-    details.append(
-      element(
-        'p',
-        'hint',
-        'Additional places are your comparisons; the source does not necessarily discuss them.',
-      ),
-    );
-  const map = element('button', '', 'Locate on globe');
-  map.onclick = () => {
-    choose(event.places[0]);
-    setMode('change');
-    if (dates.includes(event.date)) setDate(dates.indexOf(event.date));
-    awOpen(false);
-  };
-  const clear = element('button', 'event-close', '×');
-  clear.type = 'button';
-  clear.setAttribute('aria-label', 'Close event');
-  clear.title = 'Close event';
-  clear.onclick = () => {
-    aw.event = null;
-    aw.signal = null;
-    awInvalidate();
-    refresh();
-    $('analyzeView').focus({ preventScroll: true });
-  };
-  details.append(map);
-  panel.append(clear);
-}
-function awSearch() {
+
+function comparisonSearch() {
   const q = $('analysisSearch').value.trim().toLowerCase();
   $('analysisMatches').replaceChildren();
   if (!q) return;
   const matches = places
-    .filter((p) => !aw.ids.includes(p.id) && (p.name + ' ' + p.country).toLowerCase().includes(q))
+    .filter(
+      (p) => !comparison.ids.includes(p.id) && (p.name + ' ' + p.country).toLowerCase().includes(q),
+    )
     .slice(0, 8);
   for (const p of matches) {
     const b = element('button', '', p.name + ' · ' + p.country);
-    b.disabled = aw.ids.length >= 4;
+    b.disabled = comparison.ids.length >= 4;
     b.onclick = () => {
-      if (aw.ids.length >= 4 || aw.ids.includes(p.id)) return;
-      aw.ids.push(p.id);
-      state.pins = [...aw.ids];
+      if (comparison.ids.length >= 4 || comparison.ids.includes(p.id)) return;
+      comparison.ids.push(p.id);
+      state.pins = [...comparison.ids];
       $('analysisSearch').value = '';
-      awSearch();
-      awInvalidate();
+      comparisonSearch();
+      comparisonInvalidate();
     };
     $('analysisMatches').append(b);
   }
   if (!matches.length)
     $('analysisMatches').append(element('p', 'hint', 'No additional matching places.'));
 }
-function awPins() {
+function comparisonPins() {
   $('analysisPins').replaceChildren(
-    ...aw.ids.map((id, i) => {
+    ...comparison.ids.map((id, i) => {
       const b = element('button', '', `${i + 1}. ${placeById[id].name} ×`);
-      b.style.borderColor = awColors[i];
+      b.style.borderColor = comparisonColors[i];
       b.setAttribute('aria-label', 'Remove ' + placeById[id].name);
       b.onclick = () => {
-        aw.ids = aw.ids.filter((x) => x !== id);
-        state.pins = [...aw.ids];
-        awInvalidate();
+        comparison.ids = comparison.ids.filter((x) => x !== id);
+        state.pins = [...comparison.ids];
+        comparisonInvalidate();
       };
       return b;
     }),
   );
 }
-function awRenderChart() {
-  const canvas = $('analysisChart');
-  if (!$('analysisChartPanel').hidden && aw.axis.length) {
-    const { ctx, w, h } = sizeCanvas(canvas);
-    if (!w || !h) return;
-    const { left, right } = PassageChartInput.bounds(w),
-      top = 20,
-      bottom = h - 35,
-      n = aw.axis.length,
-      indexed = $('analysisScale').value === 'indexed',
-      col = Number($('analysisMetric').value) + 1;
-    const values = aw.ids.map((id, j) => {
-      const map = new Map(aw.rows[id].map((r) => [r[0], r[col]]));
-      return aw.axis.map((d) => {
-        const v = map.get(d);
-        return !awCompatible(id) ? null : indexed ? AW.normalize(v, aw.summaries[j]?.reference) : v;
-      });
-    });
-    let max = 1;
-    for (const row of values) for (const v of row) if (Number.isFinite(v)) max = Math.max(max, v);
-    const x = (i) => left + (i / Math.max(1, n - 1)) * (right - left),
-      y = (v) => bottom - (v / max) * (bottom - top);
-    ctx.clearRect(0, 0, w, h);
-    ctx.font = '11px -apple-system,sans-serif';
-    ctx.textBaseline = 'middle';
-    const rs = $('analysisRefStart').value,
-      re = $('analysisRefEnd').value;
-    let ri = aw.axis.findIndex((d) => d >= rs),
-      rj = aw.axis.findLastIndex((d) => d <= re);
-    if (ri >= 0 && rj >= ri) {
-      ctx.fillStyle = '#85bce825';
-      ctx.fillRect(x(ri), top, Math.max(1, x(rj) - x(ri)), bottom - top);
-    }
-    for (let i = 0; i <= 2; i++) {
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#9cb2ba';
-      ctx.fillText(short((max * i) / 2), left - 7, y((max * i) / 2));
-      ctx.strokeStyle = '#52737b66';
-      ctx.beginPath();
-      ctx.moveTo(left, y((max * i) / 2));
-      ctx.lineTo(right, y((max * i) / 2));
-      ctx.stroke();
-    }
-    const tickCount = Math.max(2, Math.min(6, Math.floor((right - left) / 95)));
-    for (let j = 0; j < tickCount; j++) {
-      const i = Math.round((j / (tickCount - 1)) * (n - 1));
-      ctx.textAlign = j === 0 ? 'left' : j === tickCount - 1 ? 'right' : 'center';
-      ctx.fillStyle = '#9cb2ba';
-      ctx.fillText(aw.axis[i], x(i), h - 12);
-    }
-    values.forEach((row, j) => {
-      ctx.strokeStyle = awColors[j];
-      ctx.setLineDash(j === 0 ? [] : j === 1 ? [7, 3] : j === 2 ? [2, 3] : [9, 3, 2, 3]);
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      let pen = false;
-      row.forEach((v, i) => {
-        if (!Number.isFinite(v)) {
-          pen = false;
-          return;
-        }
-        if (pen) ctx.lineTo(x(i), y(v));
-        else ctx.moveTo(x(i), y(v));
-        pen = true;
-      });
-      ctx.stroke();
-    });
-    ctx.setLineDash([]);
-    const event = awContext(),
-      ei = event ? aw.axis.indexOf(event.date) : -1;
-    if (ei >= 0) {
-      ctx.strokeStyle = '#f4c397';
-      ctx.setLineDash([4, 3]);
-      ctx.beginPath();
-      ctx.moveTo(x(ei), top);
-      ctx.lineTo(x(ei), bottom);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#f4c397';
-      ctx.textAlign = x(ei) > w / 2 ? 'right' : 'left';
-      ctx.fillText(aw.signal ? 'Detected window' : 'Event / report', x(ei), 9);
-    }
-    aw.day = Math.max(0, Math.min(n - 1, aw.day));
-    ctx.strokeStyle = '#e8f0ed';
-    ctx.beginPath();
-    ctx.moveTo(x(aw.day), top);
-    ctx.lineTo(x(aw.day), bottom);
-    ctx.stroke();
-    const reading =
-      aw.axis[aw.day] +
-      ' · ' +
-      aw.ids
-        .map(
-          (id, j) =>
-            `${j + 1}. ${placeById[id].name}: ${Number.isFinite(values[j][aw.day]) ? fmt(values[j][aw.day]) + (indexed ? ' index points' : ' ' + awUnit()) : 'unavailable'}`,
-        )
-        .join(' · ');
-    text('analysisReadout', reading);
-    canvas.setAttribute('aria-valuemin', '0');
-    canvas.setAttribute('aria-valuemax', String(n - 1));
-    canvas.setAttribute('aria-valuenow', String(aw.day));
-    canvas.setAttribute('aria-valuetext', reading);
-  }
-}
-function awDaily() {
+
+function comparisonDaily() {
   const col = Number($('analysisMetric').value) + 1,
-    maps = aw.ids.map((id) => new Map((aw.rows[id] || []).map((r) => [r[0], r[col]]))),
-    pages = Math.max(1, Math.ceil(aw.axis.length / 50));
-  aw.page = Math.min(aw.page, pages - 1);
-  const rows = aw.axis
-    .slice(aw.page * 50, (aw.page + 1) * 50)
+    maps = comparison.ids.map(
+      (id) => new Map((comparison.rows[id] || []).map((r) => [r[0], r[col]])),
+    ),
+    pages = Math.max(1, Math.ceil(comparison.axis.length / 50));
+  comparison.page = Math.min(comparison.page, pages - 1);
+  const rows = comparison.axis
+    .slice(comparison.page * 50, (comparison.page + 1) * 50)
     .map((d) => [
       d,
       d >= $('analysisStart').value
@@ -350,28 +164,34 @@ function awDaily() {
           : d < $('analysisRefStart').value
             ? 'Before reference'
             : 'Between periods',
-      ...aw.ids.map((id, i) =>
-        awCompatible(id) && Number.isFinite(maps[i].get(d)) ? fmt(maps[i].get(d)) : 'Unavailable',
+      ...comparison.ids.map((id, i) =>
+        comparisonCompatible(id) && Number.isFinite(maps[i].get(d))
+          ? fmt(maps[i].get(d))
+          : 'Unavailable',
       ),
     ]);
-  awTable(
+  comparisonTable(
     'analysisDaily',
-    'Raw daily observations · ' + awUnit() + ' · not indexed',
-    ['Date', 'Period', ...aw.ids.map((id) => placeById[id].name)],
+    'Raw daily observations · ' + comparisonUnit() + ' · not indexed',
+    ['Date', 'Period', ...comparison.ids.map((id) => placeById[id].name)],
     rows,
   );
-  $('analysisPrev').disabled = aw.page === 0;
-  $('analysisNext').disabled = aw.page >= pages - 1;
-  text('analysisPage', `Page ${aw.page + 1} / ${pages} · ${aw.axis.length} calendar days`);
+  $('analysisPrev').disabled = comparison.page === 0;
+  $('analysisNext').disabled = comparison.page >= pages - 1;
+  text(
+    'analysisPage',
+    `Page ${comparison.page + 1} / ${pages} · ${comparison.axis.length} calendar days`,
+  );
 }
-function awRecovery() {
+function comparisonRecovery() {
   const start = $('analysisEventStart').value,
     end = $('analysisEnd').value,
     col = Number($('analysisMetric').value) + 1;
-  const valid = AW.validDate(start) && start >= '2019-01-01' && start <= end;
-  awTable(
+  const valid = comparisonMath.validDate(start) && start >= '2019-01-01' && start <= end;
+  comparisonTable(
     'recoveryResults',
-    'Pre-disruption reference and follow-up · means per day; cumulative totals in ' + awUnit(),
+    'Pre-disruption reference and follow-up · means per day; cumulative totals in ' +
+      comparisonUnit(),
     [
       'Place',
       'Reference mean',
@@ -381,8 +201,8 @@ function awRecovery() {
       'Shortfall',
       'Net deviation',
     ],
-    aw.ids.map((id) => {
-      if (!valid || !awCompatible(id))
+    comparison.ids.map((id) => {
+      if (!valid || !comparisonCompatible(id))
         return [
           placeById[id].name,
           'Choose a valid start and compatible measure',
@@ -393,7 +213,7 @@ function awRecovery() {
           '',
         ];
       const v = M.eventStudy(
-        aw.rows[id],
+        comparison.rows[id],
         col,
         start,
         end,
@@ -422,59 +242,70 @@ function awRecovery() {
   );
 }
 function renderWorkspace() {
-  if (!aw.open || !manifest) return;
+  if (!comparison.open || !manifest) return;
   const start = $('analysisStart').value,
     end = $('analysisEnd').value,
     rs = $('analysisRefStart').value,
     re = $('analysisRefEnd').value,
     col = Number($('analysisMetric').value) + 1;
   const key = [
-    ...awValueIds.map((id) => $(id).value),
-    aw.ids.join(','),
-    aw.event,
-    aw.signal,
-    aw.busy,
+    ...comparisonValueIds.map((id) => $(id).value),
+    comparison.ids.join(','),
+    comparison.event,
+    comparison.signal,
+    comparison.busy,
     $('analysisSetup').open,
-    aw.ids.map((id) => [!!historyCache[id], !!historyRequests[id], historyErrors[id]]),
+    comparison.ids.map((id) => [!!historyCache[id], !!historyRequests[id], historyErrors[id]]),
     innerWidth,
     innerHeight,
   ].join('|');
-  if (key === aw.key) return;
-  aw.key = key;
-  awPins();
-  awEventContext();
+  if (key === comparison.key) return;
+  comparison.key = key;
+  comparisonPins();
+  comparisonEventContext();
   const valid =
-    [start, end].every((d) => AW.validDate(d) && d >= '2019-01-01' && d <= dates.at(-1)) &&
-    start <= end;
+    [start, end].every(
+      (d) => comparisonMath.validDate(d) && d >= '2019-01-01' && d <= dates.at(-1),
+    ) && start <= end;
   text(
     'analysisSetupSummary',
-    `Edit comparison · ${aw.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} · ${awLabels[col - 1]}`,
+    `Edit comparison · ${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} · ${comparisonLabels[col - 1]}`,
   );
   const plotStart =
-    $('analysisSpan').value === 'reference' && AW.validDate(rs) && rs < start
+    $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
       ? rs < '2019-01-01'
         ? '2019-01-01'
         : rs
       : start;
-  aw.axis = valid ? AW.days(plotStart, end) : [];
-  aw.rows = Object.fromEntries(aw.ids.map((id) => [id, combinedHistory(id)]));
-  aw.summaries = aw.ids.map((id) =>
-    AW.summary(awCompatible(id) ? aw.rows[id] : [], col, start, end, rs, re),
+  comparison.axis = valid ? comparisonMath.days(plotStart, end) : [];
+  comparison.rows = Object.fromEntries(comparison.ids.map((id) => [id, combinedHistory(id)]));
+  comparison.summaries = comparison.ids.map((id) =>
+    comparisonMath.summary(
+      comparisonCompatible(id) ? comparison.rows[id] : [],
+      col,
+      start,
+      end,
+      rs,
+      re,
+    ),
   );
   const eventStart = $('analysisEventStart').value,
     earliest = [
       start,
       rs,
-      AW.validDate(start) ? AW.shift(start, -56) : start,
-      AW.validDate(eventStart) ? AW.shift(eventStart, -28) : start,
+      comparisonMath.validDate(start) ? comparisonMath.shift(start, -56) : start,
+      comparisonMath.validDate(eventStart) ? comparisonMath.shift(eventStart, -28) : start,
     ].sort()[0],
     need = earliest < manifest.start;
   $('analysisLoad').hidden = !need;
   $('analysisLoad').disabled =
-    aw.busy || !aw.ids.length || !need || aw.ids.every((id) => historyCache[id]);
+    comparison.busy ||
+    !comparison.ids.length ||
+    !need ||
+    comparison.ids.every((id) => historyCache[id]);
   text(
     'analysisLoad',
-    aw.busy
+    comparison.busy
       ? 'Loading selected historical files…'
       : need
         ? 'Load / retry selected historical files'
@@ -482,15 +313,17 @@ function renderWorkspace() {
   );
   $('analysisStatus').hidden =
     valid &&
-    aw.ids.length > 0 &&
-    !aw.ids.some((id) => historyErrors[id] || historyRequests[id] || (need && !historyCache[id]));
+    comparison.ids.length > 0 &&
+    !comparison.ids.some(
+      (id) => historyErrors[id] || historyRequests[id] || (need && !historyCache[id]),
+    );
   text(
     'analysisStatus',
     !valid
       ? 'Choose an observation range within 2019 and the snapshot cutoff; invalid or overlapping references make comparisons unavailable.'
-      : !aw.ids.length
+      : !comparison.ids.length
         ? 'Add up to four places to compare.'
-        : aw.ids
+        : comparison.ids
             .map(
               (id) =>
                 placeById[id].name +
@@ -509,12 +342,12 @@ function renderWorkspace() {
     'analysisCoverage',
     `Snapshot: ports ${manifest.Daily_Ports_Data_latest} · passages ${manifest.Daily_Chokepoints_Data_latest}. ${$('analysisScale').value === 'indexed' ? 'Index: positive complete reference = 100.' : 'Shared absolute scale.'} Missing ≠ zero.`,
   );
-  awTable(
+  comparisonTable(
     'analysisResults',
-    `${start} → ${end}; reference ${rs} → ${re} · means in ${awUnit()}/day; net deviation in ${awUnit()}`,
+    `${start} → ${end}; reference ${rs} → ${re} · means in ${comparisonUnit()}/day; net deviation in ${comparisonUnit()}`,
     ['Place', 'Mean', 'Reference', 'Δ / day', 'Δ %', 'Net deviation', 'Coverage obs / ref'],
-    aw.ids.map((id, i) => {
-      const v = aw.summaries[i];
+    comparison.ids.map((id, i) => {
+      const v = comparison.summaries[i];
       return [
         placeById[id].name,
         fmt(v.mean),
@@ -527,12 +360,12 @@ function renderWorkspace() {
     }),
   );
   $('analysisQuality').replaceChildren(
-    ...aw.ids.map((id, i) => {
-      const v = aw.summaries[i],
-        latest = awCompatible(id)
-          ? aw.rows[id].findLast((row) => Number.isFinite(row[col]))?.[0]
+    ...comparison.ids.map((id, i) => {
+      const v = comparison.summaries[i],
+        latest = comparisonCompatible(id)
+          ? comparison.rows[id].findLast((row) => Number.isFinite(row[col]))?.[0]
           : null,
-        reason = !awCompatible(id)
+        reason = !comparisonCompatible(id)
           ? 'Measure not available for this place type'
           : v.reason +
             (v.reference > 0 && v.reference < (col <= 4 ? 10 : 1000)
@@ -547,11 +380,18 @@ function renderWorkspace() {
   );
   const sensitivity = [];
   if (valid)
-    for (const id of aw.ids)
+    for (const id of comparison.ids)
       for (const offset of [0, 7, 28]) {
-        const b = AW.shift(start, -1 - offset),
-          a = AW.shift(b, -27),
-          v = AW.summary(awCompatible(id) ? aw.rows[id] : [], col, start, end, a, b);
+        const b = comparisonMath.shift(start, -1 - offset),
+          a = comparisonMath.shift(b, -27),
+          v = comparisonMath.summary(
+            comparisonCompatible(id) ? comparison.rows[id] : [],
+            col,
+            start,
+            end,
+            a,
+            b,
+          );
         sensitivity.push([
           placeById[id].name,
           a + ' → ' + b,
@@ -560,139 +400,27 @@ function renderWorkspace() {
           v.reason,
         ]);
       }
-  awTable(
+  comparisonTable(
     'sensitivityResults',
     'Fixed observation range; alternative references',
     ['Place', 'Reference dates', 'Reference mean', 'Δ %', 'Coverage / reason'],
     sensitivity,
   );
-  $('analysisChartPanel').hidden = $('analysisDisplay').value !== 'chart' || !aw.axis.length;
+  $('analysisChartPanel').hidden =
+    $('analysisDisplay').value !== 'chart' || !comparison.axis.length;
   $('analysisDailyPanel').hidden = $('analysisDisplay').value !== 'table';
-  $('analysisExport').disabled = !valid || !aw.ids.length || aw.busy;
-  awDaily();
-  awRecovery();
-  awRenderChart();
+  $('analysisExport').disabled = !valid || !comparison.ids.length || comparison.busy;
+  comparisonDaily();
+  comparisonRecovery();
+  comparisonRenderChart();
 }
-function awExport() {
-  const col = Number($('analysisMetric').value) + 1,
-    headers = [
-      'section',
-      'place_id',
-      'date_or_key',
-      'value',
-      'measure',
-      'observation_start',
-      'observation_end',
-      'reference_start',
-      'reference_end',
-      'event_id',
-      'snapshot_assembled',
-    ];
-  const rows = [headers];
-  const add = (section, id, key, value) =>
-    rows.push([
-      section,
-      id,
-      key,
-      value,
-      awLabels[col - 1],
-      $('analysisStart').value,
-      $('analysisEnd').value,
-      $('analysisRefStart').value,
-      $('analysisRefEnd').value,
-      aw.event || aw.signal || '',
-      manifest.retrieved,
-    ]);
-  aw.ids.forEach((id, i) => {
-    for (const [key, v] of Object.entries(aw.summaries[i])) add('summary', id, key, v);
-    for (const row of aw.rows[id])
-      if (
-        aw.axis.includes(row[0]) ||
-        (row[0] >= $('analysisRefStart').value && row[0] <= $('analysisRefEnd').value)
-      )
-        add('observation', id, row[0], awCompatible(id) ? (row[col] ?? null) : null);
-    add(
-      'source',
-      id,
-      'activity',
-      manifest.sources[
-        placeById[id].kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data'
-      ],
-    );
-    add('source', id, 'historical_loaded', !!historyCache[id]);
-    if (historyCache[id]) {
-      add(
-        'source',
-        id,
-        'historical_query',
-        historyManifest.sources[
-          placeById[id].kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data'
-        ],
-      );
-      add('source', id, 'history_assembled', historyManifest.assembled);
-      add('source', id, 'history_sha256', historyManifest.files[id].sha256);
-    }
-    const start = $('analysisStart').value,
-      end = $('analysisEnd').value;
-    for (const offset of [0, 7, 28]) {
-      const re = AW.shift(start, -1 - offset),
-        rs = AW.shift(re, -27),
-        v = AW.summary(awCompatible(id) ? aw.rows[id] : [], col, start, end, rs, re);
-      add('sensitivity', id, 'reference_' + offset, rs + ' → ' + re);
-      add('sensitivity', id, 'percent_' + offset, v.percent);
-    }
-    const eventStart = $('analysisEventStart').value;
-    if (
-      AW.validDate(eventStart) &&
-      eventStart <= end &&
-      eventStart >= '2019-01-01' &&
-      awCompatible(id)
-    ) {
-      const v = M.eventStudy(
-        aw.rows[id],
-        col,
-        eventStart,
-        end,
-        Number($('analysisThreshold').value),
-        Number($('analysisSustain').value),
-      );
-      for (const [key, value] of Object.entries(v)) add('recovery', id, key, value);
-    }
-  });
-  const event = awContext();
-  if (event) {
-    add('event', '', event.date, event.title);
-    if (event.url) add('source', '', 'event', event.url);
-    add('event', '', 'date_kind', event.dateKind);
-  }
-  add('method', '', 'index', 'Daily / positive complete reference mean * 100');
-  add(
-    'method',
-    '',
-    'interpretation',
-    'Descriptive reference comparison, not causal impact or lost trade',
-  );
-  download('passage-comparison.csv', rows);
-}
-function awParams() {
-  const q = new URLSearchParams({
-    mode: 'change',
-    place: aw.ids[0] || state.selected,
-    view: 'analysis',
-    locations: aw.ids.join(','),
-    context: aw.event || '',
-    shift: aw.signal || '',
-  });
-  for (const id of awValueIds) q.set(id, $(id).value);
-  q.set('analysisDay', String(aw.day));
-  return q;
-}
+
 function bindWorkspace(q) {
-  $('analysisStart').value = AW.shift(dates[state.index], -89);
+  $('analysisStart').value = comparisonMath.shift(dates[state.index], -89);
   $('analysisEnd').value = dates[state.index];
   $('analysisMetric').value = String(state.metric);
-  aw.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
-  awReference();
+  comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
+  comparisonReference();
   for (const id of [
     'analysisStart',
     'analysisEnd',
@@ -703,22 +431,22 @@ function bindWorkspace(q) {
     $(id).min = id.startsWith('analysisRef') ? '2018-01-01' : '2019-01-01';
     $(id).max = dates.at(-1);
   }
-  for (const id of awValueIds) {
+  for (const id of comparisonValueIds) {
     const v = q.get(id);
     if (v !== null) {
       if ($(id).tagName === 'SELECT') {
         if ([...$(id).options].some((o) => o.value === v)) $(id).value = v;
       } else if (
-        AW.validDate(v) &&
+        comparisonMath.validDate(v) &&
         v >= (id.startsWith('analysisRef') ? '2018-01-01' : '2019-01-01') &&
         v <= dates.at(-1)
       )
         $(id).value = v;
     }
   }
-  awReference(); // Re-derive named presets after restoring the observation range.
+  comparisonReference(); // Re-derive named presets after restoring the observation range.
   if (q.has('locations'))
-    aw.ids = [
+    comparison.ids = [
       ...new Set(
         q
           .get('locations')
@@ -726,12 +454,12 @@ function bindWorkspace(q) {
           .filter((id) => placeById[id]),
       ),
     ].slice(0, 4);
-  if (passageEvents.some((e) => e.id === q.get('context'))) aw.event = q.get('context');
+  if (passageEvents.some((e) => e.id === q.get('context'))) comparison.event = q.get('context');
   if (passageShifts.some((h) => h.id === q.get('shift'))) {
-    aw.signal = q.get('shift');
-    aw.event = null;
+    comparison.signal = q.get('shift');
+    comparison.event = null;
   }
-  aw.day = Math.max(0, Math.min(30000, Math.floor(Number(q.get('analysisDay'))) || 0));
+  comparison.day = Math.max(0, Math.min(30000, Math.floor(Number(q.get('analysisDay'))) || 0));
   document.querySelectorAll('.event-jumps a').forEach(
     (link) =>
       (link.onclick = (e) => {
@@ -742,19 +470,26 @@ function bindWorkspace(q) {
   const discoveryPool = PassageDiscovery.candidates(passageEvents, passageShifts, places);
   $('randomEvent').disabled = !discoveryPool.length;
   $('randomEvent').onclick = () => {
-    const current = aw.signal ? 'shift:' + aw.signal : aw.event ? 'event:' + aw.event : null,
+    const current = comparison.signal
+        ? 'shift:' + comparison.signal
+        : comparison.event
+          ? 'event:' + comparison.event
+          : null,
       next = PassageDiscovery.pick(discoveryPool, current);
     if (!next) return;
-    if (next.kind === 'event') awEvent(next.id);
-    else awShift(next.id);
+    if (next.kind === 'event') comparisonEvent(next.id);
+    else comparisonShift(next.id);
     const details = $('eventContext').querySelector('details');
     if (details) details.open = true;
     if (!$('analysisLoad').hidden && !$('analysisLoad').disabled) $('analysisLoad').onclick();
   };
-  $('shiftPeriod').onchange = awShiftCards;
-  awShiftCards();
+  $('shiftPeriod').onchange = comparisonShiftCards;
+  comparisonShiftCards();
   $('eventCatalog').ontoggle = () => {
-    $('eventsView').setAttribute('aria-expanded', String(aw.open && $('eventCatalog').open));
+    $('eventsView').setAttribute(
+      'aria-expanded',
+      String(comparison.open && $('eventCatalog').open),
+    );
   };
   $('eventCards').replaceChildren(
     ...passageEvents.map((e) => {
@@ -773,73 +508,75 @@ function bindWorkspace(q) {
       );
       const b = element('button', '', 'Compare observations');
       b.dataset.event = e.id;
-      b.onclick = () => awEvent(e.id);
+      b.onclick = () => comparisonEvent(e.id);
       card.append(b);
       return card;
     }),
   );
-  $('exploreView').onclick = () => awOpen(false);
+  $('exploreView').onclick = () => comparisonOpen(false);
   $('analyzeView').onclick = () => {
-    aw.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
+    comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
     setMode('change');
-    awOpen();
+    comparisonOpen();
   };
   $('eventsView').onclick = () => {
     setMode('change');
-    awOpen();
+    comparisonOpen();
     $('eventCatalog').open = true;
   };
-  $('analysisSearch').oninput = awSearch;
+  $('analysisSearch').oninput = comparisonSearch;
   $('analysisSetup').ontoggle = () => {
-    aw.key = '';
+    comparison.key = '';
     renderWorkspace();
   };
   $('analysisClear').onclick = () => {
-    aw.ids = [];
+    comparison.ids = [];
     state.pins = [];
-    awInvalidate();
+    comparisonInvalidate();
   };
-  for (const id of awValueIds)
+  for (const id of comparisonValueIds)
     $(id).onchange = () => {
-      if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) awReference();
+      if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) comparisonReference();
       if (['analysisRefStart', 'analysisRefEnd'].includes(id))
         $('analysisReference').value = 'custom';
-      awInvalidate();
+      comparisonInvalidate();
     };
   for (const b of document.querySelectorAll('[data-range]'))
     b.onclick = () => {
       const end = $('analysisEnd').value;
-      if (!AW.validDate(end)) return;
+      if (!comparisonMath.validDate(end)) return;
       $('analysisStart').value =
-        b.dataset.range === 'all' ? '2019-01-01' : AW.shift(end, 1 - Number(b.dataset.range));
-      awReference();
-      aw.day = 0;
-      awInvalidate();
+        b.dataset.range === 'all'
+          ? '2019-01-01'
+          : comparisonMath.shift(end, 1 - Number(b.dataset.range));
+      comparisonReference();
+      comparison.day = 0;
+      comparisonInvalidate();
     };
   $('analysisLoad').onclick = async () => {
-    if (aw.busy) return;
-    aw.busy = true;
-    awInvalidate();
-    const ids = [...aw.ids];
+    if (comparison.busy) return;
+    comparison.busy = true;
+    comparisonInvalidate();
+    const ids = [...comparison.ids];
     try {
       for (const id of ids) await fetchHistory(id);
     } finally {
-      aw.busy = false;
-      awInvalidate();
+      comparison.busy = false;
+      comparisonInvalidate();
     }
   };
-  $('analysisExport').onclick = awExport;
+  $('analysisExport').onclick = comparisonExport;
   $('analysisPrev').onclick = () => {
-    aw.page = Math.max(0, aw.page - 1);
-    awDaily();
+    comparison.page = Math.max(0, comparison.page - 1);
+    comparisonDaily();
   };
   $('analysisNext').onclick = () => {
-    aw.page++;
-    awDaily();
+    comparison.page++;
+    comparisonDaily();
   };
   $('analysisShare').onclick = async () => {
-    const url = location.origin + '/#' + awParams();
-    history.replaceState(null, '', '#' + awParams());
+    const url = location.origin + '/#' + comparisonParams();
+    history.replaceState(null, '', '#' + comparisonParams());
     try {
       await navigator.clipboard.writeText(url);
       text('analysisShare', 'Link copied');
@@ -848,154 +585,15 @@ function bindWorkspace(q) {
     }
   };
   PassageChartInput.attach($('analysisChart'), {
-    count: () => aw.axis.length,
-    index: () => aw.day,
+    count: () => comparison.axis.length,
+    index: () => comparison.day,
     onSelect: (i) => {
-      aw.day = i;
-      awRenderChart();
+      comparison.day = i;
+      comparisonRenderChart();
     },
   });
   new ResizeObserver(() => {
-    if (aw.open) awRenderChart();
+    if (comparison.open) comparisonRenderChart();
   }).observe($('analysisChart'));
-  if (q.get('view') === 'analysis') awOpen();
-}
-function awGlobeContext() {
-  const found = awContext(),
-    e = found?.places.includes(state.selected) ? found : null;
-  $('globeEventContext').hidden = !e;
-  $('globeEventContext').replaceChildren();
-  if (e) {
-    const b = element(
-      'button',
-      '',
-      'Violet marker · ' + e.date + ' · ' + e.title + ' · source & comparison',
-    );
-    b.onclick = () => awOpen();
-    $('globeEventContext').append(b);
-  }
-}
-function awGlobeAnnotation(ctx, left, right, top, bottom) {
-  const event = awContext();
-  if (!event || !event.places.includes(state.selected)) return;
-  const index = dates.indexOf(event.date);
-  if (index < 0) return;
-  const x = left + (index / Math.max(1, dates.length - 1)) * (right - left);
-  ctx.save();
-  ctx.strokeStyle = '#c5a6ff';
-  ctx.setLineDash([4, 3]);
-  ctx.beginPath();
-  ctx.moveTo(x, top);
-  ctx.lineTo(x, bottom);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function awContext() {
-  if (aw.signal) {
-    const h = passageShifts.find((s) => s.id === aw.signal);
-    if (!h) return null;
-    const c = h.context;
-    return {
-      id: h.id,
-      title:
-        h.name +
-        ': ' +
-        (h.percent == null ? 'comparison unavailable' : fmt(h.percent) + '% recorded calls'),
-      date: h.start,
-      dateKind: 'Detected seven-day window start, not claimed event onset',
-      published: c?.published || null,
-      source: c?.source || '',
-      url: c?.url || null,
-      places: [h.place],
-      summary:
-        (!h.qualifies
-          ? 'Source revisions mean this archived window no longer meets the screen. '
-          : '') +
-        `${h.start} → ${h.end}: ${fmt(h.mean)} calls/day versus ${fmt(h.reference)} in ${h.referenceStart} → ${h.referenceEnd}. ` +
-        (c
-          ? c.summary
-          : 'No corroborated event is attached to this signal. Variation, reporting quality and other explanations remain possible.'),
-      caveat:
-        (c ? c.caveat : 'Unexplained signal, not evidence of disruption.') +
-        ' Retrospective screening is not a significance test or causal estimate.',
-    };
-  }
-  return passageEvents.find((e) => e.id === aw.event) || null;
-}
-function awShift(id) {
-  const h = passageShifts.find((s) => s.id === id);
-  if (!h) return;
-  aw.signal = id;
-  aw.event = null;
-  aw.ids = [h.place];
-  state.pins = [h.place];
-  choose(h.place);
-  setMode('change');
-  $('analysisMetric').value = '0';
-  $('analysisScale').value = 'absolute';
-  $('analysisStart').value = h.start;
-  $('analysisEnd').value = h.end;
-  $('analysisRefStart').value = h.referenceStart;
-  $('analysisRefEnd').value = h.referenceEnd;
-  $('analysisReference').value = 'custom';
-  $('analysisEventStart').value = '';
-  $('analysisSpan').value = 'reference';
-  aw.day = 28;
-  $('eventCatalog').open = false;
-  $('analysisSetup').open = false;
-  awOpen();
-}
-function awShiftCards() {
-  const cutoff = [
-      manifest.Daily_Ports_Data_latest,
-      manifest.Daily_Chokepoints_Data_latest,
-    ].sort()[0],
-    recent = $('shiftPeriod').value === 'recent',
-    hits = passageShifts.filter((h) => (recent ? h.recent : !h.recent));
-  text(
-    'shiftPeriodNote',
-    recent
-      ? 'Windows ending ' +
-          AW.shift(cutoff, -29) +
-          ' → ' +
-          cutoff +
-          ' · relative to observed coverage, not live news. ' +
-          (!hits.length ? 'No qualifying recent shifts.' : '')
-      : 'Previously selected windows remain linkable; values are recalculated after source revisions.',
-  );
-  $('shiftCards').replaceChildren(
-    ...hits.map((h) => {
-      const card = element('article', 'event-card');
-      card.append(
-        element(
-          'small',
-          '',
-          !h.qualifies
-            ? 'Revised data · no longer qualifies'
-            : h.context
-              ? 'Related source attached · not causal proof'
-              : 'Unexplained signal',
-        ),
-        element(
-          'h3',
-          '',
-          h.name +
-            ' · ' +
-            (h.percent == null ? 'comparison unavailable' : fmt(h.percent) + '% calls'),
-        ),
-        element('p', '', h.start + ' → ' + h.end),
-        element(
-          'p',
-          'hint',
-          fmt(h.mean) + ' / day vs ' + fmt(h.reference) + ' in preceding 28 days',
-        ),
-      );
-      const b = element('button', '', 'Inspect this shift');
-      b.dataset.shift = h.id;
-      b.onclick = () => awShift(h.id);
-      card.append(b);
-      return card;
-    }),
-  );
+  if (q.get('view') === 'analysis') comparisonOpen();
 }

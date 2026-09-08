@@ -3,8 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 exports.checkControls = async ({ call, js, click, delay, out, width, height }) => {
   const randomReady = async () => {
-    for (let i = 0; i < 200 && (await js('aw.busy')); i++) await delay(100);
-    assert.equal(await js('aw.busy'), false);
+    for (let i = 0; i < 200 && (await js('comparison.busy')); i++) await delay(100);
+    assert.equal(await js('comparison.busy'), false);
   };
   const geometry = () =>
     js(
@@ -199,18 +199,18 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   assert.equal(await js("document.body.classList.contains('explore-open')"), false);
   await click('#randomEvent');
   await randomReady();
-  assert.equal(await js('aw.open&&!!awContext()'), true);
-  const picked = await js('awContext().id');
+  assert.equal(await js('comparison.open&&!!comparisonContext()'), true);
+  const picked = await js('comparisonContext().id');
   assert.equal(await js("document.querySelector('#eventContext details').open"), true);
   await click('#randomEvent');
   await randomReady();
-  assert.notEqual(await js('awContext().id'), picked);
+  assert.notEqual(await js('comparisonContext().id'), picked);
   fs.writeFileSync(
     path.join(out, `random-${width}-${height}.png`),
     Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
   );
   const comparisonBefore = await js(
-    'JSON.stringify([aw.ids,...awValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])',
+    'JSON.stringify([comparison.ids,...comparisonValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])',
   );
   assert.equal(
     await js("document.querySelector('.event-close').getAttribute('aria-label')"),
@@ -224,11 +224,14 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
     ),
   );
   await click('.event-close');
-  assert.equal(await js("!awContext()&&document.getElementById('eventContext').hidden"), true);
+  assert.equal(
+    await js("!comparisonContext()&&document.getElementById('eventContext').hidden"),
+    true,
+  );
   assert.equal(await js('document.activeElement.id'), 'analyzeView');
   assert.equal(
     await js(
-      'JSON.stringify([aw.ids,...awValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])',
+      'JSON.stringify([comparison.ids,...comparisonValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])',
     ),
     comparisonBefore,
     'closing context preserves comparison and catalogs',
@@ -336,49 +339,49 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
     'none',
   );
   await click('#analyzeView');
-  assert.equal(await js('aw.open'), true);
+  assert.equal(await js('comparison.open'), true);
   await click('#analysisSetup summary');
   await click('#analysisSetup summary');
   await select('#analysisDisplay', 1);
   assert.equal(await js("document.getElementById('analysisDailyPanel').hidden"), false);
   await click('#exploreView');
-  assert.equal(await js('aw.open'), false);
+  assert.equal(await js('comparison.open'), false);
   // Force each existing discovery through the real button, not direct navigation calls.
   const pool = await js('PassageDiscovery.candidates(passageEvents,passageShifts,places)');
   for (const target of pool) {
     await js(
-      `aw.event=null;aw.signal=null;window.qaRandom=Math.random;Math.random=()=>${(pool.indexOf(target) + 0.5) / pool.length}`,
+      `comparison.event=null;comparison.signal=null;window.qaRandom=Math.random;Math.random=()=>${(pool.indexOf(target) + 0.5) / pool.length}`,
     );
     await click('#randomEvent');
     await js('Math.random=window.qaRandom;delete window.qaRandom');
-    await until(() => js('!aw.busy'));
-    assert.equal(await js('awContext().id'), target.id);
+    await until(() => js('!comparison.busy'));
+    assert.equal(await js('comparisonContext().id'), target.id);
     assert.ok(
-      await js('aw.summaries.some(s=>s.count>0)'),
+      await js('comparison.summaries.some(s=>s.count>0)'),
       'random discovery loads actual observations',
     );
-    assert.equal(await js('aw.open&&aw.ids.includes(state.selected)'), true);
+    assert.equal(await js('comparison.open&&comparison.ids.includes(state.selected)'), true);
     assert.equal(
       await js("document.getElementById('analysisStart').value"),
       await js(
         target.kind === 'event'
-          ? 'passageEvents.find(e=>e.id===aw.event).start'
-          : 'passageShifts.find(e=>e.id===aw.signal).start',
+          ? 'passageEvents.find(e=>e.id===comparison.event).start'
+          : 'passageShifts.find(e=>e.id===comparison.signal).start',
       ),
     );
   }
-  const context = await js('awContext().id');
+  const context = await js('comparisonContext().id');
   await click('#analysisShare');
   const link = await js('location.href');
   await navigate(link);
-  assert.equal(await js('awContext().id'), context);
+  assert.equal(await js('comparisonContext().id'), context);
   await click('#exploreView');
   await js("document.getElementById('share').scrollIntoView({block:'center'})");
   await click('#share');
   const globeLink = await js('location.href');
   await navigate(globeLink);
   assert.equal(
-    await js('awContext().id'),
+    await js('comparisonContext().id'),
     context,
     'globe share preserves the selected shift annotation',
   );
@@ -390,5 +393,5 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
     'explicit shared selections remain intact',
   );
   await navigate(base + 'stories/');
-  assert.equal(await js('aw.open&&document.getElementById("eventCatalog").open'), true);
+  assert.equal(await js('comparison.open&&document.getElementById("eventCatalog").open'), true);
 };

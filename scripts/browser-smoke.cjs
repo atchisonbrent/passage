@@ -155,15 +155,17 @@ async function until(fn) {
         "document.getElementById('shiftPeriod').value='archive';document.getElementById('shiftPeriod').dispatchEvent(new Event('change'))",
       );
       await click('[data-shift]');
-      assert.ok(await js('aw.axis.length>=35&&aw.summaries[0].mean!==null'));
+      assert.ok(await js('comparison.axis.length>=35&&comparison.summaries[0].mean!==null'));
       assert.ok(await js('document.documentElement.scrollWidth<=innerWidth+1'));
       const expected = await js(
-        '({id:aw.signal,mean:aw.summaries[0].mean,reference:aw.summaries[0].reference})',
+        '({id:comparison.signal,mean:comparison.summaries[0].mean,reference:comparison.summaries[0].reference})',
       );
-      const hash = await js("'#'+awParams()");
+      const hash = await js("'#'+comparisonParams()");
       await navigate(base + hash);
       assert.deepEqual(
-        await js('({id:aw.signal,mean:aw.summaries[0].mean,reference:aw.summaries[0].reference})'),
+        await js(
+          '({id:comparison.signal,mean:comparison.summaries[0].mean,reference:comparison.summaries[0].reference})',
+        ),
         expected,
       );
       await click('#analysisChart');
@@ -186,10 +188,10 @@ async function until(fn) {
     // Exercise every retained discovery, not a hand-counted subset.
     const ids = await js('passageShifts.map(h=>h.id)');
     for (const ident of ids) {
-      await js(`awShift(${JSON.stringify(ident)})`);
-      const hash = await js("'#'+awParams()");
+      await js(`comparisonShift(${JSON.stringify(ident)})`);
+      const hash = await js("'#'+comparisonParams()");
       await navigate(base + hash);
-      assert.equal(await js('aw.signal'), ident);
+      assert.equal(await js('comparison.signal'), ident);
     }
     await checkLenses({ call, js, click, navigate, delay, until, base, out });
     assert.deepEqual(errors, []);

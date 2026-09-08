@@ -19,7 +19,7 @@ python3 scripts/preview.py
 
 Open [localhost:8653](http://localhost:8653/). The frontend is plain JavaScript; Python handles the data and build scripts.
 
-See [maintenance](docs/maintenance.md) for tests, data updates and deployment.
+Want to build on it? Start with [contributing](CONTRIBUTING.md), the [code map](docs/architecture.md), and [methods](docs/methods.md). See [maintenance](docs/maintenance.md) for data updates and deployment.
 
 ## License and data
 

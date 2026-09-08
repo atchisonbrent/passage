@@ -10,6 +10,35 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+# Classic scripts share a lexical scope. Helpers precede UI bindings; bootstrap
+# runs last, after every view has been defined. These names are the code map.
+APP_HELPERS = (
+    "freshness.js",
+    "workspace-math.js",
+    "discovery.js",
+    "events.js",
+    "chart-input.js",
+)
+APP_VIEWS = (
+    "app.js",
+    "depth.js",
+    "chart-plot.js",
+    "workspace.js",
+    "comparison-context.js",
+    "comparison-chart.js",
+    "comparison-export.js",
+)
+
+
+def script_bundles(source):
+    """Return the exact three inline-script payloads used by the template/CSP."""
+    helpers = [(source / name).read_text() for name in APP_HELPERS]
+    shifts = "const passageShifts=" + json.dumps(signal_candidates(), separators=(",", ":")) + ";"
+    views = [(source / name).read_text() for name in APP_VIEWS]
+    application = "\n".join([*helpers, shifts, *views, "boot();"])
+    return [(source / "analysis.js").read_text(), (source / "gestures.js").read_text(), application]
+
+
 def build():
     source = ROOT / "src"
     data = ROOT / "public/data"
@@ -22,30 +51,7 @@ def build():
         )
     (data / "manifest.json").write_text(json.dumps(manifest, separators=(",", ":")))
     html = (source / "index.html").read_text()
-    scripts = [
-        (source / "analysis.js").read_text(),
-        (source / "gestures.js").read_text(),
-        (source / "freshness.js").read_text()
-        + "\n"
-        + (source / "workspace-math.js").read_text()
-        + "\n"
-        + (source / "discovery.js").read_text()
-        + "\n"
-        + (source / "events.js").read_text()
-        + "\nconst passageShifts="
-        + json.dumps(signal_candidates(), separators=(",", ":"))
-        + ";\n"
-        + "\n"
-        + (source / "chart-input.js").read_text()
-        + "\n"
-        + (source / "app.js").read_text()
-        + "\n"
-        + (source / "depth.js").read_text()
-        + "\n"
-        + (source / "chart-plot.js").read_text()
-        + "\n"
-        + (source / "workspace.js").read_text(),
-    ]
+    scripts = script_bundles(source)
     assert all("</script" not in s.lower() for s in scripts)
     replacements = {
         "STYLE": (source / "style.css").read_text(),

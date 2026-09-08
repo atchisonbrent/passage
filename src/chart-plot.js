@@ -73,7 +73,7 @@ function plot(canvas, items) {
     }
     ctx.stroke();
   }
-  if (canvas.id === 'chart') awGlobeAnnotation(ctx, left, right, top, bottom);
+  if (canvas.id === 'chart') comparisonGlobeAnnotation(ctx, left, right, top, bottom);
   const x = xAt(state.index);
   ctx.strokeStyle = '#f4c397';
   ctx.lineWidth = 1;
