@@ -1,6 +1,7 @@
 /* Real Chromium navigation + responsive/restore smoke. Node 22+, no npm dependencies. */
 const {spawn}=require('node:child_process');
 const {removeProfile}=require('./browser-profile.cjs');
+const {checkControls,checkLenses}=require('./control-checks.cjs');
 const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
@@ -28,10 +29,10 @@ async function until(fn){const deadline=Date.now()+45000;let last;while(Date.now
   const navigate=async url=>{await call('Page.navigate',{url:'about:blank'});await until(()=>js("location.href==='about:blank'"));await call('Page.navigate',{url});await until(()=>js('!!window.passageSnapshot?.().ready'));};
   await call('Page.enable');await call('Runtime.enable');
   fs.mkdirSync(out,{recursive:true});const results=[];
-  for(const [width,height] of [[320,568],[390,844],[744,1133],[834,1210],[900,1200],[901,1200],[1024,1366],[1100,1400],[1210,834],[1366,1024],[1440,900],[1920,1080]]){
+  for(const [width,height] of [[320,568],[390,844],[744,1133],[834,1210],[900,1200],[901,1200],[1024,1366],[1100,1400],[1210,702],[1210,834],[1366,1024],[1440,900],[1920,1080]]){
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
    await call('Emulation.setTouchEmulationEnabled',{enabled:width<=1210});
-   await navigate(base);await click('#eventsView');
+   await navigate(base);await checkControls({call,js,click,delay,out,width,height});await click('#eventsView');
    assert.equal(await js("document.getElementById('eventCatalog').open"),true);
    assert.ok(await js("document.getElementById('freshness').textContent.includes('Observations:')"));
    assert.ok(await js("document.getElementById('shiftPeriodNote').textContent.includes('relative to observed coverage')"));
@@ -49,6 +50,7 @@ async function until(fn){const deadline=Date.now()+45000;let last;while(Date.now
   // Exercise every retained discovery, not a hand-counted subset.
   const ids=await js('passageShifts.map(h=>h.id)');
   for(const ident of ids){await js(`awShift(${JSON.stringify(ident)})`);const hash=await js("'#'+awParams()");await navigate(base+hash);assert.equal(await js('aw.signal'),ident);}
+  await checkLenses({call,js,click,navigate,delay,until,base,out});
   assert.deepEqual(errors,[]);
   fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify({results,discoveryCount:ids.length,errors},null,2));
   console.log(JSON.stringify({viewports:results.length,discoveries:ids.length,exceptions:errors.length}));

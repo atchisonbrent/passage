@@ -92,10 +92,9 @@ body:not(.analyst) .delta{margin:8px 0 4px}body:not(.analyst) .chart-title{margi
  body:not(.timeline-open) .time-controls>label,body:not(.timeline-open) .reference-controls{display:none}
  .timeline-open .time-controls>label{font-size:11px}
  .timeline-open .reference-controls{font-size:11px}
- #mobileMeasure{display:block;font-size:10px;line-height:14px;margin-top:2px}.timeline-open #mobileMeasure{display:none}
+ #mobileMeasure{display:block;font-size:10px;line-height:14px;margin-top:2px}
  .scrubrow{margin:3px 0 0;gap:6px}.scrubrow span{font-size:8px}
- body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel{height:calc(100dvh - 202px);min-height:240px}
- .timeline-open .workspace>.map-panel,.explore-open .workspace>.map-panel{height:280px;min-height:240px}
+ body .workspace>.map-panel,body.analyst .workspace>.map-panel{height:calc(100dvh - 202px);min-height:240px}
  .map-heading{top:6px;left:6px;right:6px;padding:5px 78px 5px 7px}
  .map-heading .badge{font-size:9px;letter-spacing:.06em}.map-heading p{font-size:10px;margin-top:2px}
  #detailsToggle{right:3px;top:0;min-height:44px}
@@ -136,7 +135,6 @@ body:not(.analyst) .delta{margin:8px 0 4px}body:not(.analyst) .chart-title{margi
 }
 @media(min-width:901px) and (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){
  body .workspace>.map-panel,body.analyst .workspace>.map-panel,body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel{height:calc(100dvh - 202px);min-height:300px}
- body.timeline-open .workspace>.map-panel,body.explore-open .workspace>.map-panel{height:calc(100dvh - 360px)}
 }
 
 /* Secondary navigation belongs to More, not a full-width workspace band. */
@@ -164,7 +162,7 @@ body:not(.explore-open) .header-actions{display:none}
  #mobileControls{display:block;order:3;margin-left:auto;min-height:44px}
  body:not(.timeline-open) .time-controls>label,body:not(.timeline-open) .reference-controls{display:none}
  .time-controls>label{order:4}
- #mobileMeasure{display:block}.timeline-open #mobileMeasure{display:none}
+ #mobileMeasure{display:block}
  .timebar{padding:8px 20px;max-height:40dvh;overflow:auto}
  body .workspace>.map-panel,body.analyst .workspace>.map-panel,body.explore-open .workspace>.map-panel{height:auto;min-height:260px}
 }
@@ -234,3 +232,17 @@ body.analysis-open .view-switch{position:sticky;top:0;background:var(--bg);z-ind
 .analysis-result-column th,.analysis-result-column td{white-space:normal;font-size:12px}.analysis-result-column td:nth-child(n+2):nth-child(-n+6){white-space:nowrap}
 
 #freshness{margin:0;padding:6px 12px;font-size:11px;flex-shrink:0}#freshness.stale{color:#f4c397;border-left:3px solid #f4c397}
+
+/* Settings overlay the chart; opening them never reallocates the workspace. */
+body .timebar{overflow:visible;max-height:none}
+.timeline-settings{position:absolute;right:12px;bottom:calc(100% + 8px);z-index:8;width:400px;max-width:calc(100vw - 24px);max-height:60dvh;overflow:auto;padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 36px #0008}
+.timeline-settings[hidden]{display:none}
+.settings-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.settings-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.settings-fields label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);min-width:0}
+.settings-fields select{width:100%;min-width:0;font-size:16px;color:var(--text)}
+.timeline-settings #clockNote{margin:12px 0 0;display:block}
+body #mobileControls{font-size:12px;order:3;margin-left:auto}
+body #mobileMeasure{display:block}
+body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow,body[data-mode=exposure] .time-controls,body[data-mode=exposure] .scrubrow{display:none}
+@media(min-width:901px){.detail #placeName{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0 8px;margin-top:0;box-shadow:0 -20px 0 var(--panel)}}
