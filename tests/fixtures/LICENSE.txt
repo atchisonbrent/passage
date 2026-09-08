@@ -1,0 +1,21 @@
+Data and third-party material are NOT licensed under Passage's MIT license.
+
+Activity, catalog, network and exposure data: IMF PortWatch
+https://portwatch.imf.org/
+Underlying sources: UN Global Platform (observed activity); University of
+Oxford (network and economic models), as attributed in the source metadata.
+IMF terms: https://www.imf.org/en/about/copyright-and-terms
+Third-party product terms may also apply. Commercial reuse is not authorized
+by this repository; consult the source terms and obtain required permissions.
+
+Passage reformats observations and calculates descriptive comparisons. These
+are Passage's calculations, not IMF findings. Preserve source attribution and
+distinguish derived results from original observations. No endorsement by the
+IMF, its management, Executive Board or member countries is implied.
+
+land.json: Natural Earth 1:110m land geometry, public domain.
+https://www.naturalearthdata.com/about/terms-of-use/
+
+Source notices and links in events, signal context and test fixtures remain
+subject to their respective owners' rights. Publication here does not relicense
+third-party text or grant rights to names, marks, or logos.

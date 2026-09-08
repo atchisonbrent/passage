@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Explore changes in maritime activity, historical port connections and modeled trade exposure using IMF PortWatch data."><title>Passage — Maritime atlas</title><style>:root{color-scheme:dark;--bg:#0b141b;--panel:#101e27;--line:#293f49;--text:#e8f0ed;--muted:#9cb2ba;--up:#83dbc1;--down:#ffa77b;--blue:#85bce8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}button,input,select{font:inherit;color:inherit}button,select,input[type=search],input[type=date]{background:#142630;border:1px solid var(--line);border-radius:7px;padding:9px 11px;min-height:42px}button{cursor:pointer}button:hover{background:#25434c}button.active{color:var(--up);border-color:#6eb89f;background:#25423e}button:disabled{opacity:.45;cursor:not-allowed}a{color:var(--up)}button:focus-visible,input:focus-visible,select:focus-visible,canvas:focus-visible,a:focus-visible{outline:2px solid var(--up);outline-offset:3px}header{display:flex;align-items:center;gap:25px;padding:13px 25px;border-bottom:1px solid var(--line);flex-wrap:wrap}.brand{font-size:25px;letter-spacing:-1px;font-weight:700;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:10px}.orb{font-size:37px;font-weight:300;color:var(--up)}nav{display:flex;gap:6px}.header-actions{margin-left:auto;display:flex;gap:15px;align-items:center;font-size:12px}main{padding:0 20px 185px}.promptbar{display:flex;gap:9px;align-items:center;padding:14px 0;flex-wrap:wrap}.promptbar button{font-size:12px;padding:6px 10px;min-height:34px;background:transparent}.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:650}#status{font-size:12px;color:var(--muted);padding:0 0 10px}.workspace{display:grid;grid-template-columns:255px minmax(0,1fr) 300px;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:490px;height:calc(100dvh - 335px);max-height:920px}.discovery,.detail{background:var(--panel);padding:20px;overflow:auto}.discovery{border-right:1px solid var(--line)}.detail{border-left:1px solid var(--line)}h1,h2,h3,p{margin-top:0}h1{font-size:18px;margin-bottom:3px}h2{font-size:25px;line-height:1.2;font-weight:550;margin-bottom:8px}h3{font-size:15px}.muted,.hint{color:var(--muted)}.hint{font-size:12px;line-height:1.55;margin:12px 0}.field{display:block;font-size:11px;color:var(--muted);margin:12px 0 0}.field input,.field select{display:block;width:100%;margin-top:5px}.filterrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filterrow select{font-size:11px;padding:8px 4px}.locations{display:flex;flex-direction:column;gap:6px}.location{display:block;width:100%;text-align:left;background:transparent;border-color:transparent;padding:10px}.location strong{display:block;font-size:13px;font-weight:550}.location span{display:block;font-size:11px;color:var(--muted);margin-top:3px}.location .rankvalue{font-size:13px;font-variant-numeric:tabular-nums}.positive{color:var(--up)!important}.negative{color:var(--down)!important}.map-panel{position:relative;min-width:0;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#19313c55,transparent 65%)}.map-heading{position:absolute;z-index:1;top:19px;left:22px;right:20px;pointer-events:none}.map-heading h2{font-size:19px;margin:9px 0 5px}.map-heading p{font-size:12px;color:var(--muted)}.badge{font-size:10px;color:var(--up);text-transform:uppercase;letter-spacing:.07em}#globe{width:100%;height:100%;display:block;touch-action:none;cursor:grab}#globe:active{cursor:grabbing}.map-tools{position:absolute;right:15px;bottom:18px;display:flex;gap:5px}.map-tools button{background:#0b1921e8;font-size:12px}.legend{position:absolute;left:18px;bottom:22px;font-size:10px;color:var(--muted);pointer-events:none;max-width:60%}.legend small{display:block;padding-top:4px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px}.up{background:var(--up)}.down{background:var(--down)}.missing{border:1px solid var(--muted)}.detail h2{margin-top:10px}.detail-tools{display:flex;gap:7px;margin:15px 0}.detail-tools button{font-size:11px;flex:1;padding:7px}.big{font-size:45px;letter-spacing:-2px;line-height:1.2;font-variant-numeric:tabular-nums}.delta{display:inline-block;font-size:16px;margin:15px 0 8px}#explanation{font-size:13px}.chart-title,.chart-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;gap:5px}.chart-title{border-top:1px solid var(--line);padding-top:20px;margin-top:20px}#chart{width:100%;height:125px;cursor:crosshair}.analytical{display:none;border-top:1px solid var(--line);padding-top:16px;margin-top:20px}.analyst .analytical{display:block}dl{font-size:11px}dt{color:var(--muted)}dd{margin:0 0 8px}.analytical button,#downloadNetwork,#downloadExposure{width:100%;font-size:11px}.route,.country{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.route button{width:100%;text-align:left;background:transparent;border:0;padding:0}.route small,.country small{display:block;color:var(--muted)}.route b,.country b{font-weight:500}.bar{height:3px;background:var(--blue);margin-top:6px;border-radius:2px}.timebar{position:fixed;bottom:0;left:0;right:0;z-index:5;background:#10212cf5;backdrop-filter:blur(16px);border-top:1px solid #415c64;padding:12px 25px max(12px,env(safe-area-inset-bottom));box-shadow:0 -10px 30px #0003}.time-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.time-controls label,.reference-controls label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}.time-controls select,.reference-controls select{font-size:11px;min-height:34px;padding:6px}.time-controls button{font-size:12px;min-height:36px}.time-controls input{min-height:36px;font-size:13px}.scrubrow{display:flex;align-items:center;gap:15px;margin:10px 0}.scrubrow input{flex:1;min-width:50px;accent-color:var(--up);cursor:ew-resize}.scrubrow span{font-size:10px;color:var(--muted)}.reference-controls{display:flex;gap:16px;align-items:center;flex-wrap:wrap}#clockNote{margin-left:auto;color:var(--muted);font-size:11px}.story{position:absolute;left:20px;right:20px;bottom:78px;padding:13px;background:#0d2029ed;border:1px solid #6e8f87;border-radius:9px;font-size:12px;max-width:430px}.story button{font-size:11px;padding:5px 9px;min-height:30px;margin:6px 6px 0 0}.story p{margin:0 0 5px}.compare-panel{padding:20px;border:1px solid var(--line);border-radius:12px;margin-top:16px;background:var(--panel)}.panel-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}.panel-heading h2{font-size:18px}#comparison{height:230px;width:100%}#pinLabels{display:flex;gap:14px;flex-wrap:wrap;font-size:12px}dialog{background:#12242e;color:var(--text);border:1px solid var(--line);border-radius:12px;max-width:720px;width:calc(100% - 30px);max-height:85dvh;padding:28px;line-height:1.7}dialog::backdrop{background:#000a;backdrop-filter:blur(6px)}.close{float:right}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;color:var(--muted)}[hidden]{display:none!important}body:not(.analyst) #rank{max-width:100%}body[data-mode=connections] .time-controls,body[data-mode=exposure] .time-controls,body[data-mode=connections] .scrubrow,body[data-mode=exposure] .scrubrow,body[data-mode=connections] .reference-controls label,body[data-mode=exposure] .reference-controls label{display:none}body[data-mode=connections] main,body[data-mode=exposure] main{padding-bottom:80px}@media(min-width:801px){body[data-mode=connections] .workspace,body[data-mode=exposure] .workspace{height:calc(100dvh - 240px)}}@media(min-width:1650px){.workspace{grid-template-columns:290px minmax(0,1fr) 350px}.detail,.discovery{padding:25px}.big{font-size:54px}}@media(max-width:1100px){header{gap:15px;padding:10px 16px}.header-actions{font-size:11px;gap:8px}.workspace{grid-template-columns:205px minmax(0,1fr) 245px}.discovery,.detail{padding:13px}.map-heading{left:16px}.legend{bottom:65px;max-width:90%}.map-tools{bottom:15px}.promptbar .eyebrow{display:none}}@media(max-width:800px){header{gap:8px}.brand{font-size:22px}.orb{font-size:28px}nav{margin-left:auto}.header-actions{width:100%;justify-content:space-between}.header-actions button{min-height:32px;font-size:11px}.promptbar{flex-wrap:nowrap;overflow:auto}.promptbar button{white-space:nowrap}main{padding:0 10px 240px}.workspace{height:auto;max-height:none;grid-template-columns:1fr 1fr}.map-panel{grid-column:1/-1;grid-row:1;height:440px}.discovery{max-height:510px;grid-column:1}.detail{max-height:510px;grid-column:2}.map-heading h2{font-size:18px}.legend{bottom:20px;max-width:62%}.timebar{padding:9px 12px max(9px,env(safe-area-inset-bottom))}.reference-controls{gap:7px}#clockNote{margin:0;font-size:10px}.time-controls{gap:5px}.time-controls label{font-size:0}.time-controls select{font-size:10px}.time-controls input{width:132px}.scrubrow{margin:7px 0}.big{font-size:36px}.filterrow{grid-template-columns:1fr}.promptbar button{min-height:40px}.story{bottom:80px}.time-controls #latest{display:none}}@media(max-width:420px){nav button{font-size:12px;padding:7px}.workspace{grid-template-columns:1fr}.map-panel{height:400px}.discovery{grid-column:1;max-height:350px;border:0;border-top:1px solid var(--line)}.detail{grid-column:1;max-height:none;border:0;border-top:1px solid var(--line)}.filterrow{grid-template-columns:1fr 1fr}.map-tools #reset{display:none}.reference-controls select{max-width:150px}.time-controls input{width:125px}.header-actions label{font-size:12px}}
+/* Touch-friendly, lower-density exploration. Native page pinch stays available. */
+body,button,a,input,select{touch-action:manipulation}
+header{position:sticky;top:0;z-index:6;background:#0b141bf2;backdrop-filter:blur(12px);padding:9px 20px}
+.orb{font-size:30px;line-height:1.2}.brand{font-size:23px}
+main{padding-bottom:130px}.analyst main{padding-bottom:185px}
+.workspace{min-height:320px;height:calc(100dvh - 260px)}.analyst .workspace{height:calc(100dvh - 320px)}
+.filterrow{grid-template-columns:1fr}.filterrow select{font-size:14px;padding:9px}
+.map-heading{top:12px;left:15px;right:15px;padding:8px 10px;background:linear-gradient(90deg,#0b1921ec,#0b192188,transparent);border-radius:6px}
+.map-heading h2{display:none}.map-heading p{margin:4px 0 0;font-size:11px}
+.map-tools button{min-width:44px;min-height:44px;font-size:15px}.map-tools #reset{font-size:12px}
+body:not(.analyst) #quality{display:none}body:not(.analyst) .reference-controls label{display:none}
+.timebar{padding:10px 20px max(10px,env(safe-area-inset-bottom))}.time-controls button,.time-controls input,.time-controls select{min-height:40px}
+.time-controls select{font-size:13px}.time-controls #back,.time-controls #forward{min-width:40px}
+#browseToggle{display:none}.browse-dialog-heading{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--line)}
+#browseDialog{padding:0;max-width:410px;width:calc(100% - 24px);max-height:85dvh;overflow:hidden}
+#browseDialog .discovery{display:block;max-height:calc(85dvh - 70px);overflow:auto;border:0;padding:16px 20px}
+#browseDialog .panel-heading h1{display:none}#browseDialog .field input,#browseDialog .field select{font-size:16px;min-height:44px}
+#browseDialog button{min-height:44px}body[data-mode=connections] .filterrow,body[data-mode=exposure] .filterrow{display:none}
+@media(max-width:1280px), (max-width:1440px) and (any-pointer:coarse){
+ #browseToggle{display:inline-block}.workspace{grid-template-columns:minmax(0,1fr) 260px}
+ .workspace>.discovery{display:none}.workspace>.map-panel{grid-column:1;grid-row:1}.workspace>.detail{grid-column:2;grid-row:1;padding:16px}
+ .promptbar{padding:8px 0;flex-wrap:nowrap;overflow:auto}.promptbar .eyebrow{display:none}.promptbar button{white-space:nowrap;font-size:11px}
+ .header-actions{gap:10px}.header-actions button{font-size:12px}.detail h2{font-size:23px}.map-panel{min-height:0;height:auto}
+ .legend{font-size:10px;max-width:67%;bottom:16px}.map-tools{bottom:12px}
+ body[data-mode=connections] .workspace,body[data-mode=exposure] .workspace{height:calc(100dvh - 185px)}
+}
+@media(max-width:900px), (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){
+ header{padding:8px 10px}.header-actions{width:100%;justify-content:space-between;gap:6px}.header-actions button{min-height:38px;padding:7px 9px;font-size:11px}
+ .workspace,.analyst .workspace,body[data-mode=connections] .workspace,body[data-mode=exposure] .workspace{height:auto;grid-template-columns:1fr;max-height:none}
+ .workspace>.map-panel{grid-column:1;grid-row:1;height:clamp(380px,50dvh,520px)}.workspace>.detail{grid-column:1;grid-row:2;max-height:none;border-left:0;border-top:1px solid var(--line)}
+ .timebar{padding:8px 10px max(8px,env(safe-area-inset-bottom))}.time-controls{gap:5px}.time-controls select{font-size:12px}.time-controls label{font-size:0}
+ .time-controls #back,.time-controls #forward{display:none}.scrubrow{margin:7px 0}.scrubrow span{font-size:9px}.reference-controls{gap:4px}
+ #clockNote{font-size:10px}.legend{max-width:62%;bottom:17px}.map-tools #reset{display:none}.map-tools{right:12px}
+ main{padding-bottom:160px}.analyst main{padding-bottom:230px}
+ .field select,.field input{font-size:16px}.chart-title,.chart-labels{font-size:11px}
+}
+@media(pointer:coarse){button,select,input:not([type=checkbox]):not([type=range]){min-height:44px}.time-controls input,.time-controls select{font-size:16px}.header-actions label{font-size:12px}}
+
+/* Let layout, not guessed browser-chrome offsets, allocate the map. */
+body{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+header{flex-shrink:0}.header-actions label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;min-height:44px}
+input[type=checkbox]{min-height:0;width:16px;height:16px;margin:0}input[type=range]{min-height:24px;height:24px;margin:0}
+body main,body.analyst main,body[data-mode] main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding-bottom:12px}
+.promptbar,#status{flex-shrink:0}
+body .workspace,body.analyst .workspace,body[data-mode] .workspace{height:auto;min-height:260px;max-height:none;flex:1}
+.timebar{position:relative;flex-shrink:0;bottom:auto;left:auto;right:auto}.compare-panel{flex-shrink:0}
+#detailsToggle,#backToGlobe{display:none}
+@media(max-width:900px), (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){body .workspace,body.analyst .workspace,body[data-mode] .workspace{flex:none;min-height:0}.workspace>.detail{min-height:0}
+ #detailsToggle{display:block;position:absolute;right:7px;top:5px;pointer-events:auto;min-height:38px;padding:6px 9px;font-size:11px}
+ .map-heading{padding-right:100px}#backToGlobe{display:block}
+}
+
+.detail{display:flex;flex-direction:column;position:relative}.detail>*{flex-shrink:0}
+body:not(.analyst)[data-mode=change] .detail-tools{order:10}
+body:not(.analyst) .detail h2{margin-top:6px;margin-bottom:4px}body:not(.analyst) #placeCountry{margin-bottom:8px}
+body:not(.analyst) .delta{margin:8px 0 4px}body:not(.analyst) .chart-title{margin-top:12px;padding-top:12px}body:not(.analyst) #chart{height:100px}
+@media(min-width:760px) and (max-width:900px){.header-actions{width:auto}}
+@media(max-width:900px), (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){#backToGlobe{position:absolute;right:12px;top:10px;width:auto;min-height:38px;flex:none;padding:6px 9px;font-size:11px}.detail>#placeKind{min-height:44px;padding-right:90px}}
+/* Validated small-viewport adjustments; append to the owned stylesheet. */
+@media(max-width:900px), (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){
+ .workspace>.map-panel{height:max(220px,min(50dvh,calc(100dvh - 360px)))}
+ body.analyst .workspace>.map-panel{height:max(200px,min(50dvh,calc(100dvh - 440px)))}
+ .time-controls input[type=date]{width:150px;min-width:150px;font-size:16px}
+}
+@media(min-width:901px) and (max-height:720px){
+ body:not(.analyst) .detail{padding:12px}
+ body:not(.analyst) .big{font-size:36px}
+ body:not(.analyst) .chart-title{margin-top:8px;padding-top:8px}
+ body:not(.analyst) #chart{height:70px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* Compact chrome: secondary controls are disclosed, not removed. */
+#mobileExplore,#mobileControls,#mobileMeasure{display:none}
+@media(max-width:1280px), (max-width:1440px) and (any-pointer:coarse){
+ header{gap:6px;padding:4px 8px;flex-wrap:wrap}
+ header .brand{display:none}header nav{flex:1;gap:4px}
+ header nav button{flex:1;padding:6px 4px;font-size:11px;min-height:44px}
+ header .header-actions{display:contents}
+ #browseToggle{font-size:11px;min-height:44px;padding:6px 8px}
+ body:not(.explore-open) .header-actions>label,body:not(.explore-open) #sources{display:none}
+ .explore-open .header-actions>label{flex:1}
+ body main{padding:6px 8px 8px}
+ body:not(.explore-open) .promptbar,body.snapshot-ready:not(.explore-open) #status:not([role=alert]){display:none}
+ #mobileControls{display:block;order:3;min-height:44px;font-size:12px;padding:6px 9px}
+ .timebar{padding:5px 8px max(5px,env(safe-area-inset-bottom));max-height:50dvh;overflow:auto}
+ .time-controls{gap:6px;justify-content:space-between}
+ .time-controls #play{min-height:44px;padding:6px 10px}
+ .time-controls #dateInput{width:148px;min-width:148px;min-height:44px;padding:5px;font-size:16px}
+ .time-controls>label{order:4}
+ body:not(.timeline-open) .time-controls>label,body:not(.timeline-open) .reference-controls{display:none}
+ .timeline-open .time-controls>label{font-size:11px}
+ .timeline-open .reference-controls{font-size:11px}
+ #mobileMeasure{display:block;font-size:10px;line-height:14px;margin-top:2px}.timeline-open #mobileMeasure{display:none}
+ .scrubrow{margin:3px 0 0;gap:6px}.scrubrow span{font-size:8px}
+ body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel{height:calc(100dvh - 202px);min-height:240px}
+ .timeline-open .workspace>.map-panel,.explore-open .workspace>.map-panel{height:280px;min-height:240px}
+ .map-heading{top:6px;left:6px;right:6px;padding:5px 78px 5px 7px}
+ .map-heading .badge{font-size:9px;letter-spacing:.06em}.map-heading p{font-size:10px;margin-top:2px}
+ #detailsToggle{right:3px;top:0;min-height:44px}
+ .legend{font-size:9px;line-height:1.35;max-width:65%;left:10px;bottom:10px}
+ .map-tools{right:8px;bottom:8px}
+}
+
+@media(max-width:1280px), (max-width:1440px) and (any-pointer:coarse){#mobileExplore{display:block;flex-basis:100%;min-height:38px;padding:5px 10px;font-size:12px;text-align:left;color:var(--up)}#mobileControls{padding:6px;font-size:11px}}
+
+/* More is local to the header; edge swipes belong to native scrolling. */
+.scroll-edge{display:none}
+@media(max-width:1280px), (max-width:1440px) and (any-pointer:coarse){
+ header nav{order:0}#mobileExplore{order:2;flex-basis:auto;min-height:44px;max-width:100px;padding:6px;font-size:11px;text-align:center}
+ #browseToggle{order:2;min-height:38px}.header-actions>label,#sources{order:3}
+ header .header-actions>label{font-size:11px}
+ body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel{height:calc(100dvh - 202px)}
+ body main{padding-left:20px;padding-right:20px}
+ .scroll-edge{display:block;position:absolute;top:0;bottom:0;width:18px;z-index:4;touch-action:pan-y;pointer-events:auto;background:linear-gradient(90deg,#78939d18,transparent)}
+ .scroll-edge.left{left:0}.scroll-edge.right{right:0;transform:scaleX(-1)}
+ .map-tools{right:22px}.map-heading{left:20px;right:20px}.legend{left:22px}
+}
+
+.search-icon{display:none}
+@media(max-width:1280px), (max-width:1440px) and (any-pointer:coarse){#browseToggle{width:44px;min-width:44px;height:44px;padding:10px;display:inline-flex;align-items:center;justify-content:center}#browseToggle .search-label{display:none}#browseToggle .search-icon{display:block}}
+
+.depth-panel{margin:18px 0;padding-top:12px;border-top:1px solid var(--line)}.depth-panel summary{cursor:pointer;color:var(--up);padding:12px 0;font-weight:600}.depth-panel h3{margin:20px 0 10px}.depth-panel input[type=date]{width:100%;font-size:16px}.depth-panel dl{display:block;font-size:12px}.depth-panel dt{color:var(--muted);margin-top:10px}.depth-panel dd{margin:2px 0 10px}.season-year{display:inline-block;padding:4px 8px;margin:3px;background:#20343c;border-radius:4px;font-size:11px}#historyChart{display:block;width:100%;height:120px}.category-row{display:grid;gap:3px;border-bottom:1px solid var(--line);padding:9px 0}.category-row small{color:var(--muted)}
+
+#chart,body:not(.analyst) #chart{height:160px}#chart,#comparison{touch-action:pan-y pinch-zoom;cursor:ew-resize;user-select:none}#chart:focus-visible,#comparison:focus-visible{outline:2px solid var(--up);outline-offset:3px}.chart-readout{font-size:12px;font-variant-numeric:tabular-nums;color:var(--text);margin:8px 0;min-height:18px}#chartHelp{font-size:11px;margin:6px 0}
+
+/* Shared compact controls on tablets; keep roomier composition where it fits. */
+@media(min-width:760px) and (max-width:1280px), (min-width:760px) and (max-width:1440px) and (any-pointer:coarse){
+ header .brand{display:flex}header nav{flex:0 1 auto}header nav button{font-size:13px;padding:8px 12px}
+ #browseToggle{margin-left:auto}#mobileExplore{max-width:120px;font-size:12px}
+ .explore-open .header-actions>label{flex-basis:calc(100% - 180px)}
+}
+@media(min-width:901px) and (max-width:1280px), (min-width:901px) and (max-width:1440px) and (any-pointer:coarse){
+ body .workspace>.map-panel,body.analyst .workspace>.map-panel,body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel{height:auto;min-height:260px}
+}
+@media(min-width:901px) and (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){
+ body .workspace>.map-panel,body.analyst .workspace>.map-panel,body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel{height:calc(100dvh - 202px);min-height:300px}
+ body.timeline-open .workspace>.map-panel,body.explore-open .workspace>.map-panel{height:calc(100dvh - 360px)}
+}
+
+/* Secondary navigation belongs to More, not a full-width workspace band. */
+header{position:relative}
+#mobileExplore{display:block;min-height:44px;margin-left:auto}
+.header-actions .promptbar{flex-basis:100%;white-space:normal;flex-wrap:wrap}
+.header-actions #status{flex-basis:100%;margin:0}
+body:not(.explore-open) .header-actions{display:none}
+@media(min-width:901px){
+ header{padding:8px 20px;gap:12px;flex-wrap:nowrap}
+ header .brand{display:flex}header nav{flex:0 1 auto}
+ header nav button{font-size:13px;padding:8px 12px}
+ #browseToggle{margin-left:auto}#browseToggle+#morePanel+#mobileExplore{margin-left:0}
+ header .header-actions{position:absolute;right:20px;top:calc(100% + 6px);width:360px;max-width:calc(100vw - 40px);padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 36px #0008;z-index:10;display:none;gap:10px;flex-wrap:wrap;max-height:70dvh;overflow:auto}
+ body.explore-open header .header-actions{display:flex}
+ .explore-open header .header-actions>label{flex:1 0 100%}
+ .header-actions .promptbar{display:flex;padding:8px 0;margin:0;border-top:1px solid var(--line);gap:6px}
+ .header-actions .promptbar button{text-align:left;white-space:normal}
+ .header-actions .promptbar .eyebrow{display:none}
+ body main{padding:10px 20px}
+ body .workspace{grid-template-columns:220px minmax(0,1fr) minmax(360px,32%)}
+ .workspace>.detail{padding:20px}
+ #chart,body:not(.analyst) #chart{height:200px}
+ .time-controls{justify-content:flex-start;gap:8px;flex-wrap:wrap}
+ #mobileControls{display:block;order:3;margin-left:auto;min-height:44px}
+ body:not(.timeline-open) .time-controls>label,body:not(.timeline-open) .reference-controls{display:none}
+ .time-controls>label{order:4}
+ #mobileMeasure{display:block}.timeline-open #mobileMeasure{display:none}
+ .timebar{padding:8px 20px;max-height:40dvh;overflow:auto}
+ body .workspace>.map-panel,body.analyst .workspace>.map-panel,body.explore-open .workspace>.map-panel{height:auto;min-height:260px}
+}
+@media(min-width:901px) and (max-width:1280px), (min-width:901px) and (max-width:1440px) and (any-pointer:coarse){body .workspace{grid-template-columns:minmax(0,1fr) minmax(360px,36%)}}
+@media(min-width:901px) and (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){body .workspace{grid-template-columns:1fr}body .workspace>.map-panel{height:calc(100dvh - 202px)}}
+
+/* Keep disclosure ordering and anchoring consistent across input sizes. */
+header .header-actions>label,header #sources{order:0}
+.header-actions .promptbar{order:1}.header-actions #status{order:2}
+@media(min-width:1281px) and (pointer:fine){#browseToggle+#morePanel+#mobileExplore{margin-left:auto}}
+@media(max-width:900px){
+ header .header-actions{display:none;position:absolute;right:8px;top:calc(100% + 6px);width:360px;max-width:calc(100vw - 16px);padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 36px #0008;z-index:10;gap:8px;flex-wrap:wrap;max-height:65dvh;overflow:auto}
+ body.explore-open header .header-actions{display:flex}
+ .explore-open header .header-actions>label{flex:1 0 100%}
+ .header-actions .promptbar{display:flex;white-space:normal;flex-wrap:wrap}
+ body.explore-open:not(.timeline-open) .workspace>.map-panel{height:calc(100dvh - 202px)}
+}
+
+/* A failed snapshot must remain visible even with More closed. */
+body header .header-actions:has(#status[role=alert]){display:flex}
+
+/* Portrait tablets show context and analysis together, not a phone-sized fold. */
+@media(min-width:700px) and (max-width:900px) and (orientation:portrait), (min-width:901px) and (max-width:1100px) and (orientation:portrait) and (any-pointer:coarse){
+ body .workspace>.map-panel,
+ body.analyst .workspace>.map-panel,
+ body:not(.timeline-open):not(.explore-open) .workspace>.map-panel,
+ body.analyst:not(.timeline-open):not(.explore-open) .workspace>.map-panel,
+ body.explore-open:not(.timeline-open) .workspace>.map-panel{height:clamp(280px,36dvh,440px);min-height:280px}
+ #browseToggle{margin-left:auto}
+ #browseToggle+#morePanel+#mobileExplore{margin-left:0}
+ .time-controls{justify-content:flex-start;gap:8px}
+ #mobileControls{margin-left:auto}
+}
+
+/* Map density is not an analysis permission. */
+body .analytical{display:block}body:not(.analyst) #quality{display:block}body:not(.analyst) .reference-controls label{display:inline-flex}.analytical summary{padding:12px 0;cursor:pointer;color:var(--up)}
+
+/* Dedicated analysis view: shared controls, no nested sidebar squeeze. */
+.view-switch{display:flex;gap:6px;padding:4px 0 8px;flex-shrink:0}.view-switch button{min-height:44px}.view-switch [aria-pressed=true]{border-color:var(--up);color:var(--up)}
+body.analysis-open .workspace,body.analysis-open #comparePanel,body.analysis-open .timebar{display:none}
+#analysisWorkspace{flex:0 0 auto;min-width:0;width:100%;max-width:1600px;margin:0 auto;padding:12px 0 30px}
+#analysisWorkspace[hidden]{display:none}.analysis-heading{display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#analysisWorkspace h1{font-size:25px}#analysisWorkspace h2{font-size:17px;margin:12px 0}#analysisWorkspace h3{font-size:16px}
+#analysisWorkspace details{border:1px solid var(--line);border-radius:8px;padding:12px;margin:12px 0}#analysisWorkspace summary{min-height:44px;cursor:pointer;color:var(--up);padding:10px 0;font-weight:600}
+.event-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}.event-card,.event-context{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.event-card small{color:var(--up)}.event-context button{margin:6px 8px 0 0}.event-context strong{font-size:18px;display:block;margin-bottom:8px}
+.analysis-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:16px 0}.analysis-controls>section{background:var(--panel);padding:14px;border-radius:8px;min-width:0}
+.date-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#analysisWorkspace input,#analysisWorkspace select{width:100%;min-width:0;max-width:100%;font-size:16px;min-height:44px}
+.analysis-actions,.analysis-pins,.range-shortcuts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.analysis-actions .field{margin:0}.analysis-pins button{white-space:normal;text-align:left}.analysis-pins{min-height:44px}#analysisMatches{display:grid;gap:5px;margin-bottom:8px}#analysisMatches button{text-align:left}
+#analysisWorkspace button{min-height:44px}#analysisChart{display:block;width:100%;height:300px;touch-action:pan-y pinch-zoom;cursor:ew-resize}#analysisReadout{min-height:44px;font-variant-numeric:tabular-nums}
+.table-scroll{max-width:100%;overflow:auto;border:1px solid var(--line);border-radius:8px}.table-scroll table{border-collapse:collapse;width:100%;font-size:13px}.table-scroll caption{text-align:left;padding:12px;color:var(--muted)}.table-scroll th,.table-scroll td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}.table-scroll thead{background:#20343c}.table-scroll tbody th{font-weight:500}.table-scroll td:last-child{white-space:normal;min-width:200px}
+body.analysis-open .view-switch{position:sticky;top:0;background:var(--bg);z-index:5}
+@media(max-width:1000px){.analysis-controls{grid-template-columns:1fr 1fr}.analysis-controls>section:first-child{grid-column:1/-1}}
+@media(max-width:600px){.analysis-controls{grid-template-columns:1fr}.analysis-controls>section:first-child{grid-column:auto}.view-switch button{font-size:12px;padding:6px 8px}.view-switch{gap:4px}#analysisWorkspace{padding-top:4px}#analysisChart{height:240px}.analysis-heading h1{font-size:22px}.analysis-heading>button{width:100%}.date-pair{gap:6px}}
+
+#analysisWorkspace .event-context{padding:0;border:0;background:none}#analysisWorkspace .event-context details{margin:8px 0;padding:0 12px;background:var(--panel)}#analysisWorkspace #analysisSetup{margin:8px 0}.analysis-heading .hint{margin-bottom:8px}.analysis-heading h1{margin-bottom:4px}
+
+#eventCatalog:not([open]){display:none}
+#analysisWorkspace .analysis-actions>.field{flex:1 1 160px;max-width:260px}
+#analysisWorkspace #analysisLoad[hidden],#analysisStatus[hidden]{display:none}
+@media(max-width:600px){.analysis-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.analysis-heading>button{width:auto;max-width:100px;padding:6px 9px;font-size:12px}.analysis-heading h1{font-size:19px}.analysis-heading .hint{font-size:11px}.analysis-actions{gap:8px}#analysisWorkspace .analysis-actions>.field{flex:1 1 120px;max-width:none}.event-context summary{font-size:13px}}
+
+.event-jumps{display:flex;gap:20px}.event-jumps a{padding:10px 0}.signal-method{margin-bottom:12px}.signal-method summary{padding:8px 0}
+
+.analysis-plot-column,.analysis-result-column{min-width:0}@media(min-width:1280px){.analysis-evidence{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(480px,1fr);gap:24px}.analysis-evidence h2{margin-top:8px}}
+
+.analysis-result-column th,.analysis-result-column td{white-space:normal;font-size:12px}.analysis-result-column td:nth-child(n+2):nth-child(-n+6){white-space:nowrap}
+
+#freshness{margin:0;padding:6px 12px;font-size:11px;flex-shrink:0}#freshness.stale{color:#f4c397;border-left:3px solid #f4c397}
+</style></head>
+<body>
+<header><a class="brand" href="/" aria-label="Passage home"><span class="orb">◎</span> passage</a><nav aria-label="Data lens"><button id="change" class="active">Change</button><button id="connections">Connections</button><button id="exposure">Exposure</button></nav><button id="browseToggle" aria-haspopup="dialog" aria-label="Find a place" title="Find a place"><svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="6"></circle><path d="m15 15 5 5"></path></svg><span class="search-label">Find a place</span></button><div class="header-actions" id="morePanel"><label><input id="analyst" type="checkbox"> Show all places</label><button id="sources">Sources & methods</button><section class="promptbar" aria-label="Starting points"><span class="eyebrow">Start with a question</span><button data-story="hormuz">What changed at Hormuz? ↗</button><button data-story="routes">Who connects to Jebel Ali? ↗</button><button data-story="cape">Suez vs the Cape ↗</button><button data-story="exposure">Who depends on Singapore? ↗</button></section>
+<div id="status" role="status">Loading the dated PortWatch snapshot…</div></div><button id="mobileExplore" aria-controls="morePanel" aria-expanded="false">More ▾</button></header>
+<main>
+<p id="freshness" class="hint" role="status"></p>
+<div class="view-switch" aria-label="Workspace"><button id="exploreView" aria-pressed="true">Explore</button><button id="analyzeView" aria-pressed="false">Analyze</button><button id="eventsView" aria-expanded="false" aria-controls="eventCatalog">Events & shifts</button></div>
+<section id="analysisWorkspace" hidden aria-label="Comparison analysis">
+ <div class="analysis-heading"><div><h1>Compare observations</h1><p class="hint">Historical observation ranges are independent of the globe date. Comparisons are descriptive, not causal.</p></div><button id="analysisShare">Copy link</button></div>
+ <details id="eventCatalog"><summary>Events & context</summary><p class="hint">Curated on 2026-09-07, not a live or exhaustive news feed. Recent reporting and historical context are labeled separately. Follow the original sources for developments after publication.</p><nav class="event-jumps" aria-label="Discovery sections"><a href="#shiftHeading">Data shifts</a><a href="#eventHeading">Reported events</a></nav><h2 id="shiftHeading">Notable shifts in the data</h2><details class="signal-method"><summary>How shifts are selected</summary><p class="hint">Calls screened across the bundled activity catalog: complete 7-day mean versus preceding 28 days, reference ≥20 calls/day, shift ≥50%, all seven days on the same side of the reference. One strongest absolute shift per place; ranked retrospectively, not statistically significant anomalies. Context is separately researched. Unmatched shifts remain unexplained.</p></details><label class="field">Discovery period<select id="shiftPeriod"><option value="recent">Recent · last 30 observed days</option><option value="archive">Historical discoveries</option></select></label><p id="shiftPeriodNote" class="hint"></p><div id="shiftCards" class="event-cards"></div><h2 id="eventHeading">Reported events & historical context</h2><div id="eventCards" class="event-cards"></div></details>
+ <section id="eventContext" hidden class="event-context" aria-label="Selected event"></section>
+ <details id="analysisSetup" open><summary id="analysisSetupSummary">Places & periods</summary><div class="analysis-controls">
+  <section><h2>Places</h2><div id="analysisPins" class="analysis-pins"></div><label class="field">Add a place<input id="analysisSearch" type="search" placeholder="Search places or countries" autocomplete="off"></label><div id="analysisMatches"></div><button id="analysisClear">Clear comparison</button></section>
+  <section><h2>Observation range</h2><div class="range-shortcuts"><button data-range="90">90 days</button><button data-range="365">1 year</button><button data-range="all">All history</button></div><div class="date-pair"><label class="field">From<input type="date" id="analysisStart"></label><label class="field">Through<input type="date" id="analysisEnd"></label></div><label class="field">Measure<select id="analysisMetric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports · ports</option><option value="5">Estimated exports · ports</option><option value="6">Passage capacity · chokepoints</option></select></label></section>
+  <section><h2>Reference</h2><label class="field">Reference window<select id="analysisReference"><option value="prior">Preceding 28 days</option><option value="year">Same calendar range last year</option><option value="custom">Custom dates</option></select></label><div class="date-pair"><label class="field">From<input type="date" id="analysisRefStart"></label><label class="field">Through<input type="date" id="analysisRefEnd"></label></div><label class="field">Chart scale<select id="analysisScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · reference mean = 100</option></select></label></section>
+ </div>
+ </details><div class="analysis-actions"><button id="analysisLoad">Load historical files for these places</button><label class="field">Plot span<select id="analysisSpan"><option value="reference">Reference + observations</option><option value="observations">Observations only</option></select></label><label class="field">Display<select id="analysisDisplay"><option value="chart">Chart</option><option value="table">Daily table</option></select></label></div>
+ <p id="analysisStatus" role="status"></p><p id="analysisCoverage" class="hint"></p>
+ <div class="analysis-evidence"><div class="analysis-plot-column">
+<section id="analysisChartPanel"><h2>Daily observations</h2><p id="analysisReadout"></p><canvas id="analysisChart" tabindex="0" role="slider" aria-label="Analysis observation date" aria-orientation="horizontal" aria-describedby="analysisChartHelp"></canvas><p id="analysisChartHelp" class="hint">Drag horizontally or use arrow keys; Shift moves a week. Vertical swipes scroll. Lines and labels identify places; gaps stay missing. Shaded band = reference; amber marker = selected event/report or detected-window start, as identified in the context.</p></section>
+<section id="analysisDailyPanel" hidden><h2>Daily observations</h2><div class="table-scroll" tabindex="0" role="region" aria-label="Daily observation table"><table id="analysisDaily"></table></div><div class="analysis-actions"><button id="analysisPrev">Previous rows</button><span id="analysisPage"></span><button id="analysisNext">Next rows</button></div></section>
+</div><section class="analysis-result-column"><h2>Period comparison</h2><p class="hint">Means require every calendar day in each period. Net deviation is against the reference, not lost trade. Percentages need a positive reference; tiny references can produce large percentages.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Period comparison results"><table id="analysisResults"></table></div><div id="analysisQuality" class="hint"></div></section></div>
+<button id="analysisExport">Download results & observations · CSV</button><details id="analysisSensitivity"><summary>Does the reference change the conclusion?</summary><p class="hint">The same observation range compared with 28-day references ending immediately before it, one week earlier, and four weeks earlier. This is reference sensitivity, not significance testing.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Reference sensitivity"><table id="sensitivityResults"></table></div></details>
+ <details id="analysisRecovery"><summary>Disruption & recovery</summary><label class="field">Disruption start (not necessarily the report date)<input id="analysisEventStart" type="date"></label><div class="date-pair"><label class="field">Recovery threshold<select id="analysisThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100%</option><option value="0.8">80%</option></select></label><label class="field">Consecutive days<select id="analysisSustain"><option value="7">7 days</option><option value="14">14 days</option></select></label></div><p class="hint">Uses its own 28 days immediately before the disruption start, not the comparison reference above. Follow-up ends at Through. Missing days break recovery runs; relapse remains possible.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Recovery results"><table id="recoveryResults"></table></div></details>
+</section>
+
+
+<section class="workspace">
+<aside class="discovery"><div class="panel-heading"><h1 id="listTitle">Find the change</h1><span id="coverage" class="muted"></span></div><label class="field">Find a port or passage<input id="search" type="search" placeholder="Try Rotterdam, Panama, Japan…" autocomplete="off"></label><div class="filterrow"><label class="field">Places<select id="kind"><option value="all">Ports + passages</option><option value="port">Ports</option><option value="chokepoint">Chokepoints</option></select></label><label class="field">Rank by<select id="rank"><option value="absolute">Size of change</option><option value="percent">Percentage change</option><option value="activity">Activity</option></select></label></div><p id="listHint" class="hint"></p><div id="locations" class="locations" aria-label="Search results and ranked places"></div></aside>
+<section class="map-panel" aria-label="Interactive maritime globe"><div class="map-heading"><button id="detailsToggle">Details ↓</button><span id="lensBadge" class="badge">Observed · AIS-derived estimates</span><h2 id="mapTitle">A world of changing activity</h2><p id="mapSubtitle">Color reveals the change. Select a place to understand it.</p></div><div class="scroll-edge left" aria-hidden="true"></div><div class="scroll-edge right" aria-hidden="true"></div><canvas id="globe" tabindex="0" aria-label="Maritime globe. Drag to rotate; arrow keys rotate; plus and minus zoom. Select places using the searchable list as an accessible alternative."></canvas><div class="map-tools"><button id="zoomout" aria-label="Zoom out">−</button><button id="zoomin" aria-label="Zoom in">+</button><button id="reset">Reset view</button></div><div class="legend" id="legend"><span class="dot down"></span> Below baseline <span class="dot up"></span> Above <span class="dot missing"></span> No comparison<br><small>Ring = baseline · filled circle = current activity</small></div><div id="story" class="story" hidden></div></section>
+<aside class="detail"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p><div class="detail-tools"><button id="backToGlobe">Globe ↑</button><button id="pin">+ Compare</button><button id="share">Copy view link</button></div><section id="activityDetail"><div class="big" id="value">—</div><div id="unit" class="muted"></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><div class="chart-title"><span>Daily observations · 2026</span><span id="chartScale"></span></div><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="hint">Drag ↔ or tap to select a date. Arrow keys move a day; Shift moves a week.</p><div class="chart-labels"><span>Latest observation</span><span id="lastDate"></span></div><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, separate from the globe’s 2026 timeline.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><p id="networkSummary"></p><label class="field">Direction<select id="direction"><option value="out">Outgoing</option><option value="in">Incoming</option></select></label><p class="hint">Schematic great-circle links, not navigable shipping routes. Moving dashes show direction, not vessels.</p><div id="routes"></div><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><p>Modeled trade passing through the selected port. <strong>Exposure, not predicted losses.</strong></p><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label><label class="field">Trade measure<select id="trade"><option value="daily_import_value_at_risk">Imports at risk</option><option value="daily_export_value_at_risk">Exports at risk</option></select></label><p id="exposureSummary" class="hint"></p><div id="countries"></div><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
+</section>
+<section id="comparePanel" class="compare-panel" hidden><div class="panel-heading"><h2>Pinned histories</h2><button id="clearPins">Clear comparison</button></div><p class="hint">Daily values, shared vertical scale and date axis. Coincident changes do not establish rerouting or causation.</p><label class="field">Comparison scale<select id="comparisonScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · Jan 1–28 mean = 100</option></select></label><p id="indexNote" class="hint"></p><div id="pinLabels"></div><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
+</main>
+<section class="timebar" aria-label="Playback and date controls"><div class="time-controls"><button id="play">▶ Play</button><button id="mobileControls" aria-expanded="false" aria-label="Show or hide timeline settings">Timeline ▴</button><button id="back" aria-label="Previous day">‹</button><input id="dateInput" type="date" aria-label="Observation date"><button id="forward" aria-label="Next day">›</button><button id="latest">Latest</button><label>Speed <select id="speed"><option value="1">1 day / sec</option><option value="7" selected>1 week / sec</option><option value="28">4 weeks / sec</option></select></label><label id="metricLabel">Measure <select id="metric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports</option><option value="5">Estimated exports</option><option value="6">Passage capacity</option></select></label></div><span id="mobileMeasure" class="muted"></span><div class="scrubrow"><span id="startLabel">JAN 2026</span><input type="range" id="scrub" min="0" max="1" value="0" aria-label="Observation timeline"><span id="endLabel">Latest available</span></div><div class="reference-controls"><label>Window <select id="window"><option value="7">7-day mean</option><option value="1">Daily value</option></select></label><label>Compare with <select id="baseline"><option value="prior">Preceding 28 days</option><option value="january">Jan 1–28, 2026</option></select></label><span id="clockNote">Daily observations · dated snapshot, not live traffic</span></div></section>
+<dialog id="browseDialog" aria-label="Find a port or passage"><div class="browse-dialog-heading"><strong>Find a place</strong><button id="closeBrowse">Close ×</button></div></dialog>
+<dialog id="sourceDialog"><button id="closeDialog" class="close">Close ×</button><h2>What this atlas can—and cannot—tell you</h2><p>Independent, noncommercial visualization of <a href="https://portwatch.imf.org/" target="_blank" rel="noopener noreferrer">IMF PortWatch</a>. Not an IMF product or endorsement.</p><h3>Observed activity</h3><p>Sources: UN Global Platform; IMF PortWatch (portwatch.imf.org). Network and economic-model sources: University of Oxford; IMF PortWatch.</p><p>Daily AIS-derived port calls, transit calls and estimated trade/capacity. Ports and passages count different events; do not sum their calls as unique ships. Tonnes are estimates, not customs declarations or trade value. AIS gaps, spoofing and revisions can affect observations. Zero recorded activity is not proof of no physical traffic.</p><p>Current means require every day in the selected window. Baselines require 28 observations and must finish before the current window starts. Missing or incomplete windows are excluded from change rankings. Percentage rankings require a baseline of at least 10 calls/day or 1,000 estimated tonnes/day. These are screening thresholds, not significance tests. Rankings follow the filters; they are not a global trade index. Colors use a ±5% neutral band, not a statistical-significance threshold. Reference rings are shown for passages and the selected port; marker sizes are bounded for legibility. The default globe shows up to 80 ranked matches plus the selected location. Enable Show all places for the full filtered map catalog. Reference controls are available independently in Timeline.</p><h3>Reading the comparisons</h3><p>Recent changes, historical context and disruption recovery answer different questions. Inspect the reference dates before interpreting a percentage. Historical ranges are descriptive, not statistical significance tests.</p><p>Share a view link to preserve the selected place, date, lens, metric, reference, pins and analyst setting. These comparisons are descriptive—not causal identification or statistically tested anomalies.</p><h3>Historical connections · 2019–2024</h3><p>Previous/next port-call connections and average transit days. Capacity at risk is a historical network/model measure, not today's cargo or an ETA. Incoming reverses the selected endpoint, not the source's meaning of relative exposure. Only the strongest 20 links are drawn; full filtered links are downloadable. Self-connections are excluded from the diagram.</p><h3>Modeled exposure · 2022 base year</h3><p>Country/sector trade allocations from OxMarTrans, available here for explicitly listed selected ports. No adaptation or actual loss is inferred. The model and observed timeline do not share a clock. We do not apply port exposure tables directly to Hormuz, add up exposures across ports, or animate a claimed shock arrival.</p><p><a href="https://portwatch.imf.org/pages/data-and-methodology" target="_blank" rel="noopener noreferrer">Methodology</a> · <a href="https://www.arcgis.com/home/item.html?id=9d2ad0a4c5c5460bbd95cfe933464b7a" target="_blank" rel="noopener noreferrer">Port network</a> · <a href="https://www.arcgis.com/home/item.html?id=86842d9b6e8948f29200710a8df206f5" target="_blank" rel="noopener noreferrer">Country model</a> · <a href="https://www.imf.org/external/terms.htm" target="_blank" rel="noopener noreferrer">IMF reuse terms</a></p><p>Geography: Natural Earth, public domain. Links are schematic and may cross land. Browser processing stays on your device; no analytics are included by this application.</p><pre id="provenance"></pre><a href="/data/manifest.json" download>Download snapshot manifest</a></dialog>
+<script>/* Pure calculations shared by the browser and deterministic tests. */
+(function(root) {
+  function summarize(rows, index, metric, windowSize = 7, baselineMode = 'prior') {
+    const start = index - windowSize + 1;
+    const baseEnd = baselineMode === 'january' ? 27 : start - 1;
+    const baseStart = baseEnd - 27;
+    function windowMean(a, b, expected) {
+      if (a < 0 || b >= rows.length || b < a) return { mean: null, count: 0 };
+      const values = rows.slice(a, b + 1).map(r => r?.[metric]).filter(Number.isFinite);
+      return {mean: values.length === expected ? values.reduce((a,b)=>a+b,0)/expected : null, count: values.length};
+    }
+    const current = windowMean(start, index, windowSize);
+    const baseline = baseEnd < start ? windowMean(baseStart, baseEnd, 28) : {mean:null,count:0};
+    const difference = current.mean !== null && baseline.mean !== null ? current.mean - baseline.mean : null;
+    return {current:current.mean,baseline:baseline.mean,difference,percent: difference !== null && baseline.mean > 0 ? difference / baseline.mean * 100 : null,currentCount:current.count,baselineCount:baseline.count,start,baseStart,baseEnd};
+  }
+  function csv(rows) {
+    return rows.map(row => row.map(value => {
+      let s = value === null || value === undefined ? '' : String(value);
+      if (/^[=+@\-\t\r]/.test(s) && typeof value !== 'number') s = "'" + s;
+      return '"' + s.replaceAll('"','""') + '"';
+    }).join(',')).join('\r\n');
+  }
+  function arc(a,b) {
+    const rad=Math.PI/180;
+    const xyz=p=>[Math.cos(p[1]*rad)*Math.cos(p[0]*rad),Math.cos(p[1]*rad)*Math.sin(p[0]*rad),Math.sin(p[1]*rad)];
+    const u=xyz(a),v=xyz(b),dot=Math.max(-1,Math.min(1,u.reduce((s,x,i)=>s+x*v[i],0))),angle=Math.acos(dot);
+    let tangent=v.map((x,i)=>x-dot*u[i]);
+    let length=Math.hypot(...tangent);
+    if(length<1e-8){const axis=Math.abs(u[2])<.9?[0,0,1]:[0,1,0];const d=axis.reduce((s,x,i)=>s+x*u[i],0);tangent=axis.map((x,i)=>x-d*u[i]);length=Math.hypot(...tangent);}
+    tangent=tangent.map(x=>x/length);
+    return Array.from({length:65},(_,i)=>{const t=angle*i/64,p=u.map((x,j)=>x*Math.cos(t)+tangent[j]*Math.sin(t));return [Math.atan2(p[1],p[0])/rad,Math.asin(Math.max(-1,Math.min(1,p[2])))/rad];});
+  }
+  const shiftDay=(date,n)=>new Date(Date.parse(date+'T00:00:00Z')+n*86400000).toISOString().slice(0,10);
+  function indexed(values,base){return values.map(v=>Number.isFinite(v)&&base>0?v/base*100:null);}
+  function eventStudy(rows,column,start,end,threshold=.9,sustain=7){
+    const byDate=new Map(rows.map(r=>[r[0],r[column]]));
+    const values=(a,b)=>{const out=[];for(let d=a;d<=b;d=shiftDay(d,1))out.push([d,byDate.get(d)]);return out;};
+    const ref=values(shiftDay(start,-28),shiftDay(start,-1));
+    const baseline=ref.every(r=>Number.isFinite(r[1]))?ref.reduce((s,r)=>s+r[1],0)/28:null;
+    const follow=start<=end?values(start,end):[];const complete=follow.length>0&&follow.every(r=>Number.isFinite(r[1]));
+    let belowDays=0,observedDays=0,shortfall=0,netDeviation=0,run=0,recovery=null,hadDecline=false,minMean=null,minDate=null;
+    for(let i=0;i<follow.length;i++){
+      const [d,v]=follow[i];if(!Number.isFinite(v)){run=0;continue;}
+      observedDays++;if(baseline===null){run=0;continue;}
+      shortfall+=Math.max(0,baseline-v);netDeviation+=v-baseline;
+      if(baseline>0&&v<baseline*threshold){belowDays++;hadDecline=true;run=0;}else if(hadDecline&&baseline>0){run++;if(run>=sustain&&!recovery)recovery=d;}
+      if(i>=6){const w=follow.slice(i-6,i+1).map(r=>r[1]);if(w.every(Number.isFinite)){const mean=w.reduce((a,b)=>a+b,0)/7;if(minMean===null||mean<minMean){minMean=mean;minDate=d;}}}
+    }
+    return {baseline,referenceStart:shiftDay(start,-28),referenceEnd:shiftDay(start,-1),start,end,threshold,sustain,belowDays,observedDays,expectedDays:follow.length,complete,shortfall:complete&&baseline!==null?shortfall:null,netDeviation:complete&&baseline!==null?netDeviation:null,recovery,minMean,minDate};
+  }
+  function seasonalReference(rows,column,end,windowSize){
+    const map=new Map(rows.map(r=>[r[0],r[column]])),year=Number(end.slice(0,4)),years=[];
+    for(let y=2019;y<year;y++){
+      const target=y+end.slice(4);if(new Date(target+'T00:00:00Z').toISOString().slice(0,10)!==target)continue;
+      const window=Array.from({length:windowSize},(_,i)=>map.get(shiftDay(target,-i)));
+      if(window.every(Number.isFinite))years.push({year:y,mean:window.reduce((a,b)=>a+b,0)/windowSize});
+    }
+    const values=years.map(r=>r.mean);return {years,mean:values.length>=3?values.reduce((a,b)=>a+b,0)/values.length:null,min:values.length>=3?Math.min(...values):null,max:values.length>=3?Math.max(...values):null};
+  }
+  const api={summarize,csv,arc,indexed,eventStudy,seasonalReference,shiftDay};
+  if(typeof module !== 'undefined') module.exports=api;
+  else root.PassageMath=api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script><script>/* Pointer input only: data, rendering and page zoom remain separate. */
+(function(root){
+  function attach(canvas,{getView,setView,onTap}){
+    const pointers=new Map();
+    let drag=null,pinch=null;
+    const distance=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y);};
+    function down(e){
+      try{canvas.setPointerCapture(e.pointerId);}catch{return;}
+      pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      const view=getView();
+      if(pointers.size===1)drag={x:e.clientX,y:e.clientY,lon:view.lon,lat:view.lat,moved:false};
+      else if(pointers.size===2){pinch={distance:Math.max(1,distance()),zoom:view.zoom};drag=null;}
+    }
+    function move(e){
+      if(!pointers.has(e.pointerId))return;
+      pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(pointers.size>=2&&pinch){
+        setView({zoom:Math.min(2.5,Math.max(.7,pinch.zoom*distance()/pinch.distance))});
+        return;
+      }
+      if(!drag)return;
+      const view=getView(),dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+      drag.moved=drag.moved||Math.abs(dx)+Math.abs(dy)>4;
+      setView({lon:drag.lon-dx*.35/view.zoom,lat:Math.max(-80,Math.min(80,drag.lat+dy*.3/view.zoom))});
+    }
+    function finish(e,cancelled=false){
+      if(!pointers.has(e.pointerId))return;
+      const wasSingle=pointers.size===1;
+      if(!cancelled&&wasSingle&&drag&&!drag.moved)onTap(e);
+      pointers.delete(e.pointerId);pinch=null;drag=null;
+      // A remaining finger continues dragging without a jump or a synthetic tap.
+      if(pointers.size===1){const p=[...pointers.values()][0],view=getView();drag={x:p.x,y:p.y,lon:view.lon,lat:view.lat,moved:true};}
+      else if(pointers.size>=2)pinch={distance:Math.max(1,distance()),zoom:getView().zoom};
+    }
+    canvas.onpointerdown=down;canvas.onpointermove=move;
+    canvas.onpointerup=e=>finish(e);canvas.onpointercancel=e=>finish(e,true);
+    return {down,move,up:e=>finish(e),cancel:e=>finish(e,true)};
+  }
+  if(typeof module!=='undefined')module.exports={attach};else root.PassageGestures={attach};
+})(typeof window!=='undefined'?window:globalThis);
+</script><script>/* Client-clock warning continues to age even if the updater stops. */
+const PassageFreshness={status(manifest,today=new Date().toISOString().slice(0,10)){
+ const cutoff=[manifest.Daily_Ports_Data_latest,manifest.Daily_Chokepoints_Data_latest].sort()[0];
+ const days=Math.floor((Date.parse(today+'T00:00:00Z')-Date.parse(cutoff+'T00:00:00Z'))/86400000);
+ return {cutoff,days,stale:!Number.isFinite(days)||days>14};
+}};
+if(typeof module!=='undefined'&&module.exports)module.exports=PassageFreshness;
+
+/* Calendar-aligned descriptive comparisons. No zero fill or causal model. */
+(function(root){
+  const validDate=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s+'T00:00:00Z'))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s;
+  const shift=(s,n)=>new Date(Date.parse(s+'T00:00:00Z')+n*86400000).toISOString().slice(0,10);
+  function days(start,end){if(!validDate(start)||!validDate(end)||start>end||end>'2100-01-01'||start<'2019-01-01')return [];const out=[];for(let d=start;d<=end;d=shift(d,1))out.push(d);return out;}
+  function period(rows,col,start,end){const map=new Map(rows.map(r=>[r[0],r[col]])),ds=days(start,end),values=ds.map(d=>map.get(d)),count=values.filter(Number.isFinite).length;return {mean:ds.length&&count===ds.length?values.reduce((a,b)=>a+b,0)/ds.length:null,count,expected:ds.length};}
+  function summary(rows,col,start,end,refStart,refEnd){const cur=period(rows,col,start,end),ref=period(rows,col,refStart,refEnd),reference=refEnd<start?ref.mean:null,difference=cur.mean!==null&&reference!==null?cur.mean-reference:null;
+    return {mean:cur.mean,reference,difference,percent:difference!==null&&reference>0?100*difference/reference:null,net:difference!==null?difference*cur.expected:null,count:cur.count,expected:cur.expected,referenceCount:ref.count,referenceExpected:ref.expected,reason:!cur.expected?'Choose a valid observation range':cur.mean===null?'Incomplete observation range':refEnd>=start?'Reference must end before observations':reference===null?'Incomplete reference':reference===0?'Zero reference: percentage undefined':'Complete periods; descriptive, not causal'};}
+  const normalize=(v,ref)=>Number.isFinite(v)&&ref>0?v/ref*100:null;
+  const api={validDate,shift,days,period,summary,normalize};if(typeof module!=='undefined')module.exports=api;else root.PassageWorkspaceMath=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+/* Curated source context, reviewed 2026-09-07. Not a live or exhaustive feed. */
+const passageEvents=[
+ {id:'hormuz-2026',title:'Hormuz: the February break',date:'2026-02-28',dateKind:'Disruption start reported by IMF',published:null,source:'IMF PortWatch',url:'https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1',summary:'PortWatch reports reduced traffic from February 28 and attacks on commercial ships. Its warning includes GPS jamming, AIS spoofing and vessels going dark.',places:['chokepoint6','chokepoint4','chokepoint1'],start:'2026-02-28',end:'2026-08-28',referenceStart:'2026-01-31',referenceEnd:'2026-02-27',caveat:'Related passages provide geographic context, not a causal control group. AIS interference can affect measured traffic.'},
+ {id:'hormuz-august',title:'Hormuz: six months unresolved',date:'2026-08-28',dateKind:'Statement date, not a new disruption onset',published:'2026-08-28',source:'International Maritime Organization',url:'https://www.imo.org/en/mediacentre/pressbriefings/pages/statement-on-the-ongoing-crisis-in-the-strait-of-hormuz.aspx',summary:'The IMO described the situation as unresolved six months into the conflict and called for practical solutions to restore freedom of navigation.',places:['chokepoint6'],start:'2026-08-01',end:'2026-08-28',referenceStart:'2026-01-31',referenceEnd:'2026-02-27',caveat:'This snapshot cannot establish recovery after the statement. The comparison is August against a pre-conflict reference, not an estimate of the statement’s effect.'},
+ {id:'red-sea-2024',title:'Suez and the Cape: the longer route',date:'2024-03-07',dateKind:'IMF report publication, not disruption onset',published:'2024-03-07',source:'IMF',url:'https://www.imf.org/en/blogs/articles/2024/03/07/red-sea-attacks-disrupt-global-trade',summary:'The IMF reported reduced Suez trade and increased Cape traffic in early 2024 as shipping companies diverted around Africa following Red Sea attacks.',places:['chokepoint1','chokepoint7'],start:'2024-01-01',end:'2024-03-31',referenceStart:'2023-01-01',referenceEnd:'2023-03-31',caveat:'Historical context, not current news. The default chart uses calls, not the trade-volume measure quoted in the IMF article. The reference is the same quarter a year earlier.'},
+ {id:'panama-2024',title:'Panama: drought restrictions',date:'2024-03-07',dateKind:'IMF report publication, not restriction onset',published:'2024-03-07',source:'IMF',url:'https://www.imf.org/en/blogs/articles/2024/03/07/red-sea-attacks-disrupt-global-trade',summary:'The IMF described drought-related restrictions that reduced daily Panama Canal crossings from October 2023 and discussed weaker trade volume in early 2024.',places:['chokepoint2'],start:'2024-01-01',end:'2024-03-31',referenceStart:'2023-01-01',referenceEnd:'2023-03-31',caveat:'Historical context. Calls and estimated capacity are distinct from trade value; comparison alone does not isolate the effect of drought.'}
+];
+if(typeof module!=='undefined')module.exports=passageEvents;
+
+const passageShifts=[{"id":"chokepoint6:2026-03-02","place":"chokepoint6","name":"Strait of Hormuz","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":2.5714285714285716,"reference":77.25,"difference":-74.67857142857143,"percent":-96.67128987517337,"context":{"place":"chokepoint6","start":"2026-03-02","end":"2026-03-08","source":"IMF PortWatch","url":"https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1","published":null,"reportedDate":"2026-02-28","summary":"IMF PortWatch reports reduced Hormuz traffic from February 28 amid attacks on commercial ships, with warnings about GPS jamming, AIS spoofing and vessels going dark.","caveat":"The rolling reference includes February 28\u2013March 1; it is not a wholly pre-conflict baseline. Recorded calls do not establish complete physical closure or causal impact."},"qualifies":true,"recent":false},{"id":"port744:2026-03-02","place":"port744","name":"Jebel Ali","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":1.4285714285714286,"reference":23.857142857142858,"difference":-22.42857142857143,"percent":-94.0119760479042,"context":{"place":"port744","start":"2026-03-02","end":"2026-03-08","source":"Inchcape Shipping Services \u00b7 port advisory","url":"https://www.iss-shipping.com/wp-content/uploads/2026/03/Middle-East-Port-Advisory-02032026-1800.pdf","published":"2026-03-02","reportedDate":"2026-03-02","summary":"Inchcape's March 2 advisory described Jebel Ali terminal operations as normal while reporting sharply reduced commercial traffic through Hormuz amid regional risk.","caveat":"This corroborates regional disruption, not a week-long Jebel Ali closure. Lower measured calls and normal terminal operations can coexist; no causal attribution is established."},"qualifies":true,"recent":false},{"id":"chokepoint27:2026-05-11","place":"chokepoint27","name":"Mindoro Strait","start":"2026-05-11","end":"2026-05-17","referenceStart":"2026-04-13","referenceEnd":"2026-05-10","mean":57.0,"reference":37.82142857142857,"difference":19.17857142857143,"percent":50.70821529745043,"context":null,"qualifies":true,"recent":false},{"id":"port1253:2026-07-08","place":"port1253","name":"Suzhou (Taicang)","start":"2026-07-08","end":"2026-07-14","referenceStart":"2026-06-10","referenceEnd":"2026-07-07","mean":5.428571428571429,"reference":21.035714285714285,"difference":-15.607142857142856,"percent":-74.19354838709677,"context":{"place":"port1253","start":"2026-07-08","end":"2026-07-14","source":"Kuehne+Nagel \u00b7 dated operational updates","url":"https://mykn.kuehne-nagel.com/news/article/two-tropical-storms-strengthen-china","published":"2026-07-14","reportedDate":"2026-07-09","summary":"Kuehne+Nagel's July 9 update reported Taicang restrictions; its July 11 update listed Taicang among suspended barge and feeder locations during Typhoon Bavi. July 14 reported regional operations resuming.","caveat":"The advisory supplies contemporaneous operational context. It does not quantify how much of the weekly call decline was caused by the storm or establish this port's exact reopening time."},"qualifies":true,"recent":false},{"id":"port494:2026-03-18","place":"port494","name":"Incheon","start":"2026-03-18","end":"2026-03-24","referenceStart":"2026-02-18","referenceEnd":"2026-03-17","mean":9.428571428571429,"reference":20.964285714285715,"difference":-11.535714285714286,"percent":-55.02555366269165,"context":null,"qualifies":true,"recent":false}];
+
+/* Chart scrubbing: horizontal intent; vertical browser panning stays native. */
+(function(root){
+  const bounds=width=>({left:48,right:Math.max(49,width-10)});
+  function indexAt(x,width,count){const b=bounds(width);return Math.max(0,Math.min(count-1,Math.round((x-b.left)/(b.right-b.left)*Math.max(0,count-1))));}
+  function attach(canvas,{count,index,onSelect}){
+    const pointers=new Set();let active=null,multi=false;
+    const release=id=>{try{if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);}catch{}};
+    const select=e=>{if(count()>0){const r=canvas.getBoundingClientRect();onSelect(indexAt(e.clientX-r.left,r.width,count()));}};
+    // Ambiguous diagonals do not select: native vertical scrolling gets priority.
+    const intent=e=>{if(active?.mode!=='pending')return;const dx=Math.abs(e.clientX-active.x),dy=Math.abs(e.clientY-active.y);if(dy>6&&dy>=dx)active.mode='vertical';else if(dx>6&&dx>dy*1.2)active.mode='horizontal';};
+    canvas.addEventListener('pointerdown',e=>{
+      if(e.button!==undefined&&e.button!==0)return;
+      pointers.add(e.pointerId);if(pointers.size>1){multi=true;active=null;return;}
+      if(multi)return;active={id:e.pointerId,x:e.clientX,y:e.clientY,mode:'pending'};
+      try{canvas.setPointerCapture(e.pointerId);}catch{active=null;pointers.delete(e.pointerId);}
+    });
+    canvas.addEventListener('pointermove',e=>{if(!active||active.id!==e.pointerId||multi)return;intent(e);if(active.mode==='horizontal'){e.preventDefault();select(e);}});
+    canvas.addEventListener('pointerup',e=>{
+      if(active?.id===e.pointerId&&!multi){intent(e);if(active.mode==='horizontal'||active.mode==='pending'&&Math.hypot(e.clientX-active.x,e.clientY-active.y)<=6)select(e);}
+      if(active?.id===e.pointerId)active=null;pointers.delete(e.pointerId);release(e.pointerId);if(!pointers.size)multi=false;
+    });
+    const cancel=e=>{if(active?.id===e.pointerId)active=null;pointers.delete(e.pointerId);release(e.pointerId);if(!pointers.size)multi=false;};
+    canvas.addEventListener('pointercancel',cancel);canvas.addEventListener('lostpointercapture',cancel);
+    canvas.addEventListener('keydown',e=>{if(count()<=0)return;const step=e.shiftKey?7:1;let next=index();if(e.key==='ArrowLeft'||e.key==='ArrowDown')next-=step;else if(e.key==='ArrowRight'||e.key==='ArrowUp')next+=step;else if(e.key==='Home')next=0;else if(e.key==='End')next=count()-1;else return;e.preventDefault();onSelect(Math.max(0,Math.min(count()-1,next)));});
+  }
+  const api={bounds,indexAt,attach};if(typeof module!=='undefined')module.exports=api;else root.PassageChartInput=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+'use strict';
+const $=id=>document.getElementById(id), M=PassageMath;
+const nf=new Intl.NumberFormat('en-US',{maximumFractionDigits:1}), compact=new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:1});
+const fmt=v=>Number.isFinite(v)?nf.format(v):'—', short=v=>Number.isFinite(v)?compact.format(v):'—';
+const state={mode:'change',selected:'chokepoint6',index:0,metric:0,window:7,baseline:'prior',lon:45,lat:16,zoom:1,playing:false,pins:[],story:null};
+let manifest,places=[],placeById={},dates=[],series={},land,network=null,networkPromise=null,networkError=null,exposures={},exposurePromises={},exposureErrors={},stats={},ranking=[],links=[],countryRows=[],hitpoints=[],drag=null,clock=null,renderPending=false,routeFrame=null,phase=0,bootFailed=false;
+let globeGeometry={cx:0,cy:0,r:1,w:1,h:1};
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+async function load(file){const response=await fetch('/data/'+file);if(!response.ok)throw new Error(file+' HTTP '+response.status);return response.json();}
+function text(id,s){$(id).textContent=s;}
+function element(tag,cls,content){const e=document.createElement(tag);if(cls)e.className=cls;if(content!==undefined)e.textContent=content;return e;}
+function place(){return placeById[state.selected]||network?.nodes[state.selected];}
+function supported(p){return state.metric<4 || (state.metric<6?p.kind==='port':p.kind==='chokepoint');}
+function stop(){if(clock)clearInterval(clock);clock=null;state.playing=false;}
+function refresh(){if(renderPending)return;renderPending=true;requestAnimationFrame(()=>{renderPending=false;render();});}
+function setDate(i){stop();state.index=Math.max(0,Math.min(dates.length-1,i));refresh();}
+function play(){stop();if(state.mode!=='change')return;if(state.index>=dates.indexOf([manifest.Daily_Ports_Data_latest,manifest.Daily_Chokepoints_Data_latest].sort()[0]))state.index=0;state.playing=true;const start=state.index,t=performance.now(),rate=Number($('speed').value);clock=setInterval(()=>{const next=Math.min(dates.length-1,start+Math.floor((performance.now()-t)*rate/1000));if(next!==state.index){state.index=next;if(next===dates.length-1)stop();refresh();}},40);refresh();}
+function choose(id,recenter=true){if(!placeById[id]&&!network?.nodes[id])return;state.selected=id;document.querySelector('.detail').scrollTop=0;if($('browseDialog').open){$('search').value='';$('browseDialog').close();document.querySelector('main').scrollTo({top:0,behavior:'auto'});}const p=place();if(!supported(p))state.metric=0;if(recenter){state.lon=p.lon;state.lat=p.lat;state.zoom=1;}state.story=null;if(state.mode==='exposure')ensureExposure();refresh();}
+async function setMode(mode){if(aw.open)awOpen(false);stop();state.mode=mode;state.story=null;document.querySelector('.detail').scrollTop=0;if(mode!=='change')$('kind').value='all';if(mode==='connections'){if(place()?.kind==='chokepoint')state.selected=places.find(p=>p.name==='Jebel Ali')?.id||places[0].id;const p=place();state.lon=p.lon;state.lat=p.lat;ensureNetwork();}if(mode==='exposure'){if(!manifest.exposure.some(p=>p.id===state.selected))state.selected=manifest.exposure.find(p=>p.name==='Singapore')?.id||manifest.exposure[0]?.id;ensureExposure();const p=place();if(p){state.lon=p.lon;state.lat=p.lat;}}refresh();}
+async function ensureNetwork(){if(network)return;if(!networkPromise){networkError=null;text('status','Loading the historical network…');networkPromise=load('network.json').then(data=>{network=data;return data;}).catch(e=>{networkPromise=null;networkError=e.message;return null;});}await networkPromise;refresh();}
+async function ensureExposure(){const id=state.selected,entry=manifest.exposure.find(x=>x.id===id);if(!entry)return;if(!exposures[id]){if(!exposurePromises[id]){delete exposureErrors[id];exposurePromises[id]=load(entry.file).then(rows=>{exposures[id]=rows;}).catch(e=>{delete exposurePromises[id];exposureErrors[id]=e.message;});}await exposurePromises[id];}if(state.selected===id)refresh();}
+function recompute(){stats={};if(state.mode!=='change')return;for(const p of places)if(supported(p))stats[p.id]=M.summarize(series[p.id]||[],state.index,state.metric,state.window,state.baseline);}
+function filteredPlaces(){const q=$('search').value.trim().toLocaleLowerCase(),kind=$('kind').value;let pool=state.mode==='exposure'?manifest.exposure.map(p=>placeById[p.id]):places;
+ return pool.filter(p=>p&&(state.mode!=='connections'||p.kind==='port')&&(state.mode!=='change'||supported(p))&&(kind==='all'||p.kind===kind)&&(!q||(p.name+' '+p.country).toLocaleLowerCase().includes(q)));}
+function makeList(){const mode=state.mode,rank=$('rank').value;let list=filteredPlaces();
+ if(mode==='change'){
+  if(!$('search').value.trim()) list=list.filter(p=>rank==='activity'?stats[p.id]?.current!==null:stats[p.id]?.difference!==null && (rank!=='percent'||stats[p.id].baseline>=(state.metric<4?10:1000)));
+  list.sort((a,b)=>{const x=stats[a.id],y=stats[b.id];const score=s=>rank==='activity'?s?.current:rank==='percent'?Math.abs(s?.percent??0):Math.abs(s?.difference??0);return (score(y)??-1)-(score(x)??-1)||a.name.localeCompare(b.name);});
+ }else list.sort((a,b)=>a.name.localeCompare(b.name));
+ ranking=list;const frag=document.createDocumentFragment();
+ for(const p of list.slice(0,80)){
+  const b=element('button','location'+(p.id===state.selected?' active':''));b.setAttribute('aria-pressed',String(p.id===state.selected));b.dataset.place=p.id;b.append(element('strong','',p.name));b.append(element('span','',p.country));
+  if(mode==='change'){const s=stats[p.id],v=rank==='activity'?s?.current:rank==='percent'?s?.percent:s?.difference;const label=rank==='activity'?fmt(v)+' / day':v===null||v===undefined?'No complete comparison':(v>0?'+':'')+fmt(v)+(rank==='percent'?'%':' / day');b.append(element('span','rankvalue '+(v>0?'positive':v<0?'negative':''),label));}
+  b.onclick=()=>choose(p.id);frag.append(b);
+ }
+ if(!list.length)frag.append(element('p','hint',mode==='change'?'No matching complete comparisons. Try another date, activity ranking, or search for a place.':'No matching ports. Clear the search or select another lens.'));
+ $('locations').replaceChildren(frag);text('coverage',`${list.length.toLocaleString()} matches${list.length>80?' · top 80 listed':''}`);
+ text('listHint',mode==='change'?(rank==='percent'?'Baseline floor: '+(state.metric<4?'10 calls':'1,000 tonnes')+'/day. Complete windows only.':rank==='activity'?'Highest current activity first. Complete selected windows only.':'Largest absolute shifts first. Search includes places with missing comparisons.'):mode==='connections'?'Select a port. Historical links do not change with the observation date.':`${manifest.exposure.length} selected ports, not a global exposure ranking.`);
+}
+function sizeCanvas(canvas){const b=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);const width=Math.round(b.width*dpr),height=Math.round(b.height*dpr);if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:b.width,h:b.height};}
+function project(lon,lat){const {cx,cy,r}=globeGeometry,rad=Math.PI/180,d=(lon-state.lon)*rad,p=lat*rad,b=state.lat*rad,z=Math.sin(b)*Math.sin(p)+Math.cos(b)*Math.cos(p)*Math.cos(d);return {x:cx+r*Math.cos(p)*Math.sin(d),y:cy-r*(Math.cos(b)*Math.sin(p)-Math.sin(b)*Math.cos(p)*Math.cos(d)),z};}
+function drawLine(ctx,points,color,width=1){ctx.beginPath();let pen=false;for(const a of points){const p=project(...a);if(p.z>.002){if(pen)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);pen=true;}else pen=false;}ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
+function globe(){if(!land)return;const {ctx,w,h}=sizeCanvas($('globe'));if(!w||!h)return;const cx=w/2,cy=h*.55,r=Math.min(w*.44,h*.42)*state.zoom;globeGeometry={cx,cy,r,w,h};hitpoints=[];const labelBoxes=[];const selected=place();if(selected&&project(selected.lon,selected.lat).z>=.015){const pos=project(selected.lon,selected.lat);labelBoxes.push({x:pos.x+5,y:pos.y-25,w:selected.name.length*7+25,h:25});}ctx.clearRect(0,0,w,h);ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);ctx.clip();const ocean=ctx.createLinearGradient(cx-r,cy-r,cx+r,cy+r);ocean.addColorStop(0,'#234451');ocean.addColorStop(1,'#0b1b27');ctx.fillStyle=ocean;ctx.fillRect(0,0,w,h);
+ for(let lon=-180;lon<180;lon+=30)drawLine(ctx,Array.from({length:91},(_,i)=>[lon,i*2-90]),'#7aaba71e',.6);
+ for(let lat=-60;lat<=60;lat+=30)drawLine(ctx,Array.from({length:181},(_,i)=>[i*2-180,lat]),'#7aaba71e',.6);
+ for(const f of land.features){const polys=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates;for(const poly of polys)for(const ring of poly)drawLine(ctx,ring,'#9bbcb68c',.8);}
+ ctx.restore();ctx.strokeStyle='#9cc9ba55';ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);ctx.stroke();
+ function marker(p,color,size,label=false,ring=null){if(!Number.isFinite(p.lon)||!Number.isFinite(p.lat))return;const pos=project(p.lon,p.lat);if(pos.z<.015)return;ctx.strokeStyle=color;ctx.fillStyle=color;if(ring!==null){ctx.globalAlpha=.45;ctx.beginPath();ctx.arc(pos.x,pos.y,ring,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}ctx.beginPath();ctx.arc(pos.x,pos.y,size,0,Math.PI*2);if(color==='#81969e')ctx.stroke();else ctx.fill();if(p.id===state.selected){ctx.strokeStyle='#edf7ef';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(pos.x,pos.y,size+5,0,2*Math.PI);ctx.stroke();}hitpoints.push({...pos,id:p.id,size});if(label){ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#e4eee9';ctx.textAlign='left';const labelX=Math.min(w-ctx.measureText(p.name).width-9,Math.max(8,pos.x+size+8));const box={x:labelX,y:pos.y-19,w:ctx.measureText(p.name).width,h:15};if(p.id!==state.selected&&labelBoxes.some(b=>box.x<b.x+b.w+5&&box.x+box.w+5>b.x&&box.y<b.y+b.h+3&&box.y+box.h+3>b.y))return;labelBoxes.push(box);ctx.fillText(p.name,labelX,pos.y-8);}}
+ if(state.mode==='change'){
+  const pool=$('analyst').checked?filteredPlaces():ranking.slice(0,80),scale=state.metric<4?250:1000000;
+  const size=v=>Math.min(17,Math.max(2,Math.sqrt(Math.max(0,v||0)/scale)*14));
+  pool.sort((a,b)=>Math.abs(stats[a.id]?.difference||0)-Math.abs(stats[b.id]?.difference||0));
+  const standout=new Set(ranking.slice(0,3).map(p=>p.id));
+  for(const p of pool){if(p.id===state.selected)continue;const s=stats[p.id];const color=s?.percent===null||s?.percent===undefined?'#81969e':s.percent>5?'#83dbc1':s.percent< -5?'#ffa77b':'#c3d2cb';marker(p,color,size(s?.current),w>480&&standout.has(p.id),p.kind==='chokepoint'&&s?.baseline!==null?size(s.baseline):null);}
+  const p=place(),s=stats[state.selected];if(p)marker(p,s?.percent===null||s?.percent===undefined?'#81969e':s.percent<0?'#ffa77b':'#83dbc1',size(s?.current),true,s?.baseline!==null&&s?.baseline!==undefined?size(s.baseline):null);
+ }else if(state.mode==='connections'&&network){
+  // This lens draws only actual selected links; unrelated ports stay searchable.
+  const max=Math.max(1,...links.slice(0,20).map(e=>e[3]||0));
+  for(const edge of links.slice(0,20)){const a=network.nodes[edge[0]],b=network.nodes[edge[1]];if(!a||!b)continue;const points=M.arc([a.lon,a.lat],[b.lon,b.lat]),width=.6+3*Math.sqrt(Math.max(0,edge[3]||0)/max);drawLine(ctx,points,'#85bce860',width);ctx.setLineDash([5,22]);ctx.lineDashOffset=-phase;drawLine(ctx,points,'#a9e4fa',Math.max(1,width*.4));ctx.setLineDash([]);const mid=project(...points[33]),prev=project(...points[32]);if(mid.z>0&&prev.z>0){ctx.save();ctx.translate(mid.x,mid.y);ctx.rotate(Math.atan2(mid.y-prev.y,mid.x-prev.x));ctx.fillStyle='#c0ecff';ctx.beginPath();ctx.moveTo(4,0);ctx.lineTo(-3,-3);ctx.lineTo(-3,3);ctx.closePath();ctx.fill();ctx.restore();}const endpoint=$('direction').value==='out'?b:a;marker(endpoint,'#85bce8',3,w>480&&links.indexOf(edge)<6);}
+  marker(place(),'#83dbc1',7,true);
+ }else if(state.mode==='exposure'){
+  const max=Math.max(1,...countryRows.map(r=>r.value));for(const r of countryRows.slice(0,40)){drawLine(ctx,M.arc([place().lon,place().lat],[r.lon,r.lat]),'#85bce835',.7);marker({id:'country-'+r.iso,name:r.name,lon:r.lon,lat:r.lat},'#85bce8',3+13*Math.sqrt(r.value/max),w>480&&countryRows.indexOf(r)<4&&r.name!==place().name);}if(place())marker(place(),'#83dbc1',6,true);
+ }
+}
+function activityDetail(){const p=place(),s=stats[state.selected]||M.summarize([],0,0);text('value',fmt(s.current));text('unit',(state.window===7?'7-day mean · ':'Daily · ')+(state.metric<4?(p.kind==='port'?'port calls/day':'transit calls/day'):'estimated metric tonnes/day'));text('delta',s.percent===null?'No comparable percentage':(s.percent>0?'+':'')+fmt(s.percent)+'% vs reference');$('delta').className='delta '+(s.percent===null?'muted':s.percent<0?'negative':'positive');
+ const baselineDates=s.baseStart>=0&&s.baseEnd<dates.length?dates[s.baseStart]+' → '+dates[s.baseEnd]:'not available';
+ text('explanation',s.difference===null?'A complete current window and an earlier 28-day reference are required.':`${fmt(Math.abs(s.difference))} ${state.metric<4?'calls':'estimated tonnes'} per day ${s.difference<0?'below':'above'} the ${fmt(s.baseline)} reference mean (${baselineDates}).`);
+ text('quality',!supported(p)?'This measure is not available for this location type. Select a compatible port or passage.':s.current===0?'Zero recorded; not proof of no physical traffic.':s.current===null?`${s.currentCount}/${state.window} current observations. Missing days are not filled.`:`${s.currentCount}/${state.window} current days · ${s.baselineCount}/28 baseline days. No seasonal adjustment.`);
+ const data=series[state.selected]||[];let last=-1;data.forEach((r,i)=>{if(Number.isFinite(r?.[state.metric]))last=i;});text('lastDate',last>=0?dates[last]:'NO OBSERVATIONS');plot($('chart'),[{id:state.selected,color:'#83dbc1'}]);text('chartScale',state.metric<4?'Calls/day':'Est. tonnes/day');
+ const dl=$('calculation');dl.replaceChildren();for(const [key,value] of [['Current window',(dates[s.start]||'before snapshot')+' → '+dates[state.index]],['Reference window',baselineDates],['Current / reference mean',fmt(s.current)+' / '+fmt(s.baseline)],['Formula','100 × (current mean − reference mean) / reference mean'],['Selected source ID',state.selected],['Dataset snapshot',manifest.retrieved],['Latest selected observation',last>=0?dates[last]:'none']])dl.append(element('dt','',key),element('dd','',value));
+}
+function networkDetail(){links=network?network.edges.filter(e=>e[$('direction').value==='out'?0:1]===state.selected&&e[0]!==e[1]).sort((a,b)=>(b[3]||0)-(a[3]||0)):[];
+ $('downloadNetwork').disabled=!network;text('networkSummary',!network?(networkError?'Network download failed. Select Connections again to retry. Observed activity remains available.':'Loading historical network…'):links.length?`${links.length} historical ${$('direction').value==='out'?'outgoing':'incoming'} connections. Showing the strongest ${Math.min(20,links.length)} by daily loaded capacity at risk.`:'No matching historical connections in this snapshot.');
+ if(network&&links.length){const valid=links.filter(e=>Number.isFinite(e[3])&&e[3]>=0),total=valid.reduce((s,e)=>s+e[3],0);if(total>0){const top=valid.slice(0,5).reduce((s,e)=>s+e[3],0);text('networkSummary',$('networkSummary').textContent+' Top five account for '+fmt(top/total*100)+'% of the selected historical capacity weight. '+(links.length-valid.length)+' links excluded for missing/invalid weights. This is concentration, not resilience or available substitute capacity.');}}
+ const frag=document.createDocumentFragment();for(const edge of links.slice(0,20)){const id=edge[$('direction').value==='out'?1:0],p=network.nodes[id],r=element('div','route'),b=element('button','');b.append(element('b','',p?.name||id),element('small','',`${fmt(edge[2])} days historical mean · ${short(edge[3])} tonnes/day capacity at risk`));b.onclick=()=>choose(id);r.append(b);frag.append(r);}$('routes').replaceChildren(frag);
+}
+function exposureDetail(){const rows=exposures[state.selected];$('downloadExposure').disabled=!rows;if(!rows){text('exposureSummary',exposureErrors[state.selected]?'Model download failed. Select this port again to retry. Observed activity remains available.':'Loading this port model…');countryRows=[];$('countries').replaceChildren();return;}
+ const sectors=['all',...new Set(rows.map(r=>r.industry).filter(x=>x&&x!=='Total'))].sort((a,b)=>a==='all'?-1:b==='all'?1:a.localeCompare(b));
+ if($('sector').dataset.port!==state.selected){$('sector').replaceChildren(...sectors.map(s=>{const o=element('option','',s==='all'?'All sectors (source Total)':s);o.value=s;return o;}));$('sector').dataset.port=state.selected;}
+ const field=$('trade').value,sector=$('sector').value;const filtered=rows.filter(r=>r.industry===(sector==='all'?'Total':sector)&&r.unit==='US Dollars'&&r.scale==='Unit');
+ // Use the source Total only; never add Total to its component sectors.
+ countryRows=filtered.filter(r=>Number.isFinite(r[field])).map(r=>({name:r.to_country,iso:r.to_iso3,lat:r.to_lat,lon:r.to_lon,value:r[field]})).sort((a,b)=>b.value-a.value);
+ text('exposureSummary',`${countryRows.length} countries with reported values · USD/day · 2022 modeled allocation. Missing values excluded, not zero. Top 40 mapped and listed; export retains all selected source rows.`);
+ const max=Math.max(1,...countryRows.map(r=>r.value)),frag=document.createDocumentFragment();for(const row of countryRows.slice(0,40)){const r=element('div','country');r.append(element('b','',row.name+' · $'+short(row.value)+'/day'));const bar=element('div','bar');bar.style.width=(row.value/max*100)+'%';r.append(bar);frag.append(r);}$('countries').replaceChildren(frag);
+}
+function render(){if(!manifest||!land)return;document.body.dataset.mode=state.mode;recompute();makeList();const p=place();if(!p)return;text('placeName',p.name);text('placeCountry',p.country);text('placeKind',p.kind==='chokepoint'?'Selected passage':'Selected port');
+ for(const m of ['change','connections','exposure']){$(m).classList.toggle('active',state.mode===m);$(m).setAttribute('aria-pressed',String(state.mode===m));}
+ const activity=state.mode==='change';$('activityDetail').hidden=!activity;$('networkDetail').hidden=state.mode!=='connections';$('exposureDetail').hidden=state.mode!=='exposure';$('pin').hidden=!activity;text('pin',state.pins.includes(state.selected)?'− Unpin':'+ Compare');
+ text('listTitle',activity?'Find the change':state.mode==='connections'?'Trace the connections':'Explore dependence');
+ text('lensBadge',activity?'Observed · AIS-derived estimates':state.mode==='connections'?'Historical network · 2019–2024':'Modeled trade exposure · 2022');
+ text('mapTitle',activity?'Where the pattern changes':state.mode==='connections'?'Connected across oceans':'Far away. Still dependent.');
+ text('mapSubtitle',activity?dates[state.index]+' · '+(state.window===7?'7-day means':'daily values'):state.mode==='connections'?'Previous / next port calls · not final cargo destinations':'Country markers show trade exposure—not actual losses');
+ text('mobileExplore',($('analyst').checked?'More · All':'More')+(document.body.classList.contains('explore-open')?' ▴':' ▾'));text('mobileMeasure',activity?$('metric').options[state.metric].text+' · '+(state.window===7?'7-day mean':'daily')+' · '+(state.baseline==='january'?'Jan reference':'prior 28 days'):'Historical/model data · timeline paused');$('metric').value=state.metric;$('window').value=state.window;$('baseline').value=state.baseline;
+ for(const id of ['play','back','forward','dateInput','latest','speed','metric','window','baseline','scrub'])$(id).disabled=!activity;
+ $('rank').disabled=!activity;$('kind').disabled=state.mode==='exposure';
+ text('play',state.playing?'Ⅱ Pause':'▶ Play');$('scrub').value=state.index;$('scrub').setAttribute('aria-valuetext',dates[state.index]);$('dateInput').value=dates[state.index];
+ text('clockNote',activity?'Daily observations · snapshot, not live traffic':'Observation clock paused · this layer has its own historical vintage');
+ text('status',$('analyst').checked?`${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ports through ${manifest.Daily_Ports_Data_latest} · passages through ${manifest.Daily_Chokepoints_Data_latest}`:`${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ${manifest.start} → ${dates.at(-1)}`);
+ text('legend',activity?($('analyst').checked?'Full catalog · reference rings for passages/selection · coral < −5% / mint > +5% · hollow: no comparison':'Up to 80 ranked matches + selected · coral < −5% / mint > +5%'):state.mode==='connections'?'Arrow = direction · width = historical capacity · top 20 schematic links':'Country size = modeled USD/day at risk · top 40 · no scenario clock');
+ if(activity){activityDetail();awGlobeContext();}else if(state.mode==='connections')networkDetail();else exposureDetail();
+ $('story').hidden=!state.story;if(state.story)renderStory();
+ $('comparePanel').hidden=!state.pins.length||!activity;
+ if(state.pins.length&&activity){text('indexNote',$('comparisonScale').value==='indexed'?'Each series uses its complete Jan 1–28, 2026 mean as 100. Zero/incomplete references are omitted. Values before Jan 29 overlap the reference; this is retrospective normalization, not a real-time signal.':'Daily values with one shared vertical scale.');const colors=['#83dbc1','#ffa77b','#85bce8','#d8a7e7'];$('pinLabels').replaceChildren(...state.pins.map((id,i)=>{const s=element('span','',(placeById[id]?.name||id));s.style.color=colors[i];return s;}));plot($('comparison'),state.pins.map((id,i)=>({id,color:colors[i]})));}
+ if(activity)renderDepth();renderWorkspace();globe();startRouteMotion();
+}
+function startRouteMotion(){if(routeFrame!==null){cancelAnimationFrame(routeFrame);routeFrame=null;}if(state.mode!=='connections'||reduced.matches||document.hidden||!network)return;let last=0;function tick(t){if(t-last>65){phase=t*.018;globe();last=t;}routeFrame=requestAnimationFrame(tick);}routeFrame=requestAnimationFrame(tick);}
+function renderStory(){const panel=$('story');panel.replaceChildren();const isHormuz=state.story==='hormuz';panel.append(element('p','',isHormuz?'Hormuz: inspect the recorded break, then the following months. This is an observed decline, not a claim of complete physical closure.':'Suez and the Cape: compare the timing and vessel categories. Opposite changes alone do not prove the same cargo was rerouted.'));
+ for(const [label,date] of isHormuz?[['Before','2026-02-20'],['After','2026-03-15'],['Latest',dates.at(-1)]]:[['January','2026-01-31'],['March','2026-03-31'],['Latest',dates.at(-1)]]){const b=element('button','',label);b.onclick=()=>setDate(dates.indexOf(date));panel.append(b);}const b=element('button','','Explore freely ×');b.onclick=()=>{state.story=null;refresh();};panel.append(b);}
+async function story(name){$('search').value='';$('kind').value='all';if(name==='routes'||name==='exposure'){await setMode(name==='routes'?'connections':'exposure');const match=places.find(p=>p.name===(name==='routes'?'Jebel Ali':'Singapore'));if(match)choose(match.id);else text('status','This guided port is unavailable in the current snapshot. Choose another port.');return;}await setMode('change');state.metric=0;state.window=7;state.baseline='january';state.selected=name==='hormuz'?'chokepoint6':'chokepoint1';state.lon=name==='hormuz'?45:30;state.lat=15;state.zoom=1;state.index=dates.indexOf(name==='hormuz'?'2026-02-20':'2026-03-31');state.story=name;if(name==='cape')state.pins=['chokepoint1','chokepoint7'];refresh();}
+function download(name,rows){const blob=new Blob(['\ufeff'+M.csv(rows)],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=element('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function bind(){bindDepth();bindCharts();
+ const closeMore=()=>{document.body.classList.remove('explore-open');$('mobileExplore').setAttribute('aria-expanded','false');text('mobileExplore',($('analyst').checked?'More · All':'More')+' ▾');};
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('explore-open')){closeMore();$('mobileExplore').focus();}});
+ document.addEventListener('click',e=>{if(!e.target.closest('#morePanel,#mobileExplore'))closeMore();});
+ $('morePanel').addEventListener('click',e=>{if(e.target.closest('[data-story],#sources'))closeMore();});
+for(const [id,cls,label] of [['mobileControls','timeline-open','Timeline'],['mobileExplore','explore-open','More']])$(id).onclick=()=>{const open=document.body.classList.toggle(cls);$(id).setAttribute('aria-expanded',String(open));if(id==='mobileControls')text(id,open?'Timeline ▾':'Timeline ▴');else text(id,($('analyst').checked?'More · All':'More')+(open?' ▴':' ▾'));document.querySelector('main').scrollTop=0;};$('detailsToggle').onclick=()=>document.querySelector('.detail').scrollIntoView({block:'start',behavior:'auto'});$('backToGlobe').onclick=()=>document.querySelector('main').scrollTo({top:0,behavior:'auto'});$('browseToggle').onclick=()=>{$('browseDialog').append(document.querySelector('.discovery'));$('browseDialog').showModal();$('search').focus();};$('closeBrowse').onclick=()=>$('browseDialog').close();$('browseDialog').addEventListener('close',()=>document.querySelector('.workspace').prepend(document.querySelector('.discovery')));for(const mode of ['change','connections','exposure'])$(mode).onclick=()=>setMode(mode);for(const id of ['search','kind','rank'])$(id).addEventListener(id==='search'?'input':'change',refresh);$('analyst').onchange=refresh;$('window').onchange=()=>{state.window=Number($('window').value);refresh();};$('baseline').onchange=()=>{state.baseline=$('baseline').value;refresh();};$('metric').onchange=()=>{state.metric=Number($('metric').value);refresh();};$('play').onclick=()=>{if(state.playing){stop();refresh();}else play();};$('speed').onchange=()=>{if(state.playing)play();};$('scrub').oninput=()=>setDate(Number($('scrub').value));$('back').onclick=()=>setDate(state.index-1);$('forward').onclick=()=>setDate(state.index+1);$('latest').onclick=()=>{const rows=series[state.selected]||[];let last=dates.length-1;while(last>0&&!Number.isFinite(rows[last]?.[state.metric]))last--;setDate(last);};$('dateInput').onchange=()=>{const i=dates.indexOf($('dateInput').value);if(i>=0)setDate(i);else refresh();};$('direction').onchange=refresh;$('sector').onchange=refresh;$('trade').onchange=refresh;
+ $('sources').onclick=()=>$('sourceDialog').showModal();$('closeDialog').onclick=()=>$('sourceDialog').close();$('reset').onclick=()=>{state.lon=45;state.lat=16;state.zoom=1;globe();};const zoom=f=>{state.zoom=Math.min(2.5,Math.max(.7,state.zoom*f));globe();};$('zoomin').onclick=()=>zoom(1.15);$('zoomout').onclick=()=>zoom(1/1.15);
+ const c=$('globe');PassageGestures.attach(c,{getView:()=>state,setView:changes=>{Object.assign(state,changes);globe();},onTap:e=>{const b=c.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top,p=hitpoints.filter(p=>!p.id.startsWith('country-')).sort((a,b)=>Math.hypot(x-a.x,y-a.y)-Math.hypot(x-b.x,y-b.y)).find(p=>Math.hypot(x-p.x,y-p.y)<p.size+8);if(p)choose(p.id,false);}});c.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:1/1.08);},{passive:false});c.onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','-','='].includes(e.key))return;e.preventDefault();if(e.key==='ArrowLeft')state.lon-=10;if(e.key==='ArrowRight')state.lon+=10;if(e.key==='ArrowUp')state.lat=Math.min(80,state.lat+10);if(e.key==='ArrowDown')state.lat=Math.max(-80,state.lat-10);if(e.key==='+'||e.key==='=')zoom(1.1);if(e.key==='-')zoom(1/1.1);globe();};
+ $('pin').onclick=()=>{if(state.pins.includes(state.selected))state.pins=state.pins.filter(id=>id!==state.selected);else if(state.pins.length<4)state.pins.push(state.selected);else{text('pin','Four pins maximum');return;}text('pin',state.pins.includes(state.selected)?'− Unpin':'+ Compare');refresh();};$('clearPins').onclick=()=>{state.pins=[];refresh();};
+ $('share').onclick=async()=>{const params=new URLSearchParams({mode:state.mode,place:state.selected,date:dates[state.index],metric:state.metric,window:state.window,baseline:state.baseline,direction:$('direction').value,sector:$('sector').value,trade:$('trade').value,pins:state.pins.join(','),context:aw.event||'',event:$('eventStart').value,threshold:$('recoveryThreshold').value,sustain:$('recoveryDays').value,compare:$('comparisonScale').value,depth:$('depthPanel').open?'1':'0',analyst:$('analyst').checked?'1':'0'});const url=location.origin+'/#'+params;history.replaceState(null,'','#'+params);try{await navigator.clipboard.writeText(url);text('share','Link copied');}catch{text('share','View saved in address bar');}};
+ $('download').onclick=()=>{const headers=['date','port_id','place','measure','value','unit','snapshot_utc','source','window_days','baseline_mode','selected_end_date','current_start_date','reference_start_date','reference_end_date'];const service=place().kind==='port'?'Daily_Ports_Data':'Daily_Chokepoints_Data';download(state.selected+'-'+manifest.fields[state.metric]+'.csv',[headers,...dates.map((date,i)=>[date,state.selected,place().name,manifest.fields[state.metric],series[state.selected]?.[i]?.[state.metric]??null,state.metric<4?'calls/day':'estimated metric tonnes/day',manifest.retrieved,manifest.sources[service],state.window,state.baseline,dates[state.index],dates[stats[state.selected]?.start]||null,dates[stats[state.selected]?.baseStart]||null,dates[stats[state.selected]?.baseEnd]||null])]);};
+ $('downloadNetwork').onclick=()=>download(state.selected+'-connections.csv',[['from_port_id','to_port_id','historical_mean_transit_days','daily_capacity_at_risk_metric_tonnes','relative_capacity_at_risk_percent','network_vintage','source'],...links.map(e=>[...e,'2019–2024',manifest.network.source])]);
+ $('downloadExposure').onclick=()=>{const rows=(exposures[state.selected]||[]).filter(r=>r.industry===($('sector').value==='all'?'Total':$('sector').value));const keys=['to_country','to_iso3','industry','unit','scale','daily_import_value_at_risk','daily_export_value_at_risk'];download(state.selected+'-exposure.csv',[['from_port_id',...keys,'base_year','source'],...rows.map(r=>[state.selected,...keys.map(k=>r[k]),2022,'https://www.arcgis.com/home/item.html?id=86842d9b6e8948f29200710a8df206f5'])]);};
+ document.querySelectorAll('[data-story]').forEach(b=>b.onclick=()=>story(b.dataset.story));document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();refresh();});reduced.addEventListener('change',startRouteMotion);new ResizeObserver(()=>{if(!matchMedia('(max-width:1280px), (max-width:1440px) and (any-pointer:coarse)').matches&&$('browseDialog').open)$('browseDialog').close();refresh();}).observe(document.querySelector('.map-panel'));
+}
+async function boot(){try{[manifest,places,land]=await Promise.all([load('manifest.json'),load('places.json'),load('land.json')]);placeById=Object.fromEntries(places.map(p=>[p.id,p]));const end=[manifest.Daily_Ports_Data_latest,manifest.Daily_Chokepoints_Data_latest].sort().at(-1);for(let t=Date.parse(manifest.start+'T00:00:00Z');t<=Date.parse(end+'T00:00:00Z');t+=86400000)dates.push(new Date(t).toISOString().slice(0,10));const dateIndex=Object.fromEntries(dates.map((d,i)=>[d,i]));let complete=0;for(let batch=0;batch<manifest.activity.length;batch+=3) await Promise.all(manifest.activity.slice(batch,batch+3).map(async part=>{const rows=await load(part.file);if(rows.length!==part.rows)throw new Error('Snapshot row count mismatch');for(const row of rows){const [id,date,...values]=row;if(!series[id])series[id]=Array(dates.length).fill(null);series[id][dateIndex[date]]=values;}complete++;if(!bootFailed)text('status',`Loading observed history · ${complete}/${manifest.activity.length} monthly partitions`);}));
+ state.index=dates.indexOf([manifest.Daily_Ports_Data_latest,manifest.Daily_Chokepoints_Data_latest].sort()[0]);const q=new URLSearchParams(location.hash.slice(1));if(placeById[q.get('place')])state.selected=q.get('place');if(dates.includes(q.get('date')))state.index=dates.indexOf(q.get('date'));if(['0','1','2','3','4','5','6'].includes(q.get('metric')))state.metric=Number(q.get('metric'));if(q.get('window')==='1')state.window=1;if(q.get('baseline')==='january')state.baseline='january';state.pins=(q.get('pins')||'').split(',').filter(id=>placeById[id]).slice(0,4);$('analyst').checked=q.get('analyst')==='1';if(q.get('direction')==='in')$('direction').value='in';if(q.get('trade')==='daily_export_value_at_risk')$('trade').value=q.get('trade');
+ $('scrub').max=dates.length-1;$('dateInput').min=dates[0];$('dateInput').max=end;text('endLabel',end);text('provenance',`Snapshot retrieved: ${manifest.retrieved}\nCatalog: ${manifest.ports} ports, ${manifest.chokepoints} chokepoints\nActivity rows: ${Object.values(manifest.rows).reduce((a,b)=>a+b,0)}\nHistorical connection rows: ${manifest.network.rows}\nCountry-model selected ports: ${manifest.exposure.map(p=>p.name).join(', ')}\nActivity sources: UN Global Platform; IMF PortWatch.\nNetwork/model sources: University of Oxford; IMF PortWatch (portwatch.imf.org).`);
+ restoreDepth(q);bind();bindWorkspace(q);updateFreshness();setInterval(updateFreshness,60000);render();if(['connections','exposure'].includes(q.get('mode'))){await setMode(q.get('mode'));if(state.mode==='exposure'){await ensureExposure();render();if([...$('sector').options].some(o=>o.value===q.get('sector')))$('sector').value=q.get('sector');refresh();}}else if(location.pathname.startsWith('/stories'))story('hormuz');
+ document.body.classList.add('snapshot-ready');window.passageSnapshot=()=>({state:{...state},date:dates[state.index],place:place()?.name,summary:stats[state.selected],places:places.length,series:Object.keys(series).length,ranking:ranking.slice(0,5).map(p=>p.id),links:links.length,countries:countryRows.length,networkRows:network?.edges.length,hitpoints:hitpoints.map(p=>({...p})),ready:true});
+ }catch(e){bootFailed=true;text('status','Snapshot could not load. Reload to retry. '+e.message);$('status').setAttribute('role','alert');for(const b of document.querySelectorAll('button,input,select'))b.disabled=true;}}
+boot();
+
+function updateFreshness(){if(!manifest)return;const f=PassageFreshness.status(manifest);text('freshness',`${f.stale?'Data is aging · ':''}Observations: ports ${manifest.Daily_Ports_Data_latest}, passages ${manifest.Daily_Chokepoints_Data_latest}. Last published source check: ${manifest.refresh?.checked||'not recorded'}. Context reviewed separately.`);$('freshness').classList.toggle('stale',f.stale);}
+
+/* Selected-place analysis. Historical files load only on explicit request. */
+const historyCache={},historyRequests={},historyErrors={};
+let historyManifest=null,depthExport=[],depthKey='';
+function restoreDepth(q){
+  if(/^\d{4}-\d{2}-\d{2}$/.test(q.get('event')||'')&&q.get('event')>='2019-01-01'&&q.get('event')<=dates.at(-1))$('eventStart').value=q.get('event');
+  if(['0.8','0.9','1'].includes(q.get('threshold')))$('recoveryThreshold').value=q.get('threshold');
+  if(['7','14'].includes(q.get('sustain')))$('recoveryDays').value=q.get('sustain');
+  if(q.get('compare')==='indexed')$('comparisonScale').value='indexed';
+  $('depthPanel').open=q.get('depth')==='1';
+}
+function bindDepth(){
+  $('depthPanel').ontoggle=()=>{depthKey='';renderDepth();};
+  $('loadHistory').onclick=()=>fetchHistory(state.selected);
+  for(const id of ['eventStart','recoveryThreshold','recoveryDays','comparisonScale'])$(id).onchange=()=>{depthKey='';refresh();};
+  $('downloadDepth').onclick=()=>download(state.selected+'-analysis.csv',depthExport);
+}
+async function fetchHistory(id){
+  if(historyCache[id]||historyRequests[id])return;
+  delete historyErrors[id];
+  historyRequests[id]=(async()=>{
+    try{
+      if(!historyManifest)historyManifest=await load('history-manifest.json');
+      const entry=historyManifest.files[id];if(!entry)throw new Error('No historical file for this place');
+      const rows=await load(entry.file);if(rows.length!==entry.rows)throw new Error('Historical row count mismatch');
+      historyCache[id]=rows;
+    }catch(e){historyErrors[id]=e.message;}
+    finally{delete historyRequests[id];depthKey='';refresh();}
+  })();depthKey='';refresh();await historyRequests[id];
+}
+function combinedHistory(id){return [...(historyCache[id]||[]),...dates.map((d,i)=>[d,...(series[id]?.[i]||Array(7).fill(null))])];}
+function renderDepth(){
+  if(!$('depthPanel').open)return;
+  const id=state.selected,end=dates[state.index],metric=state.metric,col=metric+1,rows=combinedHistory(id),event=$('eventStart').value;
+  const key=[id,end,metric,state.window,state.baseline,event,$('recoveryThreshold').value,$('recoveryDays').value,!!historyCache[id],!!historyRequests[id],historyErrors[id],innerWidth].join('|');
+  if(key===depthKey)return;depthKey=key;
+  $('eventStart').min='2019-01-01';$('eventStart').max=end;
+  $('loadHistory').disabled=!!historyRequests[id]||!!historyCache[id];
+  text('loadHistory',historyCache[id]?'Historical file loaded':historyRequests[id]?'Loading historical file…':'Load 2019–2025 history');
+  text('historyStatus',historyErrors[id]?'History unavailable: '+historyErrors[id]+'. Tap Load to retry.':historyCache[id]?`${historyCache[id].length.toLocaleString()} dated source rows loaded. Coverage depends on measure and period.`:'Historical context loads only for this selected place. Current analysis uses the bundled 2026 observations.');
+  const seasonal=M.seasonalReference(rows,col,end,state.window),current=M.summarize(series[id]||[],state.index,metric,state.window).current;
+  text('seasonSummary',seasonal.mean===null?(historyCache[id]?`Only ${seasonal.years.length} complete earlier years for this window; at least three are required.`:'Load history to compare the same calendar window in earlier years. At least three complete prior years are required.'):`${fmt(current)} now versus ${fmt(seasonal.mean)} across ${seasonal.years.length} complete earlier years; historical range ${fmt(seasonal.min)}–${fmt(seasonal.max)}. Same calendar dates, not holiday-adjusted or a confidence interval.`);
+  $('seasonYears').replaceChildren(...seasonal.years.map(r=>element('span','season-year',r.year+': '+fmt(r.mean))));
+  drawHistory(rows,col);
+  const valid=/^\d{4}-\d{2}-\d{2}$/.test(event)&&event>='2019-01-01'&&event<=end;
+  const study=valid?M.eventStudy(rows,col,event,end,Number($('recoveryThreshold').value),Number($('recoveryDays').value)):null;
+  const dl=$('eventResults');dl.replaceChildren();
+  const recovery=study?.baseline===null?'Insufficient pre-event observations':study?.baseline===0?'Undefined for a zero baseline':study?.recovery?`Confirmed ${study.recovery}`:study?.observedDays===0?'No usable follow-up observations':study?.belowDays===0?'No observed decline below threshold':'Not confirmed within observed follow-up';
+  const results=study?[
+    ['Reference window',study.referenceStart+' → '+study.referenceEnd],['Pre-event mean',fmt(study.baseline)+' / day'],
+    ['Follow-up',event+' → '+end],['Coverage',study.observedDays+' / '+study.expectedDays+' days with usable observed values'],
+    ['Days below threshold',study.baseline>0?study.belowDays+' observed days':'Unavailable'],['Recovery',recovery],
+    ['Lowest complete 7-day mean',fmt(study.minMean)+(study.minDate?' · ending '+study.minDate:'')],
+    ['Cumulative shortfall',fmt(study.shortfall)+' '+(metric<4?'calls':'estimated tonnes')],
+    ['Net deviation',fmt(study.netDeviation)+' '+(metric<4?'calls':'estimated tonnes')]
+  ]:[['Choose an event date','It must be on or before the selected observation date.']];
+  for(const [k,v] of results)dl.append(element('dt','',k),element('dd','',v));
+  dl.append(element('dt','','Interpretation'),element('dd','','Shortfall sums only below-reference deviations; net deviation also includes surges. Missing follow-up days suppress both totals. These are descriptive reference comparisons, not economic losses. Recovery can be followed by relapse; missing days break its confirmation run. A zero reference still permits absolute deviations, but not percentage or recovery claims.'));
+  const labels=['All calls','Tanker calls','Container calls','Dry-bulk calls','Estimated imports','Estimated exports','Passage capacity'];
+  const entries=[];for(let m=0;m<7;m++){
+    if(m>=4&&(m<6?place().kind!=='port':place().kind!=='chokepoint'))continue;
+    const s=M.summarize(series[id]||[],state.index,m,state.window,state.baseline);
+    entries.push({m,s});
+  }
+  const total=entries[0]?.s.current;
+  $('categoryResults').replaceChildren(...entries.map(({m,s})=>{
+    const e=element('div','category-row');e.append(element('strong','',labels[m]),element('span','',fmt(s.current)+' / day'),element('small','',s.percent===null?'No complete reference':(s.percent>0?'+':'')+fmt(s.percent)+'% vs '+(state.baseline==='january'?'Jan 1–28':'preceding 28 days')));
+    if(m>0&&m<4&&total>0&&s.current!==null)e.append(element('small','',fmt(s.current/total*100)+'% of all calls'));return e;
+  }));
+  const categories=entries.filter(e=>e.m>0&&e.m<4).map(e=>e.s.current);
+  const residual=Number.isFinite(total)&&categories.length===3&&categories.every(Number.isFinite)?total-categories.reduce((a,b)=>a+b,0):null;
+  $('categoryResults').append(element('p','hint',residual===null?'Unrepresented call categories: insufficient data.':residual>=0?'Other call categories: '+fmt(residual)+' / day.':'Selected category totals exceed all calls; shares are not presented as an exhaustive partition.'));
+  depthExport=[['section','key','value','place_id','measure','observation_end','event_start','threshold','sustain_days','snapshot_assembled'],...results.map(([k,v])=>['event',k,v,id,labels[metric],end,event,$('recoveryThreshold').value,$('recoveryDays').value,manifest.retrieved]),...seasonal.years.map(y=>['seasonal',y.year,y.mean,id,labels[metric],end,'','','',historyManifest?.assembled||'']),...entries.map(({m,s})=>['category',labels[m],s.current,id,labels[m],end,'','','',manifest.retrieved])];
+  if(study)for(const [key,value] of Object.entries(study))depthExport.push(['event_numeric',key,value,id,labels[metric],end,event,$('recoveryThreshold').value,$('recoveryDays').value,manifest.retrieved]);
+  for(const row of rows)depthExport.push(['observation',row[0],row[col]??null,id,labels[metric],end]);
+  depthExport.push(['method','window_days',state.window],['method','category_reference',state.baseline],['source','activity',manifest.sources[place().kind==='port'?'Daily_Ports_Data':'Daily_Chokepoints_Data']],['source','history',historyManifest?.sources[place().kind==='port'?'Daily_Ports_Data':'Daily_Chokepoints_Data']||'not loaded'],['method','seasonal','Same end month/day, trailing selected window, complete prior years only; at least 3 for pooled reference. Not seasonally adjusted.']);
+  depthExport=depthExport.map(row=>[...row,...Array(Math.max(0,depthExport[0].length-row.length)).fill('')]);
+}
+function drawHistory(rows,column){
+  const months=new Map();if(rows.length){for(let d=rows[0][0].slice(0,7)+'-01';d<=rows.at(-1)[0];){months.set(d.slice(0,7),[]);const t=new Date(d+'T00:00:00Z');t.setUTCMonth(t.getUTCMonth()+1);d=t.toISOString().slice(0,10);}}for(const row of rows){const month=row[0].slice(0,7);if(!months.has(month))months.set(month,[]);months.get(month).push(row);}
+  const points=[...months].sort(([a],[b])=>a.localeCompare(b)).map(([month,rs])=>{
+    const expected=new Date(Date.UTC(Number(month.slice(0,4)),Number(month.slice(5)),0)).getUTCDate(),v=rs.map(r=>r[column]);
+    return {month,mean:rs.length===expected&&v.every(Number.isFinite)?v.reduce((a,b)=>a+b,0)/expected:null};
+  });
+  const {ctx,w,h}=sizeCanvas($('historyChart'));ctx.clearRect(0,0,w,h);const max=Math.max(1,...points.map(p=>p.mean||0));ctx.strokeStyle='#83dbc1';ctx.beginPath();let pen=false;
+  points.forEach((p,i)=>{if(p.mean===null){pen=false;return;}const x=i/Math.max(1,points.length-1)*w,y=h-10-p.mean/max*(h-25);if(pen)ctx.lineTo(x,y);else ctx.moveTo(x,y);pen=true;});ctx.stroke();
+  text('historyRange',`${points[0]?.month||'—'} → ${points.at(-1)?.month||'—'} · complete calendar-month means only · scale 0–${short(max)} / day. Partial months are gaps. Historical chart does not move the globe date.`);
+}
+
+/* Readable daily charts share date geometry with pointer/keyboard selection. */
+function plot(canvas,items){
+  const {ctx,w,h}=sizeCanvas(canvas),{left,right}=PassageChartInput.bounds(w),top=10,bottom=h-30,metric=state.metric,indexMode=canvas.id==='comparison'&&$('comparisonScale').value==='indexed';
+  ctx.clearRect(0,0,w,h);const values={};let max=1;
+  for(const item of items){const raw=(series[item.id]||[]).map(r=>r?.[metric]),ref=raw.slice(0,28),base=ref.length===28&&ref.every(Number.isFinite)?ref.reduce((a,b)=>a+b,0)/28:null;values[item.id]=indexMode?M.indexed(raw,base):raw;for(const v of values[item.id])if(Number.isFinite(v))max=Math.max(max,v);}
+  const xAt=i=>left+i/Math.max(1,dates.length-1)*(right-left),yAt=v=>bottom-v/max*(bottom-top);
+  ctx.font='11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';ctx.textBaseline='middle';ctx.textAlign='right';
+  for(let i=0;i<3;i++){const value=max*i/2,y=yAt(value);ctx.strokeStyle='#52737b66';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();ctx.fillStyle='#a9bdc4';ctx.fillText(short(value),left-8,y);}
+  const ticks=[0];for(let i=1;i<dates.length-1;i++)if(dates[i].endsWith('-01')&&xAt(i)-xAt(ticks.at(-1))>=65&&right-xAt(i)>=55)ticks.push(i);if(dates.length>1)ticks.push(dates.length-1);
+  const dateLabel=new Intl.DateTimeFormat('en',{month:'short',day:'numeric',timeZone:'UTC'});
+  for(const i of ticks){const x=xAt(i);ctx.strokeStyle='#52737b44';ctx.beginPath();ctx.moveTo(x,bottom);ctx.lineTo(x,bottom+5);ctx.stroke();ctx.fillStyle='#a9bdc4';ctx.textAlign=i===0?'left':i===dates.length-1?'right':'center';ctx.fillText(dateLabel.format(new Date(dates[i]+'T00:00:00Z')),x,h-12);}
+  for(const item of items){ctx.strokeStyle=item.color;ctx.lineWidth=1.5;ctx.beginPath();let pen=false;for(let i=0;i<dates.length;i++){const v=values[item.id]?.[i];if(!Number.isFinite(v)){pen=false;continue;}if(pen)ctx.lineTo(xAt(i),yAt(v));else ctx.moveTo(xAt(i),yAt(v));pen=true;}ctx.stroke();}
+  if(canvas.id==='chart')awGlobeAnnotation(ctx,left,right,top,bottom);
+  const x=xAt(state.index);ctx.strokeStyle='#f4c397';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();
+  for(const item of items){const v=values[item.id]?.[state.index];if(!Number.isFinite(v))continue;ctx.fillStyle=item.color;ctx.beginPath();ctx.arc(x,yAt(v),3.5,0,Math.PI*2);ctx.fill();}
+  const unit=indexMode?'index points':metric<4?'calls':'estimated tonnes';
+  const reading=dates[state.index]+' · '+items.map(item=>{const v=values[item.id]?.[state.index];return (items.length>1?(placeById[item.id]?.name||item.id)+': ':'')+(Number.isFinite(v)?fmt(v)+' '+unit:'no observation');}).join(' · ');
+  text(canvas.id==='chart'?'chartReadout':'comparisonReadout',reading+' · daily');
+  canvas.setAttribute('aria-valuemin','0');canvas.setAttribute('aria-valuemax',String(dates.length-1));canvas.setAttribute('aria-valuenow',String(state.index));canvas.setAttribute('aria-valuetext',reading);
+  return max;
+}
+function bindCharts(){for(const id of ['chart','comparison'])PassageChartInput.attach($(id),{count:()=>dates.length,index:()=>state.index,onSelect:i=>setDate(i)});}
+
+/* Comparison-first workspace; same observations, separate historical clock. */
+const AW=PassageWorkspaceMath;
+const aw={ids:[],event:null,signal:null,open:false,day:0,page:0,key:'',summaries:[],axis:[],rows:{},busy:false};
+const awColors=['#83dbc1','#ffa77b','#85bce8','#d8a7e7'];
+const awValueIds=['analysisStart','analysisEnd','analysisRefStart','analysisRefEnd','analysisReference','analysisMetric','analysisScale','analysisSpan','analysisDisplay','analysisEventStart','analysisThreshold','analysisSustain'];
+const awLabels=['All calls','Tanker calls','Container calls','Dry-bulk calls','Estimated imports','Estimated exports','Passage capacity'];
+function awUnit(){return Number($('analysisMetric').value)<4?'calls':'estimated tonnes';}
+function awCompatible(id){const m=Number($('analysisMetric').value);return m<4||(m<6?placeById[id]?.kind==='port':placeById[id]?.kind==='chokepoint');}
+function awReference(){const start=$('analysisStart').value,end=$('analysisEnd').value;if(!AW.validDate(start)||!AW.validDate(end))return;
+ if($('analysisReference').value==='prior'){$('analysisRefStart').value=AW.shift(start,-28);$('analysisRefEnd').value=AW.shift(start,-1);}
+ if($('analysisReference').value==='year'){const prev=d=>{let s=(Number(d.slice(0,4))-1)+d.slice(4);return AW.validDate(s)?s:s.slice(0,8)+'28';};$('analysisRefStart').value=prev(start);$('analysisRefEnd').value=prev(end);}
+}
+function awTable(id,caption,heads,rows){const table=$(id);table.replaceChildren(element('caption','',caption));const head=document.createElement('thead'),tr=document.createElement('tr');for(const name of heads){const th=element('th','',name);th.scope='col';tr.append(th);}head.append(tr);const body=document.createElement('tbody');for(const row of rows){const tr=document.createElement('tr');row.forEach((v,i)=>{const cell=element(i===0?'th':'td','',v);if(i===0)cell.scope='row';tr.append(cell);});body.append(tr);}table.append(head,body);}
+function awInvalidate(){text('analysisShare','Copy link');aw.key='';aw.page=0;renderWorkspace();}
+function awOpen(open=true){stop();aw.open=open;document.body.classList.toggle('analysis-open',open);$('analysisWorkspace').hidden=!open;$('exploreView').setAttribute('aria-pressed',String(!open));$('analyzeView').setAttribute('aria-pressed',String(open));$('eventsView').setAttribute('aria-expanded',String(open&&$('eventCatalog').open));document.querySelector('main').scrollTop=0;awInvalidate();refresh();}
+function awEvent(id){const event=passageEvents.find(e=>e.id===id);if(!event)return;aw.event=id;aw.signal=null;aw.ids=[...event.places];choose(event.places[0]);state.pins=[...event.places];setMode('change');$('analysisMetric').value='0';$('analysisStart').value=event.start;$('analysisEnd').value=event.end;$('analysisReference').value='custom';$('analysisRefStart').value=event.referenceStart;$('analysisRefEnd').value=event.referenceEnd;$('analysisEventStart').value=event.id==='hormuz-2026'?'2026-02-28':'';aw.day=0;$('eventCatalog').open=false;$('analysisSetup').open=false;awOpen();}
+function awEventContext(){const event=awContext(),panel=$('eventContext');const wasOpen=panel.querySelector('details')?.open||false;panel.hidden=!event;panel.replaceChildren();if(!event)return;
+ const details=document.createElement('details');details.open=wasOpen;details.append(element('summary','',event.title+' · context & sources'));panel.append(details);details.append(element('p','',event.summary),element('p','hint',event.date+' · '+event.dateKind+' · '+(event.published?'Published '+event.published:'Publication date not supplied')+' · reviewed 2026-09-07'));
+ const link=element('a','',event.source+' · original source ↗');link.href=event.url;link.target='_blank';link.rel='noopener noreferrer';if(event.url)details.append(link);details.append(element('p','hint',event.caveat));
+ if(event.date>dates.at(-1))details.append(element('p','', 'Reporting is newer than this observation snapshot; post-event effects cannot be displayed.'));
+ if(aw.ids.some(id=>!event.places.includes(id)))details.append(element('p','hint','Additional places are your comparisons; the source does not necessarily discuss them.'));
+ const map=element('button','','Locate on globe');map.onclick=()=>{choose(event.places[0]);setMode('change');if(dates.includes(event.date))setDate(dates.indexOf(event.date));awOpen(false);};
+ const clear=element('button','','Remove event annotation');clear.onclick=()=>{aw.event=null;aw.signal=null;awInvalidate();refresh();};details.append(map,clear);
+}
+function awSearch(){const q=$('analysisSearch').value.trim().toLowerCase();$('analysisMatches').replaceChildren();if(!q)return;const matches=places.filter(p=>!aw.ids.includes(p.id)&&(p.name+' '+p.country).toLowerCase().includes(q)).slice(0,8);
+ for(const p of matches){const b=element('button','',p.name+' · '+p.country);b.disabled=aw.ids.length>=4;b.onclick=()=>{if(aw.ids.length>=4||aw.ids.includes(p.id))return;aw.ids.push(p.id);state.pins=[...aw.ids];$('analysisSearch').value='';awSearch();awInvalidate();};$('analysisMatches').append(b);}if(!matches.length)$('analysisMatches').append(element('p','hint','No additional matching places.'));}
+function awPins(){$('analysisPins').replaceChildren(...aw.ids.map((id,i)=>{const b=element('button','',`${i+1}. ${placeById[id].name} ×`);b.style.borderColor=awColors[i];b.setAttribute('aria-label','Remove '+placeById[id].name);b.onclick=()=>{aw.ids=aw.ids.filter(x=>x!==id);state.pins=[...aw.ids];awInvalidate();};return b;}));}
+function awRenderChart(){const canvas=$('analysisChart');if(!$('analysisChartPanel').hidden&&aw.axis.length){const {ctx,w,h}=sizeCanvas(canvas);if(!w||!h)return;const {left,right}=PassageChartInput.bounds(w),top=20,bottom=h-35,n=aw.axis.length,indexed=$('analysisScale').value==='indexed',col=Number($('analysisMetric').value)+1;
+ const values=aw.ids.map((id,j)=>{const map=new Map(aw.rows[id].map(r=>[r[0],r[col]]));return aw.axis.map(d=>{const v=map.get(d);return !awCompatible(id)?null:indexed?AW.normalize(v,aw.summaries[j]?.reference):v;});});let max=1;for(const row of values)for(const v of row)if(Number.isFinite(v))max=Math.max(max,v);
+ const x=i=>left+i/Math.max(1,n-1)*(right-left),y=v=>bottom-v/max*(bottom-top);ctx.clearRect(0,0,w,h);ctx.font='11px -apple-system,sans-serif';ctx.textBaseline='middle';
+ const rs=$('analysisRefStart').value,re=$('analysisRefEnd').value;let ri=aw.axis.findIndex(d=>d>=rs),rj=aw.axis.findLastIndex(d=>d<=re);if(ri>=0&&rj>=ri){ctx.fillStyle='#85bce825';ctx.fillRect(x(ri),top,Math.max(1,x(rj)-x(ri)),bottom-top);}
+ for(let i=0;i<=2;i++){ctx.textAlign='right';ctx.fillStyle='#9cb2ba';ctx.fillText(short(max*i/2),left-7,y(max*i/2));ctx.strokeStyle='#52737b66';ctx.beginPath();ctx.moveTo(left,y(max*i/2));ctx.lineTo(right,y(max*i/2));ctx.stroke();}
+ const tickCount=Math.max(2,Math.min(6,Math.floor((right-left)/95)));for(let j=0;j<tickCount;j++){const i=Math.round(j/(tickCount-1)*(n-1));ctx.textAlign=j===0?'left':j===tickCount-1?'right':'center';ctx.fillStyle='#9cb2ba';ctx.fillText(aw.axis[i],x(i),h-12);}
+ values.forEach((row,j)=>{ctx.strokeStyle=awColors[j];ctx.setLineDash(j===0?[]:j===1?[7,3]:j===2?[2,3]:[9,3,2,3]);ctx.lineWidth=1.5;ctx.beginPath();let pen=false;row.forEach((v,i)=>{if(!Number.isFinite(v)){pen=false;return;}if(pen)ctx.lineTo(x(i),y(v));else ctx.moveTo(x(i),y(v));pen=true;});ctx.stroke();});ctx.setLineDash([]);
+ const event=awContext(),ei=event?aw.axis.indexOf(event.date):-1;if(ei>=0){ctx.strokeStyle='#f4c397';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(x(ei),top);ctx.lineTo(x(ei),bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#f4c397';ctx.textAlign=x(ei)>w/2?'right':'left';ctx.fillText(aw.signal?'Detected window':'Event / report',x(ei),9);}
+ aw.day=Math.max(0,Math.min(n-1,aw.day));ctx.strokeStyle='#e8f0ed';ctx.beginPath();ctx.moveTo(x(aw.day),top);ctx.lineTo(x(aw.day),bottom);ctx.stroke();
+ const reading=aw.axis[aw.day]+' · '+aw.ids.map((id,j)=>`${j+1}. ${placeById[id].name}: ${Number.isFinite(values[j][aw.day])?fmt(values[j][aw.day])+(indexed?' index points':' '+awUnit()):'unavailable'}`).join(' · ');text('analysisReadout',reading);canvas.setAttribute('aria-valuemin','0');canvas.setAttribute('aria-valuemax',String(n-1));canvas.setAttribute('aria-valuenow',String(aw.day));canvas.setAttribute('aria-valuetext',reading);
+ }}
+function awDaily(){const col=Number($('analysisMetric').value)+1,maps=aw.ids.map(id=>new Map((aw.rows[id]||[]).map(r=>[r[0],r[col]]))),pages=Math.max(1,Math.ceil(aw.axis.length/50));aw.page=Math.min(aw.page,pages-1);const rows=aw.axis.slice(aw.page*50,(aw.page+1)*50).map(d=>[d,d>=$('analysisStart').value?'Observation':d>=$('analysisRefStart').value&&d<=$('analysisRefEnd').value?'Reference':d<$('analysisRefStart').value?'Before reference':'Between periods',...aw.ids.map((id,i)=>awCompatible(id)&&Number.isFinite(maps[i].get(d))?fmt(maps[i].get(d)):'Unavailable')]);awTable('analysisDaily','Raw daily observations · '+awUnit()+' · not indexed',['Date','Period',...aw.ids.map(id=>placeById[id].name)],rows);$('analysisPrev').disabled=aw.page===0;$('analysisNext').disabled=aw.page>=pages-1;text('analysisPage',`Page ${aw.page+1} / ${pages} · ${aw.axis.length} calendar days`);}
+function awRecovery(){const start=$('analysisEventStart').value,end=$('analysisEnd').value,col=Number($('analysisMetric').value)+1;const valid=AW.validDate(start)&&start>='2019-01-01'&&start<=end;
+ awTable('recoveryResults','Pre-disruption reference and follow-up · means per day; cumulative totals in '+awUnit(),['Place','Reference mean','Coverage','Days below','Recovery confirmation','Shortfall','Net deviation'],aw.ids.map(id=>{if(!valid||!awCompatible(id))return [placeById[id].name,'Choose a valid start and compatible measure','','','','',''];const v=M.eventStudy(aw.rows[id],col,start,end,Number($('analysisThreshold').value),Number($('analysisSustain').value));return [placeById[id].name,fmt(v.baseline),`${v.observedDays}/${v.expectedDays}`,v.baseline>0?v.belowDays:'Unavailable',v.baseline===null?'Incomplete pre-event reference':v.baseline===0?'Undefined for zero reference':v.recovery||(!v.observedDays?'No follow-up':v.belowDays?'Not confirmed in follow-up':'No observed decline'),fmt(v.shortfall),fmt(v.netDeviation)];}));}
+function renderWorkspace(){if(!aw.open||!manifest)return;const start=$('analysisStart').value,end=$('analysisEnd').value,rs=$('analysisRefStart').value,re=$('analysisRefEnd').value,col=Number($('analysisMetric').value)+1;
+ const key=[...awValueIds.map(id=>$(id).value),aw.ids.join(','),aw.event,aw.signal,aw.busy,$('analysisSetup').open,aw.ids.map(id=>[!!historyCache[id],!!historyRequests[id],historyErrors[id]]),innerWidth,innerHeight].join('|');if(key===aw.key)return;aw.key=key;awPins();awEventContext();
+ const valid=[start,end].every(d=>AW.validDate(d)&&d>='2019-01-01'&&d<=dates.at(-1))&&start<=end;
+ text('analysisSetupSummary',`Edit comparison · ${aw.ids.map(id=>placeById[id].name).join(' / ')||'Add places'} · ${start} → ${end} · ${awLabels[col-1]}`);
+ const plotStart=$('analysisSpan').value==='reference'&&AW.validDate(rs)&&rs<start?(rs<'2019-01-01'?'2019-01-01':rs):start;aw.axis=valid?AW.days(plotStart,end):[];aw.rows=Object.fromEntries(aw.ids.map(id=>[id,combinedHistory(id)]));aw.summaries=aw.ids.map(id=>AW.summary(awCompatible(id)?aw.rows[id]:[],col,start,end,rs,re));
+ const eventStart=$('analysisEventStart').value,earliest=[start,rs,AW.validDate(start)?AW.shift(start,-56):start,AW.validDate(eventStart)?AW.shift(eventStart,-28):start].sort()[0],need=earliest<manifest.start;
+ $('analysisLoad').hidden=!need;$('analysisLoad').disabled=aw.busy||!aw.ids.length||!need||aw.ids.every(id=>historyCache[id]);text('analysisLoad',aw.busy?'Loading selected historical files…':need?'Load / retry selected historical files':'Bundled activity already available');
+ $('analysisStatus').hidden=valid&&aw.ids.length>0&&!aw.ids.some(id=>historyErrors[id]||historyRequests[id]||(need&&!historyCache[id]));
+ text('analysisStatus',!valid?'Choose an observation range within 2019 and the snapshot cutoff; invalid or overlapping references make comparisons unavailable.':!aw.ids.length?'Add up to four places to compare.':aw.ids.map(id=>placeById[id].name+': '+(historyErrors[id]?'history failed; retry':historyRequests[id]?'loading':need&&!historyCache[id]?'earlier history not loaded':'requested files available')).join(' · '));
+ text('analysisCoverage',`Snapshot: ports ${manifest.Daily_Ports_Data_latest} · passages ${manifest.Daily_Chokepoints_Data_latest}. ${$('analysisScale').value==='indexed'?'Index: positive complete reference = 100.':'Shared absolute scale.'} Missing ≠ zero.`);
+ awTable('analysisResults',`${start} → ${end}; reference ${rs} → ${re} · means in ${awUnit()}/day; net deviation in ${awUnit()}`,['Place','Mean','Reference','Δ / day','Δ %','Net deviation','Coverage obs / ref'],aw.ids.map((id,i)=>{const v=aw.summaries[i];return [placeById[id].name,fmt(v.mean),fmt(v.reference),fmt(v.difference),fmt(v.percent),fmt(v.net),`${v.count}/${v.expected} · ${v.referenceCount}/${v.referenceExpected}`];}));
+ $('analysisQuality').replaceChildren(...aw.ids.map((id,i)=>{const v=aw.summaries[i],latest=awCompatible(id)?aw.rows[id].findLast(row=>Number.isFinite(row[col]))?.[0]:null,reason=!awCompatible(id)?'Measure not available for this place type':v.reason+(v.reference>0&&v.reference<(col<=4?10:1000)?'; small reference: percentage unstable':'');return element('p','',placeById[id].name+': '+reason+'. Latest usable: '+(latest||'none')+'.');}));
+ const sensitivity=[];if(valid)for(const id of aw.ids)for(const offset of [0,7,28]){const b=AW.shift(start,-1-offset),a=AW.shift(b,-27),v=AW.summary(awCompatible(id)?aw.rows[id]:[],col,start,end,a,b);sensitivity.push([placeById[id].name,a+' → '+b,fmt(v.reference),fmt(v.percent),v.reason]);}awTable('sensitivityResults','Fixed observation range; alternative references',['Place','Reference dates','Reference mean','Δ %','Coverage / reason'],sensitivity);
+ $('analysisChartPanel').hidden=$('analysisDisplay').value!=='chart'||!aw.axis.length;$('analysisDailyPanel').hidden=$('analysisDisplay').value!=='table';$('analysisExport').disabled=!valid||!aw.ids.length||aw.busy;
+ awDaily();awRecovery();awRenderChart();
+}
+function awExport(){const col=Number($('analysisMetric').value)+1,headers=['section','place_id','date_or_key','value','measure','observation_start','observation_end','reference_start','reference_end','event_id','snapshot_assembled'];const rows=[headers];const add=(section,id,key,value)=>rows.push([section,id,key,value,awLabels[col-1],$('analysisStart').value,$('analysisEnd').value,$('analysisRefStart').value,$('analysisRefEnd').value,aw.event||aw.signal||'',manifest.retrieved]);
+ aw.ids.forEach((id,i)=>{for(const [key,v] of Object.entries(aw.summaries[i]))add('summary',id,key,v);for(const row of aw.rows[id])if(aw.axis.includes(row[0])||(row[0]>=$('analysisRefStart').value&&row[0]<=$('analysisRefEnd').value))add('observation',id,row[0],awCompatible(id)?row[col]??null:null);add('source',id,'activity',manifest.sources[placeById[id].kind==='port'?'Daily_Ports_Data':'Daily_Chokepoints_Data']);add('source',id,'historical_loaded',!!historyCache[id]);if(historyCache[id]){add('source',id,'historical_query',historyManifest.sources[placeById[id].kind==='port'?'Daily_Ports_Data':'Daily_Chokepoints_Data']);add('source',id,'history_assembled',historyManifest.assembled);add('source',id,'history_sha256',historyManifest.files[id].sha256);}
+ const start=$('analysisStart').value,end=$('analysisEnd').value;for(const offset of [0,7,28]){const re=AW.shift(start,-1-offset),rs=AW.shift(re,-27),v=AW.summary(awCompatible(id)?aw.rows[id]:[],col,start,end,rs,re);add('sensitivity',id,'reference_'+offset,rs+' → '+re);add('sensitivity',id,'percent_'+offset,v.percent);}
+ const eventStart=$('analysisEventStart').value;if(AW.validDate(eventStart)&&eventStart<=end&&eventStart>='2019-01-01'&&awCompatible(id)){const v=M.eventStudy(aw.rows[id],col,eventStart,end,Number($('analysisThreshold').value),Number($('analysisSustain').value));for(const [key,value] of Object.entries(v))add('recovery',id,key,value);}
+});
+ const event=awContext();if(event){add('event','',event.date,event.title);if(event.url)add('source','','event',event.url);add('event','','date_kind',event.dateKind);}add('method','','index','Daily / positive complete reference mean * 100');add('method','','interpretation','Descriptive reference comparison, not causal impact or lost trade');download('passage-comparison.csv',rows);
+}
+function awParams(){const q=new URLSearchParams({mode:'change',place:aw.ids[0]||state.selected,view:'analysis',locations:aw.ids.join(','),context:aw.event||'',shift:aw.signal||''});for(const id of awValueIds)q.set(id,$(id).value);q.set('analysisDay',String(aw.day));return q;}
+function bindWorkspace(q){$('analysisStart').value=AW.shift(dates[state.index],-89);$('analysisEnd').value=dates[state.index];$('analysisMetric').value=String(state.metric);aw.ids=state.pins.length?[...new Set(state.pins)]:[state.selected];awReference();
+ for(const id of ['analysisStart','analysisEnd','analysisRefStart','analysisRefEnd','analysisEventStart']){$(id).min=id.startsWith('analysisRef')?'2018-01-01':'2019-01-01';$(id).max=dates.at(-1);}
+ for(const id of awValueIds){const v=q.get(id);if(v!==null){if($(id).tagName==='SELECT'){if([...$(id).options].some(o=>o.value===v))$(id).value=v;}else if(AW.validDate(v)&&v>=(id.startsWith('analysisRef')?'2018-01-01':'2019-01-01')&&v<=dates.at(-1))$(id).value=v;}}
+ awReference(); // Re-derive named presets after restoring the observation range.
+ if(q.has('locations'))aw.ids=[...new Set(q.get('locations').split(',').filter(id=>placeById[id]))].slice(0,4);if(passageEvents.some(e=>e.id===q.get('context')))aw.event=q.get('context');if(passageShifts.some(h=>h.id===q.get('shift'))){aw.signal=q.get('shift');aw.event=null;}aw.day=Math.max(0,Math.min(30000,Math.floor(Number(q.get('analysisDay')))||0));
+ document.querySelectorAll('.event-jumps a').forEach(link=>link.onclick=e=>{e.preventDefault();$(link.hash.slice(1)).scrollIntoView({block:'start'});});
+ $('shiftPeriod').onchange=awShiftCards;awShiftCards();
+ $('eventCatalog').ontoggle=()=>{$('eventsView').setAttribute('aria-expanded',String(aw.open&&$('eventCatalog').open));};
+ $('eventCards').replaceChildren(...passageEvents.map(e=>{const card=element('article','event-card');card.append(element('small','',(Date.now()-Date.parse(e.date+'T00:00:00Z'))/86400000<=90?'Dated reporting / disruption':'Historical context'),element('h3','',e.title),element('p','',e.summary),element('p','hint',e.date+' · '+e.dateKind));const b=element('button','','Compare observations');b.dataset.event=e.id;b.onclick=()=>awEvent(e.id);card.append(b);return card;}));
+ $('exploreView').onclick=()=>awOpen(false);$('analyzeView').onclick=()=>{aw.ids=state.pins.length?[...new Set(state.pins)]:[state.selected];setMode('change');awOpen();};$('eventsView').onclick=()=>{setMode('change');awOpen();$('eventCatalog').open=true;};$('analysisSearch').oninput=awSearch;$('analysisSetup').ontoggle=()=>{aw.key='';renderWorkspace();};$('analysisClear').onclick=()=>{aw.ids=[];state.pins=[];awInvalidate();};
+ for(const id of awValueIds)$(id).onchange=()=>{if(['analysisStart','analysisEnd','analysisReference'].includes(id))awReference();if(['analysisRefStart','analysisRefEnd'].includes(id))$('analysisReference').value='custom';awInvalidate();};
+ for(const b of document.querySelectorAll('[data-range]'))b.onclick=()=>{const end=$('analysisEnd').value;if(!AW.validDate(end))return;$('analysisStart').value=b.dataset.range==='all'?'2019-01-01':AW.shift(end,1-Number(b.dataset.range));awReference();aw.day=0;awInvalidate();};
+ $('analysisLoad').onclick=async()=>{if(aw.busy)return;aw.busy=true;awInvalidate();const ids=[...aw.ids];try{for(const id of ids)await fetchHistory(id);}finally{aw.busy=false;awInvalidate();}};
+ $('analysisExport').onclick=awExport;$('analysisPrev').onclick=()=>{aw.page=Math.max(0,aw.page-1);awDaily();};$('analysisNext').onclick=()=>{aw.page++;awDaily();};
+ $('analysisShare').onclick=async()=>{const url=location.origin+'/#'+awParams();history.replaceState(null,'','#'+awParams());try{await navigator.clipboard.writeText(url);text('analysisShare','Link copied');}catch{text('analysisShare','Link in address bar');}};
+ PassageChartInput.attach($('analysisChart'),{count:()=>aw.axis.length,index:()=>aw.day,onSelect:i=>{aw.day=i;awRenderChart();}});
+ new ResizeObserver(()=>{if(aw.open)awRenderChart();}).observe($('analysisChart'));
+ if(q.get('view')==='analysis')awOpen();
+}
+function awGlobeContext(){const found=awContext(),e=found?.places.includes(state.selected)?found:null;$('globeEventContext').hidden=!e;$('globeEventContext').replaceChildren();if(e){const b=element('button','','Violet marker · '+e.date+' · '+e.title+' · source & comparison');b.onclick=()=>awOpen();$('globeEventContext').append(b);}}
+function awGlobeAnnotation(ctx,left,right,top,bottom){const event=awContext();if(!event||!event.places.includes(state.selected))return;const index=dates.indexOf(event.date);if(index<0)return;const x=left+index/Math.max(1,dates.length-1)*(right-left);ctx.save();ctx.strokeStyle='#c5a6ff';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();ctx.restore();}
+
+function awContext(){
+ if(aw.signal){const h=passageShifts.find(s=>s.id===aw.signal);if(!h)return null;const c=h.context;return {id:h.id,title:h.name+': '+(h.percent==null?'comparison unavailable':fmt(h.percent)+'% recorded calls'),date:h.start,dateKind:'Detected seven-day window start, not claimed event onset',published:c?.published||null,source:c?.source||'',url:c?.url||null,places:[h.place],summary:(!h.qualifies?'Source revisions mean this archived window no longer meets the screen. ':'')+`${h.start} → ${h.end}: ${fmt(h.mean)} calls/day versus ${fmt(h.reference)} in ${h.referenceStart} → ${h.referenceEnd}. `+(c?c.summary:'No corroborated event is attached to this signal. Variation, reporting quality and other explanations remain possible.'),caveat:(c?c.caveat:'Unexplained signal, not evidence of disruption.')+' Retrospective screening is not a significance test or causal estimate.'};}
+ return passageEvents.find(e=>e.id===aw.event)||null;
+}
+function awShift(id){const h=passageShifts.find(s=>s.id===id);if(!h)return;aw.signal=id;aw.event=null;aw.ids=[h.place];state.pins=[h.place];choose(h.place);setMode('change');$('analysisMetric').value='0';$('analysisScale').value='absolute';$('analysisStart').value=h.start;$('analysisEnd').value=h.end;$('analysisRefStart').value=h.referenceStart;$('analysisRefEnd').value=h.referenceEnd;$('analysisReference').value='custom';$('analysisEventStart').value='';$('analysisSpan').value='reference';aw.day=28;$('eventCatalog').open=false;$('analysisSetup').open=false;awOpen();}
+function awShiftCards(){const cutoff=[manifest.Daily_Ports_Data_latest,manifest.Daily_Chokepoints_Data_latest].sort()[0],recent=$('shiftPeriod').value==='recent',hits=passageShifts.filter(h=>recent?h.recent:!h.recent);text('shiftPeriodNote',recent?'Windows ending '+AW.shift(cutoff,-29)+' → '+cutoff+' · relative to observed coverage, not live news. '+(!hits.length?'No qualifying recent shifts.':''):'Previously selected windows remain linkable; values are recalculated after source revisions.');$('shiftCards').replaceChildren(...hits.map(h=>{const card=element('article','event-card');card.append(element('small','',!h.qualifies?'Revised data · no longer qualifies':h.context?'Related source attached · not causal proof':'Unexplained signal'),element('h3','',h.name+' · '+(h.percent==null?'comparison unavailable':fmt(h.percent)+'% calls')),element('p','',h.start+' → '+h.end),element('p','hint',fmt(h.mean)+' / day vs '+fmt(h.reference)+' in preceding 28 days'));const b=element('button','','Inspect this shift');b.dataset.shift=h.id;b.onclick=()=>awShift(h.id);card.append(b);return card;}));}
+</script>
+</body></html>

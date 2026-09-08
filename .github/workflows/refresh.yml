@@ -1,0 +1,76 @@
+name: Refresh observed activity
+on:
+  schedule:
+    - cron: '23 11 * * *'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish a validated changed candidate
+        type: boolean
+        default: false
+      full:
+        description: Reconcile all activity since the bootstrap boundary
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: passage-production-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    # Fail closed until credential scope and spending boundary are approved.
+    if: vars.PASSAGE_REFRESH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Prepare source-backed candidate
+        id: candidate
+        env:
+          FULL: ${{ inputs.full }}
+        run: |
+          args=()
+          if [ "$FULL" = true ]; then args+=(--full); fi
+          python3 scripts/prepare-refresh.py --receipt-dir "$RUNNER_TEMP/receipts" "${args[@]}"
+      - name: Browser acceptance before publication
+        run: |
+          python3 scripts/preview.py > "$RUNNER_TEMP/preview.log" 2>&1 &
+          preview=$!
+          trap 'kill "$preview" 2>/dev/null || true' EXIT
+          for _ in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:8653/; then break; fi
+            sleep 1
+          done
+          curl -fsS -o /dev/null http://127.0.0.1:8653/ || { printf 'Preview did not become ready\n' >&2; exit 1; }
+          node scripts/browser-smoke.cjs http://127.0.0.1:8653/ "$RUNNER_TEMP/browser"
+      - name: Publish validated changed bundle
+        if: steps.candidate.outputs.publish == 'true' && (github.event_name == 'schedule' || inputs.publish)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python3 scripts/deploy.py check
+          npx --yes wrangler@4.129.1 pages deploy public --project-name=passage-imf --branch=main --commit-hash="$GITHUB_SHA" --commit-dirty=true
+          python3 scripts/verify-public.py
+      - name: Record bounded run summary
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/receipts/candidate.json" ]; then
+            {
+              printf '### Candidate validation\n```json\n'
+              cat "$RUNNER_TEMP/receipts/candidate.json"
+              printf '\n```\n'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f "$RUNNER_TEMP/browser/browser.json" ]; then
+            printf 'Browser acceptance completed; results checked before publication.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
