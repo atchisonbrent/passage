@@ -53,6 +53,7 @@ jobs:
           curl -fsS -o /dev/null http://127.0.0.1:8653/ || { printf 'Preview did not become ready\n' >&2; exit 1; }
           node scripts/browser-smoke.cjs http://127.0.0.1:8653/ "$RUNNER_TEMP/browser"
       - name: Publish validated changed bundle
+        id: publish
         if: steps.candidate.outputs.publish == 'true' && (github.event_name == 'schedule' || inputs.publish)
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -60,7 +61,9 @@ jobs:
         run: |
           python3 scripts/deploy.py check
           npx --yes wrangler@4.129.1 pages deploy public --project-name=passage-imf --branch=main --commit-hash="$GITHUB_SHA" --commit-dirty=true
-          python3 scripts/verify-public.py
+      - name: Verify public deployment without credentials
+        if: steps.publish.outcome == 'success'
+        run: python3 scripts/verify-public.py
       - name: Record bounded run summary
         if: always()
         run: |

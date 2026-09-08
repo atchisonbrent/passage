@@ -44,7 +44,7 @@ Sources: UN Global Platform / IMF PortWatch (observed activity); University of
 Oxford / IMF PortWatch (network and economic models); Natural Earth (land).
 [Data terms and attribution](public/data/LICENSE.txt) apply separately from code.
 Source cutoffs and hashes are in `public/data/manifest.json`; historical provenance
-is in `history-manifest.json`. Data is generally published weekly, not live.
+is in `public/data/history-manifest.json`. Data is generally published weekly, not live.
 
 Percent changes require valid complete references; zero and missing differ.
 Cumulative deviations are descriptive, not lost trade. Exposure is modeled risk,

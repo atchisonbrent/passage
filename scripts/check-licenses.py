@@ -4,7 +4,7 @@ from pathlib import Path
 def validate(root):
     required={
         'LICENSE':['MIT License','Copyright (c) 2026 Brent Atchison'],
-        'LICENSES.md':['public/data/','tests/fixtures/','not','src/events.js'],
+        'LICENSES.md':['public/data/','tests/fixtures/','does **not** cover','src/events.js'],
         'public/data/LICENSE.txt':['NOT licensed','IMF PortWatch','https://www.imf.org/en/about/copyright-and-terms','Natural Earth','No endorsement'],
         'tests/fixtures/LICENSE.txt':['NOT licensed','IMF PortWatch'],
     }
