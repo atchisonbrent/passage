@@ -20,7 +20,7 @@ function awEventContext(){const event=awContext(),panel=$('eventContext');const 
  if(event.date>dates.at(-1))details.append(element('p','', 'Reporting is newer than this observation snapshot; post-event effects cannot be displayed.'));
  if(aw.ids.some(id=>!event.places.includes(id)))details.append(element('p','hint','Additional places are your comparisons; the source does not necessarily discuss them.'));
  const map=element('button','','Locate on globe');map.onclick=()=>{choose(event.places[0]);setMode('change');if(dates.includes(event.date))setDate(dates.indexOf(event.date));awOpen(false);};
- const clear=element('button','','Remove event annotation');clear.onclick=()=>{aw.event=null;aw.signal=null;awInvalidate();refresh();};details.append(map,clear);
+ const clear=element('button','event-close','×');clear.type='button';clear.setAttribute('aria-label','Close event');clear.title='Close event';clear.onclick=()=>{aw.event=null;aw.signal=null;awInvalidate();refresh();$('analyzeView').focus({preventScroll:true});};details.append(map);panel.append(clear);
 }
 function awSearch(){const q=$('analysisSearch').value.trim().toLowerCase();$('analysisMatches').replaceChildren();if(!q)return;const matches=places.filter(p=>!aw.ids.includes(p.id)&&(p.name+' '+p.country).toLowerCase().includes(q)).slice(0,8);
  for(const p of matches){const b=element('button','',p.name+' · '+p.country);b.disabled=aw.ids.length>=4;b.onclick=()=>{if(aw.ids.length>=4||aw.ids.includes(p.id))return;aw.ids.push(p.id);state.pins=[...aw.ids];$('analysisSearch').value='';awSearch();awInvalidate();};$('analysisMatches').append(b);}if(!matches.length)$('analysisMatches').append(element('p','hint','No additional matching places.'));}

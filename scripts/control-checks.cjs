@@ -67,6 +67,15 @@ exports.checkControls=async({call,js,click,delay,out,width,height})=>{
   assert.equal(await js("document.querySelector('#eventContext details').open"),true);
   await click('#randomEvent');await randomReady();assert.notEqual(await js('awContext().id'),picked);
   fs.writeFileSync(path.join(out,`random-${width}-${height}.png`),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  const comparisonBefore=await js("JSON.stringify([aw.ids,...awValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])");
+  assert.equal(await js("document.querySelector('.event-close').getAttribute('aria-label')"),'Close event');
+  await click('#eventContext summary');
+  assert.equal(await js("document.querySelector('#eventContext details').open"),false);
+  assert.ok(await js("(()=>{const r=document.querySelector('.event-close').getBoundingClientRect();return r.width>=44&&r.height>=44})()"));
+  await click('.event-close');
+  assert.equal(await js("!awContext()&&document.getElementById('eventContext').hidden"),true);
+  assert.equal(await js('document.activeElement.id'),'analyzeView');
+  assert.equal(await js("JSON.stringify([aw.ids,...awValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])"),comparisonBefore,'closing context preserves comparison and catalogs');
   await click('#exploreView');
 
 };

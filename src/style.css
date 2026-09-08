@@ -253,5 +253,8 @@ body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow
 /* Keep the heading in the scroll flow: no opaque strip over charts. */
 .detail #placeName{position:static}
 #randomEvent{display:inline-flex;align-items:center;gap:7px}
+#eventContext{position:relative}
+#eventContext summary{padding-right:48px;white-space:normal;min-height:32px}
+.event-close{position:absolute;top:0;right:0;width:44px;height:44px;padding:0;font-size:24px;line-height:1}
 #randomEvent svg{width:18px;height:18px;flex:none}
 @media(max-width:480px){.view-switch{display:grid;grid-template-columns:1fr 1fr}.view-switch button{justify-content:center;white-space:nowrap}}
