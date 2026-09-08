@@ -1,0 +1,1 @@
+{"name":"passage","private":true,"scripts":{"format":"prettier --write src scripts tests docs README.md CONTRIBUTING.md","format:check":"prettier --check src scripts tests docs README.md CONTRIBUTING.md"},"devDependencies":{"prettier":"3.6.2"}}

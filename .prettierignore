@@ -1,0 +1,5 @@
+public/
+# Template marker whitespace participates in exact CSP hashes.
+src/index.html
+*.py
+*.json

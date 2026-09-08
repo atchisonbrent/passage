@@ -1,10 +1,13 @@
-const assert=require('node:assert/strict');
-const fs=require('node:fs');
-assert.ok(fs.existsSync(require('node:path').join(__dirname,'../src/freshness.js')), 'Missing freshness logic');
-const F=require('../src/freshness.js');
-const m={Daily_Ports_Data_latest:'2026-12-31',Daily_Chokepoints_Data_latest:'2027-01-01'};
-assert.equal(F.status(m,'2027-01-02').stale,false);
-assert.equal(F.status(m,'2027-01-16').stale,true);
-assert.equal(F.status(m,'2027-01-16').days,16);
-assert.equal(F.status(m,'2027-01-16').cutoff,'2026-12-31');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+assert.ok(
+  fs.existsSync(require('node:path').join(__dirname, '../src/freshness.js')),
+  'Missing freshness logic',
+);
+const F = require('../src/freshness.js');
+const m = { Daily_Ports_Data_latest: '2026-12-31', Daily_Chokepoints_Data_latest: '2027-01-01' };
+assert.equal(F.status(m, '2027-01-02').stale, false);
+assert.equal(F.status(m, '2027-01-16').stale, true);
+assert.equal(F.status(m, '2027-01-16').days, 16);
+assert.equal(F.status(m, '2027-01-16').cutoff, '2026-12-31');
 console.log('freshness: rollover and frozen-scheduler staleness passed');

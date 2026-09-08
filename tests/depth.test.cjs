@@ -1,21 +1,62 @@
-const assert=require('node:assert/strict');
-const M=require('../src/analysis.js');
-const days=Array.from({length:100},(_,i)=>new Date(Date.UTC(2026,0,i+1)).toISOString().slice(0,10));
-const rows=days.map((d,i)=>[d,i<28?100:i<50?20:100]);
-let r=M.eventStudy(rows,1,days[28],days[80],.9,7);
-assert.equal(r.baseline,100);assert.equal(r.recovery,days[56]);assert.equal(r.belowDays,22);assert.equal(r.shortfall,1760);assert.equal(r.minMean,20);
-const gap=rows.map(r=>[...r]);gap[40][1]=null;r=M.eventStudy(gap,1,days[28],days[80],.9,7);assert.equal(r.shortfall,null);assert.equal(r.complete,false);
-const zero=rows.map(r=>[r[0],0]);assert.equal(M.eventStudy(zero,1,days[28],days[80],.9,7).baseline,0);assert.equal(M.eventStudy(zero,1,days[28],days[80],.9,7).recovery,null);
-assert.equal(M.eventStudy(rows,1,days[10],days[80],.9,7).baseline,null);
-assert.equal(M.eventStudy(rows,1,days[10],days[80],.9,7).observedDays,rows.filter(r=>r[0]>=days[10]&&r[0]<=days[80]).length);
-assert.equal(M.eventStudy(rows,1,days[28],days[40],.9,7).recovery,null);
-const seasonal=[];for(let y=2019;y<=2025;y++)for(let d=1;d<=7;d++)seasonal.push([`${y}-03-0${d}`,y-2010]);
-let s=M.seasonalReference(seasonal,1,'2026-03-07',7);assert.equal(s.years.length,7);assert.equal(s.mean,12);
-s=M.seasonalReference(seasonal.filter(r=>r[0]!=='2020-03-02'),1,'2026-03-07',7);assert.equal(s.years.length,6);
-assert.equal(M.indexed([0,1,null],0)[1],null);assert.deepEqual(M.indexed([10,null,20],10),[100,null,200]);
-assert.equal(M.seasonalReference(seasonal.filter(r=>r[0]<'2021'),1,'2026-03-07',7).mean,null);
-const boundary=rows.map((r,i)=>[r[0],i<28?100:90]);assert.equal(M.eventStudy(boundary,1,days[28],days[80],.9,7).belowDays,0);
-const recoveryGap=rows.map(r=>[...r]);recoveryGap[53][1]=null;assert.equal(M.eventStudy(recoveryGap,1,days[28],days[80],.9,7).recovery,days[60]);
-const early=Array.from({length:40},(_,i)=>[M.shiftDay('2019-01-01',i),100]);assert.equal(M.eventStudy(early,1,'2019-01-10','2019-02-05').baseline,null);
-const noFollow=rows.map((r,i)=>[r[0],i<28?100:null]);assert.equal(M.eventStudy(noFollow,1,days[28],days[80]).observedDays,0);
-console.log('depth: event baseline, recovery confirmation, censoring, missingness, seasonal complete years, index zero/gaps passed');
+const assert = require('node:assert/strict');
+const M = require('../src/analysis.js');
+const days = Array.from({ length: 100 }, (_, i) =>
+  new Date(Date.UTC(2026, 0, i + 1)).toISOString().slice(0, 10),
+);
+const rows = days.map((d, i) => [d, i < 28 ? 100 : i < 50 ? 20 : 100]);
+let r = M.eventStudy(rows, 1, days[28], days[80], 0.9, 7);
+assert.equal(r.baseline, 100);
+assert.equal(r.recovery, days[56]);
+assert.equal(r.belowDays, 22);
+assert.equal(r.shortfall, 1760);
+assert.equal(r.minMean, 20);
+const gap = rows.map((r) => [...r]);
+gap[40][1] = null;
+r = M.eventStudy(gap, 1, days[28], days[80], 0.9, 7);
+assert.equal(r.shortfall, null);
+assert.equal(r.complete, false);
+const zero = rows.map((r) => [r[0], 0]);
+assert.equal(M.eventStudy(zero, 1, days[28], days[80], 0.9, 7).baseline, 0);
+assert.equal(M.eventStudy(zero, 1, days[28], days[80], 0.9, 7).recovery, null);
+assert.equal(M.eventStudy(rows, 1, days[10], days[80], 0.9, 7).baseline, null);
+assert.equal(
+  M.eventStudy(rows, 1, days[10], days[80], 0.9, 7).observedDays,
+  rows.filter((r) => r[0] >= days[10] && r[0] <= days[80]).length,
+);
+assert.equal(M.eventStudy(rows, 1, days[28], days[40], 0.9, 7).recovery, null);
+const seasonal = [];
+for (let y = 2019; y <= 2025; y++)
+  for (let d = 1; d <= 7; d++) seasonal.push([`${y}-03-0${d}`, y - 2010]);
+let s = M.seasonalReference(seasonal, 1, '2026-03-07', 7);
+assert.equal(s.years.length, 7);
+assert.equal(s.mean, 12);
+s = M.seasonalReference(
+  seasonal.filter((r) => r[0] !== '2020-03-02'),
+  1,
+  '2026-03-07',
+  7,
+);
+assert.equal(s.years.length, 6);
+assert.equal(M.indexed([0, 1, null], 0)[1], null);
+assert.deepEqual(M.indexed([10, null, 20], 10), [100, null, 200]);
+assert.equal(
+  M.seasonalReference(
+    seasonal.filter((r) => r[0] < '2021'),
+    1,
+    '2026-03-07',
+    7,
+  ).mean,
+  null,
+);
+const boundary = rows.map((r, i) => [r[0], i < 28 ? 100 : 90]);
+assert.equal(M.eventStudy(boundary, 1, days[28], days[80], 0.9, 7).belowDays, 0);
+const recoveryGap = rows.map((r) => [...r]);
+recoveryGap[53][1] = null;
+assert.equal(M.eventStudy(recoveryGap, 1, days[28], days[80], 0.9, 7).recovery, days[60]);
+const early = Array.from({ length: 40 }, (_, i) => [M.shiftDay('2019-01-01', i), 100]);
+assert.equal(M.eventStudy(early, 1, '2019-01-10', '2019-02-05').baseline, null);
+const noFollow = rows.map((r, i) => [r[0], i < 28 ? 100 : null]);
+assert.equal(M.eventStudy(noFollow, 1, days[28], days[80]).observedDays, 0);
+console.log(
+  'depth: event baseline, recovery confirmation, censoring, missingness, seasonal complete years, index zero/gaps passed',
+);

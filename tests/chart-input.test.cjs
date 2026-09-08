@@ -1,15 +1,66 @@
-const assert=require('node:assert/strict');
-const T=require('../src/chart-input.js');
-assert.equal(T.indexAt(48,300,100),0);assert.equal(T.indexAt(290,300,100),99);assert.equal(T.indexAt(-100,300,100),0);assert.equal(T.indexAt(900,300,100),99);
-const handlers={},captures=new Set(),chosen=[];
-const canvas={addEventListener:(n,f)=>handlers[n]=f,getBoundingClientRect:()=>({left:0,width:300}),setPointerCapture:i=>captures.add(i),releasePointerCapture:i=>captures.delete(i),hasPointerCapture:i=>captures.has(i)};
-let current=50;T.attach(canvas,{count:()=>100,index:()=>current,onSelect:i=>{current=i;chosen.push(i)}});
-const e=(x,y,id=1)=>({clientX:x,clientY:y,pointerId:id,button:0,preventDefault(){}});
-handlers.pointerdown(e(50,10));handlers.pointermove(e(200,12));handlers.pointerup(e(200,12));assert(chosen.at(-1)>50);
-let n=chosen.length;handlers.pointerdown(e(100,10));handlers.pointermove(e(101,50));handlers.pointerup(e(101,50));assert.equal(chosen.length,n,'vertical scrolling does not select');
-handlers.pointerdown(e(80,10));handlers.pointerup(e(80,10));assert.equal(current,T.indexAt(80,300,100));
-n=chosen.length;handlers.pointerdown(e(80,10));handlers.pointerdown(e(180,10,2));handlers.pointermove(e(200,10));handlers.pointerup(e(200,10));handlers.pointerup(e(180,10,2));assert.equal(chosen.length,n,'multi-touch never scrubs');
-handlers.pointerdown(e(80,10));handlers.pointercancel(e(80,10));n=chosen.length;handlers.pointerup(e(80,10));assert.equal(chosen.length,n);
-handlers.keydown({key:'End',preventDefault(){}});assert.equal(current,99);handlers.keydown({key:'ArrowLeft',shiftKey:true,preventDefault(){}});assert.equal(current,92);handlers.keydown({key:'Home',preventDefault(){}});assert.equal(current,0);
-assert.equal(captures.size,0);
-console.log('chart input: endpoints, tap, horizontal drag, vertical scroll, multitouch, cancellation, keyboard passed');
+const assert = require('node:assert/strict');
+const T = require('../src/chart-input.js');
+assert.equal(T.indexAt(48, 300, 100), 0);
+assert.equal(T.indexAt(290, 300, 100), 99);
+assert.equal(T.indexAt(-100, 300, 100), 0);
+assert.equal(T.indexAt(900, 300, 100), 99);
+const handlers = {},
+  captures = new Set(),
+  chosen = [];
+const canvas = {
+  addEventListener: (n, f) => (handlers[n] = f),
+  getBoundingClientRect: () => ({ left: 0, width: 300 }),
+  setPointerCapture: (i) => captures.add(i),
+  releasePointerCapture: (i) => captures.delete(i),
+  hasPointerCapture: (i) => captures.has(i),
+};
+let current = 50;
+T.attach(canvas, {
+  count: () => 100,
+  index: () => current,
+  onSelect: (i) => {
+    current = i;
+    chosen.push(i);
+  },
+});
+const e = (x, y, id = 1) => ({
+  clientX: x,
+  clientY: y,
+  pointerId: id,
+  button: 0,
+  preventDefault() {},
+});
+handlers.pointerdown(e(50, 10));
+handlers.pointermove(e(200, 12));
+handlers.pointerup(e(200, 12));
+assert(chosen.at(-1) > 50);
+let n = chosen.length;
+handlers.pointerdown(e(100, 10));
+handlers.pointermove(e(101, 50));
+handlers.pointerup(e(101, 50));
+assert.equal(chosen.length, n, 'vertical scrolling does not select');
+handlers.pointerdown(e(80, 10));
+handlers.pointerup(e(80, 10));
+assert.equal(current, T.indexAt(80, 300, 100));
+n = chosen.length;
+handlers.pointerdown(e(80, 10));
+handlers.pointerdown(e(180, 10, 2));
+handlers.pointermove(e(200, 10));
+handlers.pointerup(e(200, 10));
+handlers.pointerup(e(180, 10, 2));
+assert.equal(chosen.length, n, 'multi-touch never scrubs');
+handlers.pointerdown(e(80, 10));
+handlers.pointercancel(e(80, 10));
+n = chosen.length;
+handlers.pointerup(e(80, 10));
+assert.equal(chosen.length, n);
+handlers.keydown({ key: 'End', preventDefault() {} });
+assert.equal(current, 99);
+handlers.keydown({ key: 'ArrowLeft', shiftKey: true, preventDefault() {} });
+assert.equal(current, 92);
+handlers.keydown({ key: 'Home', preventDefault() {} });
+assert.equal(current, 0);
+assert.equal(captures.size, 0);
+console.log(
+  'chart input: endpoints, tap, horizontal drag, vertical scroll, multitouch, cancellation, keyboard passed',
+);
