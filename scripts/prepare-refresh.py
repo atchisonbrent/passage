@@ -9,6 +9,12 @@ import sys
 import datetime as dt
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/"scripts"))
+from refresh import published_baseline
+
+def prepare_code_data(data):
+    """Reuse verified published observations; never acquire upstream data."""
+    published_baseline(data)
 
 
 def validate_changed_paths():
@@ -25,7 +31,9 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--receipt-dir',type=Path,required=True)
     parser.add_argument('--full',action='store_true')
+    parser.add_argument('--code-release',action='store_true')
     args=parser.parse_args()
+    if args.code_release and args.full:parser.error('--full is only for data refresh')
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT).strip():
         raise ValueError('Start with a committed clean checkout')
     receipts=args.receipt_dir.resolve()
@@ -33,17 +41,21 @@ def main():
         raise ValueError('Receipts must stay outside publication checkout')
     receipts.mkdir(parents=True,exist_ok=True)
     revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    cmd=[sys.executable,'scripts/refresh.py','--published-baseline','--receipt',str(receipts/'refresh.json')]
-    if args.full:cmd.append('--full')
-    subprocess.run(cmd,cwd=ROOT,check=True)
-    receipt=json.loads((receipts/'refresh.json').read_text())
-    age=(dt.date.fromisoformat(receipt['checked'])-dt.date.fromisoformat(min(window['end'] for window in receipt['windows'].values()))).days
-    if age>14:
-        raise ValueError('Source observations exceed 14-day freshness threshold; retaining last published snapshot')
+    if args.code_release:
+        prepare_code_data(ROOT/'public/data')
+        receipt={'changed':False,'kind':'code-release'}
+    else:
+        cmd=[sys.executable,'scripts/refresh.py','--published-baseline','--receipt',str(receipts/'refresh.json')]
+        if args.full:cmd.append('--full')
+        subprocess.run(cmd,cwd=ROOT,check=True)
+        receipt=json.loads((receipts/'refresh.json').read_text())
+        age=(dt.date.fromisoformat(receipt['checked'])-dt.date.fromisoformat(min(window['end'] for window in receipt['windows'].values()))).days
+        if age>14:
+            raise ValueError('Source observations exceed 14-day freshness threshold; retaining last published snapshot')
     data=ROOT/'public/data';manifest=json.loads((data/'manifest.json').read_text())
     publish=receipt['changed'] or manifest.get('source_revision')!=revision
     if publish:
-        manifest['refresh']=receipt
+        if not args.code_release:manifest['refresh']=receipt
         manifest['source_revision']=revision
         (data/'manifest.json').write_text(json.dumps(manifest,separators=(',',':')))
     subprocess.run([sys.executable,'scripts/build.py'],cwd=ROOT,check=True)

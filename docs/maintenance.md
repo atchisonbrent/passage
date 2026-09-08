@@ -1,5 +1,13 @@
 # Maintaining Passage
 
+## Local development and code releases
+
+Run `python3 scripts/qa.py --output /tmp/passage-qa` for an offline build, all tests, an isolated loopback preview and responsive browser acceptance. The server chooses a free port and is stopped automatically. Inspect the generated screenshots as well as browser.json. No cloud job, deployment or source acquisition occurs.
+
+For a production code release, manually dispatch `release.yml` with `publish=true`. It downloads and hash-checks the current published observation partitions, preserves their refresh provenance, builds the new code, tests it and publishes. It never queries ArcGIS or claims a fresh data check. Release and refresh share a concurrency lock so they cannot overwrite each other mid-run. Ordinary pushes do not deploy.
+
+## Scheduled data refresh
+
 `.github/workflows/refresh.yml` checks daily at 11:23 UTC. Activation is explicit:
 `PASSAGE_REFRESH_ENABLED=true`, main branch only. The repository variable is the on/off switch; check Actions for the latest run.
 Standard hosted runners in this public repository have free Actions execution;
