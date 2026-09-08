@@ -7,7 +7,7 @@ Use Python 3.12+, Node 22+ and Chrome/Chromium. No application dependencies are 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install -r requirements-dev.txt
+python -m pip install --only-binary=:all: -r requirements-dev.txt
 npm ci --ignore-scripts
 ```
 

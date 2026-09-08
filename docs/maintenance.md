@@ -47,6 +47,8 @@ The current bundle retains noindex headers; public accessibility is not authenti
 
 ## Checks
 
+For source changes, run the formatting and lint checks in [Contributing](../CONTRIBUTING.md) as well as the checks below. Code releases enforce those checks; daily data refreshes do not download development tools.
+
 ```sh
 python3 -m unittest discover -s tests
 for test in tests/*.test.cjs; do node "$test"; done

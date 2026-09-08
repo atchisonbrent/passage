@@ -24,7 +24,7 @@ Passage is a static application: Python assembles same-origin snapshots and HTML
 
 `public/data/manifest.json` identifies observation partitions and their provenance. Current observations load at startup. Selected historical files, network data and exposure data load on demand. The build embeds the curated event catalog and deterministic shift candidates.
 
-The frontend currently uses ordered classic scripts, not ES modules. Pure helper APIs are available to Node tests and the browser. UI files share application state and DOM helpers. `scripts/build.py` is the authoritative dependency order; do not reorder files casually. Bootstrap loads the snapshot before binding views.
+The frontend currently uses ordered classic scripts, not ES modules. Pure helper APIs are available to Node tests and the browser. UI files share application state and DOM helpers. The lexical `comparison` object owns comparison state; access the similarly named DOM element through `$('comparison')`, not a bare global. `scripts/build.py` is the authoritative dependency order; do not reorder files casually. Bootstrap loads the snapshot before binding views.
 
 The globe clock and comparison date range are separate. The comparison workspace may use historical dates not available in the globe snapshot. History caches are keyed by place; errors remain visible and retryable.
 
