@@ -1,5 +1,6 @@
 /* Real Chromium navigation + responsive/restore smoke. Node 22+, no npm dependencies. */
 const {spawn}=require('node:child_process');
+const {removeProfile}=require('./browser-profile.cjs');
 const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
@@ -52,6 +53,6 @@ async function until(fn){const deadline=Date.now()+45000;let last;while(Date.now
   fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify({results,discoveryCount:ids.length,errors},null,2));
   console.log(JSON.stringify({viewports:results.length,discoveries:ids.length,exceptions:errors.length}));
  }finally{
-  ws?.close();proc.kill('SIGTERM');await new Promise(resolve=>proc.exitCode!==null?resolve():proc.once('exit',resolve));fs.rmSync(tmp,{recursive:true,force:true});
+  ws?.close();proc.kill('SIGTERM');await new Promise(resolve=>proc.exitCode!==null?resolve():proc.once('exit',resolve));await removeProfile(tmp);
  }
 })().catch(e=>{console.error(e);process.exitCode=1;});
