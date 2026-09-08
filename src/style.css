@@ -2316,6 +2316,9 @@ body[data-mode='exposure'] .scrubrow {
 
 /* Keep analysis navigation on the same rail as its centered content. */
 @media (min-width: 1680px) {
+  body.analysis-open main {
+    scrollbar-gutter: stable both-edges;
+  }
   body.analysis-open header {
     padding-left: calc((100% - 1600px) / 2);
     padding-right: calc((100% - 1600px) / 2);
