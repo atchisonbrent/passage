@@ -250,4 +250,8 @@ body #mobileControls{display:inline-flex;align-items:center;justify-content:cent
 #mobileControls[aria-expanded="true"] .settings-chevron{transform:rotate(180deg)}
 body #mobileMeasure{display:block}
 body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow,body[data-mode=exposure] .time-controls,body[data-mode=exposure] .scrubrow{display:none}
-@media(min-width:901px){.detail #placeName{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0 8px;margin-top:0}}
+/* Keep the heading in the scroll flow: no opaque strip over charts. */
+.detail #placeName{position:static}
+#randomEvent{display:inline-flex;align-items:center;gap:7px}
+#randomEvent svg{width:18px;height:18px;flex:none}
+@media(max-width:480px){.view-switch{display:grid;grid-template-columns:1fr 1fr}.view-switch button{justify-content:center;white-space:nowrap}}

@@ -2,8 +2,10 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 exports.checkControls=async({call,js,click,delay,out,width,height})=>{
+  const randomReady=async()=>{for(let i=0;i<200&&await js('aw.busy');i++)await delay(100);assert.equal(await js('aw.busy'),false);};
   const geometry=()=>js("(()=>{const r=document.getElementById('globe').getBoundingClientRect();return {height:r.height,width:r.width}})()");
   const before=await geometry();
+  assert.equal(await js('passageSnapshot().place'),'Singapore','unlinked landing is a general shipping hub');
   assert.equal(await js("document.querySelectorAll('#mobileControls svg[aria-hidden=true]').length"),2,'Settings needs decorative gear and disclosure icons');
   if(width>=901){
     assert.equal(await js("getComputedStyle(document.getElementById('placeName')).boxShadow"),'none','sticky title must not paint over the resting place label');
@@ -59,6 +61,14 @@ exports.checkControls=async({call,js,click,delay,out,width,height})=>{
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   assert.equal(await js("document.body.classList.contains('explore-open')"),false);
+  await click('#randomEvent');await randomReady();
+  assert.equal(await js('aw.open&&!!awContext()'),true);
+  const picked=await js('awContext().id');
+  assert.equal(await js("document.querySelector('#eventContext details').open"),true);
+  await click('#randomEvent');await randomReady();assert.notEqual(await js('awContext().id'),picked);
+  fs.writeFileSync(path.join(out,`random-${width}-${height}.png`),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  await click('#exploreView');
+
 };
 exports.checkLenses=async({call,js,click,navigate,delay,until,base,out})=>{
   await call('Emulation.setDeviceMetricsOverride',{width:1210,height:702,deviceScaleFactor:1,mobile:false});
@@ -85,7 +95,7 @@ exports.checkLenses=async({call,js,click,navigate,delay,until,base,out})=>{
   await click('#clearPins');assert.equal(await js('state.pins.length'),0);
   await click('#depthPanel summary');await click('#loadHistory');await until(()=>js('!!historyCache[state.selected]'));
   await js("document.querySelector('.detail').scrollTop=500");await delay(100);
-  assert.ok(await js("(()=>{const p=document.getElementById('placeName').getBoundingClientRect(),d=document.querySelector('.detail').getBoundingClientRect();return p.top>=d.top-1&&p.bottom<d.bottom})()"),'selected place stays visible while details scroll');
+  assert.ok(await js("(()=>{const p=document.getElementById('placeName').getBoundingClientRect(),d=document.querySelector('.detail').getBoundingClientRect();return p.bottom<d.top&&getComputedStyle(document.getElementById('placeName')).position==='static'})()"),'heading scrolls with content rather than masking the chart');
   fs.writeFileSync(path.join(out,'details-expanded.png'),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));
   await click('#connections');await until(()=>js("state.mode==='connections'&&!!network"));
   assert.equal(await js("getComputedStyle(document.querySelector('.time-controls')).display"),'none');
@@ -99,4 +109,25 @@ exports.checkLenses=async({call,js,click,navigate,delay,until,base,out})=>{
   await click('#analysisSetup summary');await click('#analysisSetup summary');
   await select('#analysisDisplay',1);assert.equal(await js("document.getElementById('analysisDailyPanel').hidden"),false);
   await click('#exploreView');assert.equal(await js('aw.open'),false);
+  // Force each existing discovery through the real button, not direct navigation calls.
+  const pool=await js('PassageDiscovery.candidates(passageEvents,passageShifts,places)');
+  for(const target of pool){
+    await js(`aw.event=null;aw.signal=null;window.qaRandom=Math.random;Math.random=()=>${(pool.indexOf(target)+0.5)/pool.length}`);
+    await click('#randomEvent');await js('Math.random=window.qaRandom;delete window.qaRandom');
+    await until(()=>js('!aw.busy'));
+    assert.equal(await js('awContext().id'),target.id);
+    assert.ok(await js('aw.summaries.some(s=>s.count>0)'), 'random discovery loads actual observations');
+    assert.equal(await js('aw.open&&aw.ids.includes(state.selected)'),true);
+    assert.equal(await js("document.getElementById('analysisStart').value"),await js(target.kind==='event'?'passageEvents.find(e=>e.id===aw.event).start':'passageShifts.find(e=>e.id===aw.signal).start'));
+  }
+  const context=await js('awContext().id');await click('#analysisShare');const link=await js('location.href');
+  await navigate(link);assert.equal(await js('awContext().id'),context);
+  await click('#exploreView');
+  await js("document.getElementById('share').scrollIntoView({block:'center'})");await click('#share');
+  const globeLink=await js('location.href');await navigate(globeLink);
+  assert.equal(await js('awContext().id'),context,'globe share preserves the selected shift annotation');
+
+  await navigate(base+'#place=chokepoint6');assert.equal(await js('state.selected'),'chokepoint6','explicit shared selections remain intact');
+  await navigate(base+'stories/');assert.equal(await js('aw.open&&document.getElementById("eventCatalog").open'),true);
+
 };
