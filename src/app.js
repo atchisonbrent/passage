@@ -113,7 +113,7 @@ function bind(){bindDepth();bindCharts();
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('explore-open')){closeMore();$('mobileExplore').focus();}});
  document.addEventListener('click',e=>{if(!e.target.closest('#morePanel,#mobileExplore'))closeMore();});
  $('morePanel').addEventListener('click',e=>{if(e.target.closest('[data-story],#sources'))closeMore();});
-const setTimeline=open=>{document.body.classList.toggle('timeline-open',open);$('timelineSettings').hidden=!open;$('mobileControls').setAttribute('aria-expanded',String(open));if(open)$('speed').focus({preventScroll:true});};
+const setTimeline=open=>{document.body.classList.toggle('timeline-open',open);$('timelineSettings').hidden=!open;$('mobileControls').setAttribute('aria-expanded',String(open));};
  $('mobileControls').onclick=()=>setTimeline($('timelineSettings').hidden);
  $('closeTimeline').onclick=()=>{setTimeline(false);$('mobileControls').focus();};
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('timelineSettings').hidden){setTimeline(false);$('mobileControls').focus();}});

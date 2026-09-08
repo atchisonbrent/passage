@@ -239,10 +239,15 @@ body .timebar{overflow:visible;max-height:none}
 .timeline-settings[hidden]{display:none}
 .settings-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .settings-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:360px){.settings-fields{grid-template-columns:1fr}}
 .settings-fields label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);min-width:0}
 .settings-fields select{width:100%;min-width:0;font-size:16px;color:var(--text)}
 .timeline-settings #clockNote{margin:12px 0 0;display:block}
-body #mobileControls{font-size:12px;order:3;margin-left:auto}
+body #mobileControls{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;order:3;margin-left:auto;white-space:nowrap}
+#mobileControls svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.settings-icon{width:18px;height:18px}
+.settings-chevron{width:14px;height:14px}
+#mobileControls[aria-expanded="true"] .settings-chevron{transform:rotate(180deg)}
 body #mobileMeasure{display:block}
 body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow,body[data-mode=exposure] .time-controls,body[data-mode=exposure] .scrubrow{display:none}
 @media(min-width:901px){.detail #placeName{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0 8px;margin-top:0}}

@@ -240,10 +240,15 @@ body .timebar{overflow:visible;max-height:none}
 .timeline-settings[hidden]{display:none}
 .settings-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .settings-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:360px){.settings-fields{grid-template-columns:1fr}}
 .settings-fields label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);min-width:0}
 .settings-fields select{width:100%;min-width:0;font-size:16px;color:var(--text)}
 .timeline-settings #clockNote{margin:12px 0 0;display:block}
-body #mobileControls{font-size:12px;order:3;margin-left:auto}
+body #mobileControls{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;order:3;margin-left:auto;white-space:nowrap}
+#mobileControls svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.settings-icon{width:18px;height:18px}
+.settings-chevron{width:14px;height:14px}
+#mobileControls[aria-expanded="true"] .settings-chevron{transform:rotate(180deg)}
 body #mobileMeasure{display:block}
 body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow,body[data-mode=exposure] .time-controls,body[data-mode=exposure] .scrubrow{display:none}
 @media(min-width:901px){.detail #placeName{position:sticky;top:0;z-index:2;background:var(--panel);padding:4px 0 8px;margin-top:0}}
@@ -282,7 +287,7 @@ body[data-mode=connections] .time-controls,body[data-mode=connections] .scrubrow
 <section id="comparePanel" class="compare-panel" hidden><div class="panel-heading"><h2>Pinned histories</h2><button id="clearPins">Clear comparison</button></div><p class="hint">Daily values, shared vertical scale and date axis. Coincident changes do not establish rerouting or causation.</p><label class="field">Comparison scale<select id="comparisonScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · Jan 1–28 mean = 100</option></select></label><p id="indexNote" class="hint"></p><div id="pinLabels"></div><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
 </main>
 <section class="timebar" aria-label="Playback and date controls">
- <div class="time-controls"><button id="play">▶ Play</button><button id="back" aria-label="Previous day">‹</button><input id="dateInput" type="date" aria-label="Observation date"><button id="forward" aria-label="Next day">›</button><button id="latest">Latest</button><button id="mobileControls" aria-controls="timelineSettings" aria-expanded="false">Settings</button></div>
+ <div class="time-controls"><button id="play">▶ Play</button><button id="back" aria-label="Previous day">‹</button><input id="dateInput" type="date" aria-label="Observation date"><button id="forward" aria-label="Next day">›</button><button id="latest">Latest</button><button id="mobileControls" aria-controls="timelineSettings" aria-expanded="false"><svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/></svg><span>Settings</span><svg class="settings-chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4 10 4-4 4 4"/></svg></button></div>
  <span id="mobileMeasure" class="muted"></span>
  <div class="scrubrow"><span id="startLabel">JAN 2026</span><input type="range" id="scrub" min="0" max="1" value="0" aria-label="Observation timeline"><span id="endLabel">Latest available</span></div>
  <div id="timelineSettings" class="timeline-settings" role="region" aria-label="Playback settings" hidden>
@@ -571,7 +576,7 @@ function bind(){bindDepth();bindCharts();
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('explore-open')){closeMore();$('mobileExplore').focus();}});
  document.addEventListener('click',e=>{if(!e.target.closest('#morePanel,#mobileExplore'))closeMore();});
  $('morePanel').addEventListener('click',e=>{if(e.target.closest('[data-story],#sources'))closeMore();});
-const setTimeline=open=>{document.body.classList.toggle('timeline-open',open);$('timelineSettings').hidden=!open;$('mobileControls').setAttribute('aria-expanded',String(open));if(open)$('speed').focus({preventScroll:true});};
+const setTimeline=open=>{document.body.classList.toggle('timeline-open',open);$('timelineSettings').hidden=!open;$('mobileControls').setAttribute('aria-expanded',String(open));};
  $('mobileControls').onclick=()=>setTimeline($('timelineSettings').hidden);
  $('closeTimeline').onclick=()=>{setTimeline(false);$('mobileControls').focus();};
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('timelineSettings').hidden){setTimeline(false);$('mobileControls').focus();}});

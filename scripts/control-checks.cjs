@@ -4,6 +4,7 @@ const path=require('node:path');
 exports.checkControls=async({call,js,click,delay,out,width,height})=>{
   const geometry=()=>js("(()=>{const r=document.getElementById('globe').getBoundingClientRect();return {height:r.height,width:r.width}})()");
   const before=await geometry();
+  assert.equal(await js("document.querySelectorAll('#mobileControls svg[aria-hidden=true]').length"),2,'Settings needs decorative gear and disclosure icons');
   if(width>=901){
     assert.equal(await js("getComputedStyle(document.getElementById('placeName')).boxShadow"),'none','sticky title must not paint over the resting place label');
     assert.ok(await js("(()=>{const a=document.getElementById('placeKind').getBoundingClientRect(),b=document.getElementById('placeName').getBoundingClientRect();return a.height>0&&a.bottom<=b.top+1})()"));
@@ -11,13 +12,45 @@ exports.checkControls=async({call,js,click,delay,out,width,height})=>{
   }
   await click('#mobileControls');
   assert.equal(await js("document.getElementById('timelineSettings').hidden"),false);
+  assert.notEqual(await js('document.activeElement.tagName'),'SELECT','opening Settings must not focus a native picker');
   assert.deepEqual(await geometry(),before,'settings must not resize the globe');
   assert.ok(await js("(()=>{const r=document.getElementById('timelineSettings').getBoundingClientRect();return r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight})()"),'settings must fit the viewport');
+  if(width<=360)assert.ok(await js("document.getElementById('speed').getBoundingClientRect().width>200"),'narrow settings must give select labels a full row');
   fs.writeFileSync(path.join(out,`settings-${width}-${height}.png`),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  if(width<=360){
+    await call('Input.dispatchMouseEvent',{type:'mouseWheel',x:width/2,y:250,deltaX:0,deltaY:240});await delay(300);
+    assert.ok(await js("document.getElementById('timelineSettings').scrollTop>0"),'narrow Settings scrolls through all fields');
+    assert.ok(await js("(()=>{const r=document.getElementById('baseline').getBoundingClientRect(),p=document.getElementById('timelineSettings').getBoundingClientRect();return r.top>=p.top&&r.bottom<=p.bottom})()"),'comparison control remains reachable');
+    fs.writeFileSync(path.join(out,'settings-narrow-scrolled.png'),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  }
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   assert.equal(await js("document.getElementById('timelineSettings').hidden&&document.activeElement.id==='mobileControls'"),true);
   await click('#mobileControls');await click('#closeTimeline');
+  // Exercise a real touch sequence, not mouse clicks with a mobile viewport.
+  if(width<=1210){
+    const b=await js("(()=>{const r=document.getElementById('mobileControls').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+    await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...b,id:0,radiusX:1,radiusY:1}]});
+    await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(150);
+    assert.equal(await js("document.getElementById('timelineSettings').hidden"),false);
+    assert.notEqual(await js('document.activeElement.tagName'),'SELECT','Settings tap must not focus a picker');
+    await click('#closeTimeline');
+  }
+  // Opening with Enter keeps focus on the disclosure; Tab reaches Close then Speed.
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  assert.equal(await js("document.getElementById('timelineSettings').hidden"),false);
+  assert.equal(await js('document.activeElement.id'),'mobileControls');
+  assert.notEqual(await js("getComputedStyle(document.querySelector('.settings-chevron')).transform"),'none');
+  const tab=async()=>{await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});};
+  await tab(); // Scrubber follows the disclosure in document order.
+  assert.equal(await js('document.activeElement.id'),'scrub');
+  await tab();assert.equal(await js('document.activeElement.id'),'closeTimeline');
+  await tab();assert.equal(await js('document.activeElement.id'),'speed');
+  await click('#closeTimeline');
+  await click('#mobileControls');await click('#reset');
+  assert.equal(await js("document.getElementById('timelineSettings').hidden"),true,'outside click closes Settings');
+  assert.equal(await js("getComputedStyle(document.querySelector('.settings-chevron')).transform"),'none');
   assert.equal(await js("document.getElementById('mobileControls').getAttribute('aria-expanded')"),'false');
   await click('#mobileExplore');
   assert.deepEqual(await geometry(),before,'More must not resize the globe');
