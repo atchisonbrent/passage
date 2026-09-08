@@ -144,25 +144,38 @@ def acquire(service, start, end):
     fields = SERVICES[service]
     rows = []
     seen = set()
-    for offset in range(0, count, 1000):
+    last_id = None
+    started = time.monotonic()
+    print(f"Acquire {service}: {start} → {end}, {count} rows", flush=True)
+    while len(rows) < count:
         result = request(
             query(
                 service,
-                where=where,
+                where=where if last_id is None else where + f" AND ObjectId > {last_id}",
                 outFields="ObjectId,date,portid," + ",".join(f for f in fields if f),
                 returnGeometry="false",
                 orderByFields="ObjectId ASC",
-                resultOffset=offset,
                 resultRecordCount=1000,
             )
         )
+        if not result["features"]:
+            raise ValueError("Source pagination stopped before expected count")
         for item in result["features"]:
             row = item["attributes"]
+            object_id = row["ObjectId"]
+            if type(object_id) is not int or (last_id is not None and object_id <= last_id):
+                raise ValueError("Source ObjectId cursor did not advance")
+            last_id = object_id
             if row["ObjectId"] in seen:
                 raise ValueError("Repeated source ObjectId")
             seen.add(row["ObjectId"])
             # Missing fields are schema failure, not null observations.
             rows.append([row["portid"], row["date"]] + [row[f] if f else None for f in fields])
+        if len(rows) % 10000 == 0 or len(rows) >= count:
+            print(
+                f"Acquire {service}: {len(rows)}/{count} rows in {time.monotonic() - started:.1f}s",
+                flush=True,
+            )
     if (
         len(rows) != count
         or request(query(service, where=where, returnCountOnly="true"))["count"] != count
@@ -255,6 +268,7 @@ def refresh(data, fetch, latest, today, full=False):
 def published_baseline(data):
     """Read only canonical public activity; pinned reference assets stay in Git."""
     origin = "https://passage.batchison.dev/data/"
+    print("Loading published baseline", flush=True)
     current = request(origin + "manifest.json")
     local = json.loads((data / "manifest.json").read_text())
     # Catalog/model changes require an explicit bootstrap update, not silent drift.
