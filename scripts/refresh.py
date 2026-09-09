@@ -15,8 +15,9 @@ def merge_rows(old, fresh, identifiers, start, end):
     first, last = date(start), date(end)
     if last < first or not identifiers:
         raise ValueError("Invalid acquisition interval/catalog")
-    seen = set()
+    seen = {}
     previous = {tuple(row[:2]): row for row in old}
+    deduplicated = []
     for row in fresh:
         if len(row) != 9 or row[0] not in identifiers or not first <= date(row[1]) <= last:
             raise ValueError("Unexpected source row")
@@ -38,13 +39,19 @@ def merge_rows(old, fresh, identifiers, start, end):
         ):
             raise ValueError("Known observation coverage regressed; review source revision")
         if key in seen:
-            raise ValueError("Duplicate source observation")
-        seen.add(key)
+            # The source has published byte-identical repeats of an observation
+            # (distinct ObjectIds, same values). One copy is kept; any
+            # disagreement between copies is still a hard failure.
+            if seen[key] != row:
+                raise ValueError("Conflicting duplicate source observation")
+            continue
+        seen[key] = row
+        deduplicated.append(row)
     if len(seen) != len(identifiers) * ((last - first).days + 1):
         raise ValueError("Incomplete source date/place coverage")
     if old and max(r[1] for r in old) > end:
         raise ValueError("Source cutoff regressed")
-    return sorted([r for r in old if r[1] < start] + fresh, key=lambda r: (r[0], r[1]))
+    return sorted([r for r in old if r[1] < start] + deduplicated, key=lambda r: (r[0], r[1]))
 
 
 import argparse

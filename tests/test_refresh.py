@@ -36,7 +36,7 @@ class RefreshTests(unittest.TestCase):
         row = ["port1", "2027-01-01", 10, 1, 2, 3, None, None, None]
         for bad in [
             [],
-            [row, row],
+            [row, row[:2] + [11] + row[3:]],
             [["port2"] + row[1:]],
             [row[:2] + [float("nan")] + row[3:]],
             [row[:2] + [-1] + row[3:]],
@@ -46,6 +46,13 @@ class RefreshTests(unittest.TestCase):
             with self.subTest(bad=bad):
                 with self.assertRaises(ValueError):
                     merge_rows([row], bad, {"port1"}, "2027-01-01", "2027-01-01")
+        # Byte-identical repeats (the source republished an observation under a
+        # second ObjectId) collapse to one row; they do not count as coverage twice.
+        self.assertEqual(
+            merge_rows([row], [row, list(row)], {"port1"}, "2027-01-01", "2027-01-01"), [row]
+        )
+        with self.assertRaises(ValueError):
+            merge_rows([row], [row, row], {"port1"}, "2027-01-01", "2027-01-02")
         with self.assertRaises(ValueError):
             merge_rows([row], [row], {"port1"}, "2027-01-01", "2027-01-02")
         with self.assertRaises(ValueError):
