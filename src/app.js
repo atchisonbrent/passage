@@ -867,7 +867,18 @@ function render() {
   else exposureDetail();
   $('story').hidden = !state.story;
   if (state.story) renderStory();
+  // Capture chip focus before the strip can hide; an emptied comparison sends
+  // focus to the Compare toggle rather than leaving it on a hidden control.
+  const focused = document.activeElement?.closest?.('#pinLabels .pin-chip');
+  const restoreFocus = focused && {
+    id: focused.dataset.id,
+    remove:
+      focused.contains(document.activeElement) &&
+      document.activeElement.classList.contains('pin-remove'),
+    index: [...$('pinLabels').children].indexOf(focused),
+  };
   $('comparePanel').hidden = !state.pins.length || !activity;
+  if (restoreFocus && $('comparePanel').hidden) $('pin').focus({ preventScroll: true });
   if (state.pins.length && activity) {
     text(
       'indexNote',
@@ -876,14 +887,6 @@ function render() {
         : 'Daily values, one shared scale. Coincident changes do not establish rerouting or causation.',
     );
     const colors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
-    const focused = document.activeElement?.closest?.('#pinLabels .pin-chip');
-    const restoreFocus = focused && {
-      id: focused.dataset.id,
-      remove:
-        focused.contains(document.activeElement) &&
-        document.activeElement.classList.contains('pin-remove'),
-      index: [...$('pinLabels').children].indexOf(focused),
-    };
     $('pinLabels').replaceChildren(
       ...state.pins.map((id, i) => {
         const name = placeById[id]?.name || id;

@@ -57,6 +57,23 @@ assert.equal(
   null,
   'Gap in last-year window is not filled',
 );
+assert.equal(
+  summarize(rows, 41, 0, 7, 'year', { yearAgo: [] }).baseline,
+  null,
+  'Empty last-year rows stay null',
+);
+// Varying last-year series: the reference must be exactly the aligned window slice.
+const varying = rows.map((_, i) => [i]);
+assert.equal(
+  summarize(rows, 41, 0, 7, 'year', { yearAgo: varying }).baseline,
+  38,
+  'Mean of aligned indices 35..41',
+);
+const negative = rows.map(() => [-4]);
+const neg = summarize(rows, 41, 0, 7, 'year', { yearAgo: negative });
+assert.equal(neg.baseline, -4);
+assert.equal(neg.percent, null, 'Negative reference has no percentage');
+assert.equal(neg.difference, 24);
 assert.ok(csv([['=HYPERLINK("x")', 'a,b', null]]).startsWith('"\'=HYPERLINK'));
 const points = arc([170, 10], [-170, 10]);
 assert.equal(points.length, 65);

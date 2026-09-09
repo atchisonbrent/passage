@@ -84,6 +84,14 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
     await js("document.activeElement.closest('#pinLabels, #clearPins')!==null"),
     'keyboard focus stays in the compare strip after removing a chip',
   );
+  // Removing the sole remaining chip hides the strip; focus must land somewhere visible.
+  await js("document.querySelector('#pinLabels .pin-chip .pin-remove').focus()");
+  await click('#pinLabels .pin-chip .pin-remove');
+  assert.equal(await js('state.pins.length'), 0);
+  assert.equal(await js("document.getElementById('comparePanel').hidden"), true);
+  assert.equal(await js('document.activeElement.id'), 'pin', 'focus moves to the Compare toggle');
+  await click('#pin');
+  assert.equal(await js('state.pins.length'), 1);
   await click('#pin');
   assert.equal(await js("document.getElementById('pin').getAttribute('aria-pressed')"), 'false');
   await click('#share');
@@ -121,6 +129,27 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   assert.ok(
     await js("document.getElementById('explanation').textContent.includes('same dates last year')"),
   );
+  // Exported reference dates and the category breakdown follow the same reference.
+  const yearRefs = await js(
+    '(()=>{const s=stats[state.selected];const shift=d=>String(Number(d.slice(0,4))-1)+d.slice(4);return {actual:referenceDates(s),expected:[shift(dates[s.start]),shift(dates[state.index])]}})()',
+  );
+  assert.deepEqual(
+    yearRefs.actual,
+    yearRefs.expected,
+    'year-mode CSV reference dates are last year',
+  );
+  assert.ok(yearRefs.actual.every((d) => d.startsWith('2025-')));
+  await js("document.getElementById('depthPanel').open=true;renderDepth()");
+  await delay(150);
+  const categoryCaptions = await js(
+    "[...document.querySelectorAll('#categoryResults .category-row small')].map(e=>e.textContent)",
+  );
+  assert.ok(
+    categoryCaptions.some((c) => c.includes('same dates last year')),
+    'category breakdown names the selected reference',
+  );
+  assert.ok(!categoryCaptions.some((c) => c.includes('preceding 28')));
+  await js("document.getElementById('depthPanel').open=false");
   await setValue('baseline', 'prior');
   await setValue('window', '7');
   if (!settingsInline) await click('#closeTimeline');
@@ -528,6 +557,21 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
   await click('#analysisSetup summary');
   await select('#analysisDisplay', 1);
   assert.equal(await js("document.getElementById('analysisDailyPanel').hidden"), false);
+  assert.ok(
+    await js("document.getElementById('analysisDisplay').getBoundingClientRect().width>0"),
+    'Display control stays visible in table mode',
+  );
+  await select('#analysisDisplay', 0);
+  assert.equal(await js("document.getElementById('analysisChartPanel').hidden"), false);
+  assert.equal(await js("document.getElementById('analysisDailyPanel').hidden"), true);
+  // Method note is a real disclosure, not hover-only text.
+  await click('.method-note summary');
+  assert.equal(await js("document.querySelector('.method-note').open"), true);
+  assert.ok(
+    await js(
+      "document.getElementById('analysisCoverage').textContent.includes('missing is not zero')",
+    ),
+  );
   await click('#exploreView');
   assert.equal(await js('comparison.open'), false);
   // Force each existing discovery through the real button, not direct navigation calls.
