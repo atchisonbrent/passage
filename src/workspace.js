@@ -6,6 +6,7 @@ const comparison = {
   signal: null,
   open: false,
   day: 0,
+  pendingDay: null,
   page: 0,
   key: '',
   summaries: [],
@@ -388,13 +389,29 @@ function renderWorkspace() {
         ? '2019-01-01'
         : rs
       : start;
+  // The selection is a calendar date, not an index. Ordinary edits keep the
+  // selected date wherever the rebuilt axis still contains it; callers that
+  // intend a reset set comparison.pendingDay (a date or an offset from the
+  // observation start) instead of poking the index against the old axis.
   const selectedDay = comparison.axis[comparison.day];
   comparison.axis = valid ? comparisonMath.days(plotStart, end) : [];
-  // The selection is a calendar date, not an index: keep it where the axis
-  // still contains it, otherwise clamp regardless of whether a chart is drawn.
-  const kept = selectedDay ? comparison.axis.indexOf(selectedDay) : -1;
+  const pending = comparison.pendingDay;
+  comparison.pendingDay = null;
+  const target =
+    pending === null || pending === undefined
+      ? selectedDay
+      : typeof pending === 'number'
+        ? comparisonMath.validDate(start)
+          ? comparisonMath.shift(start, pending)
+          : null
+        : pending;
+  const kept = target ? comparison.axis.indexOf(target) : -1;
   comparison.day =
-    kept >= 0 ? kept : Math.max(0, Math.min(comparison.axis.length - 1, comparison.day));
+    kept >= 0
+      ? kept
+      : pending !== null && pending !== undefined
+        ? Math.max(0, comparison.axis.indexOf(start))
+        : Math.max(0, Math.min(comparison.axis.length - 1, comparison.day));
   comparison.rows = Object.fromEntries(comparison.ids.map((id) => [id, combinedHistory(id)]));
   comparison.summaries = comparison.ids.map((id) =>
     comparisonMath.summary(
@@ -673,7 +690,7 @@ function bindWorkspace(q) {
           ? '2019-01-01'
           : comparisonMath.shift(end, 1 - Number(b.dataset.range));
       comparisonReference();
-      comparison.day = 0;
+      comparison.pendingDay = 0;
       comparisonInvalidate();
     };
   $('analysisLoad').onclick = async () => {

@@ -716,7 +716,30 @@ exports.checkLenses = async ({ call, js, click, hover, navigate, delay, until, b
   await select('#analysisSpan', 0);
   await click('#analysisSetup summary');
   await click('[data-range="90"]');
+  // A range shortcut is an intentional reset: it lands on the new From, not on
+  // whatever date sat at index 0 of the previous axis.
+  assert.equal(
+    await js('comparison.axis[comparison.day]'),
+    await js("document.getElementById('analysisStart').value"),
+    'range shortcut selects the new observation start',
+  );
   await click('#analysisSetup summary');
+  // An ordinary edit keeps the selected calendar date across an expanded axis.
+  await select('#analysisDisplay', 1);
+  await click('#analysisDaily tbody tr:nth-child(12) .day-select');
+  const keptDay = await js('comparison.axis[comparison.day]');
+  await click('#analysisSetup summary');
+  await js(
+    "(()=>{const e=document.getElementById('analysisStart');e.value=comparisonMath.shift(e.value,-100);e.dispatchEvent(new Event('change'));})()",
+  );
+  assert.equal(
+    await js('comparison.axis[comparison.day]'),
+    keptDay,
+    'editing From keeps the selected date',
+  );
+  await click('[data-range="90"]');
+  await click('#analysisSetup summary');
+  await select('#analysisDisplay', 0);
   // Ownership round trip: an explicit date equal to From stays explicit after
   // restoring the link and moving From; an automatic one keeps following.
   const start0 = await js("document.getElementById('analysisStart').value");
@@ -760,6 +783,14 @@ exports.checkLenses = async ({ call, js, click, hover, navigate, delay, until, b
   await js('comparisonReference()');
   await js('comparisonShift(passageShifts[0].id)');
   await until(() => js("document.getElementById('analysisReference').value==='custom'"));
+  // Discovery selects the detected window's first day (the plot begins 28 days
+  // earlier), resolved against the new axis rather than the old one.
+  assert.equal(
+    await js('comparison.axis[comparison.day]'),
+    await js("document.getElementById('analysisStart').value"),
+    'shift selection lands on its own axis',
+  );
+  assert.equal(await js('comparison.day'), 28, 'the plotted reference precedes it');
   assert.equal(
     await js("document.getElementById('analysisRefStart').readOnly"),
     false,

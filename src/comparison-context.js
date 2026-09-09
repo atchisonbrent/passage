@@ -20,7 +20,7 @@ function comparisonEvent(id) {
   $('analysisEventStart').value = event.disruptionStart || '';
   comparison.recoveryAuto = !event.disruptionStart;
   comparisonReference();
-  comparison.day = 0;
+  comparison.pendingDay = 0;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
   comparisonOpen();
@@ -179,7 +179,8 @@ function comparisonShift(id) {
   comparison.recoveryAuto = true;
   comparisonReference();
   $('analysisSpan').value = 'reference';
-  comparison.day = 28;
+  // Select the detected window's first day (the plot begins 28 days earlier).
+  comparison.pendingDay = h.start;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
   comparisonOpen();
