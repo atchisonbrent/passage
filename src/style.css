@@ -257,19 +257,6 @@ h3 {
 .missing {
   border: 1px solid var(--muted);
 }
-.detail h2 {
-  margin-top: 10px;
-}
-.detail-tools {
-  display: flex;
-  gap: 7px;
-  margin: 15px 0;
-}
-.detail-tools button {
-  font-size: 11px;
-  flex: 1;
-  padding: 7px;
-}
 .big {
   font-size: 45px;
   letter-spacing: -2px;
@@ -283,19 +270,6 @@ h3 {
 }
 #explanation {
   font-size: 13px;
-}
-.chart-title,
-.chart-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 9px;
-  gap: 5px;
-}
-.chart-title {
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
-  margin-top: 20px;
 }
 #chart {
   width: 100%;
@@ -393,7 +367,7 @@ dd {
   font-size: 18px;
 }
 #comparison {
-  height: 230px;
+  height: 170px;
   width: 100%;
 }
 #pinLabels {
@@ -586,9 +560,6 @@ main {
 .map-tools #reset {
   font-size: 12px;
 }
-body:not(.analyst) #quality {
-  display: none;
-}
 body[data-mode='connections'] .filterrow,
 body[data-mode='exposure'] .filterrow {
   display: none;
@@ -608,9 +579,6 @@ body[data-mode='exposure'] .filterrow {
     grid-column: 2;
     grid-row: 1;
     padding: 16px;
-  }
-  .detail h2 {
-    font-size: 23px;
   }
   .map-panel {
     min-height: 0;
@@ -671,10 +639,6 @@ body[data-mode='exposure'] .filterrow {
   .field input {
     font-size: 16px;
   }
-  .chart-title,
-  .chart-labels {
-    font-size: 11px;
-  }
 }
 @media (pointer: coarse) {
   button,
@@ -722,8 +686,7 @@ body[data-mode] .workspace {
 .compare-panel {
   flex-shrink: 0;
 }
-#detailsToggle,
-#backToGlobe {
+#detailsToggle {
   display: none;
 }
 @media (max-width: 900px),
@@ -750,9 +713,6 @@ body[data-mode] .workspace {
   .map-heading {
     padding-right: 100px;
   }
-  #backToGlobe {
-    display: block;
-  }
 }
 .detail {
   display: flex;
@@ -762,42 +722,11 @@ body[data-mode] .workspace {
 .detail > * {
   flex-shrink: 0;
 }
-body:not(.analyst)[data-mode='change'] .detail-tools {
-  order: 10;
-}
-body:not(.analyst) .detail h2 {
-  margin-top: 6px;
-  margin-bottom: 4px;
-}
-body:not(.analyst) #placeCountry {
-  margin-bottom: 8px;
-}
 body:not(.analyst) .delta {
   margin: 8px 0 4px;
 }
-body:not(.analyst) .chart-title {
-  margin-top: 12px;
-  padding-top: 12px;
-}
 body:not(.analyst) #chart {
   height: 100px;
-}
-@media (max-width: 900px),
-  (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
-  #backToGlobe {
-    position: absolute;
-    right: 12px;
-    top: 10px;
-    width: auto;
-    min-height: 38px;
-    flex: none;
-    padding: 6px 9px;
-    font-size: 11px;
-  }
-  .detail > #placeKind {
-    min-height: 44px;
-    padding-right: 90px;
-  }
 }
 /* Validated small-viewport adjustments; append to the owned stylesheet. */
 @media (max-width: 900px),
@@ -815,10 +744,6 @@ body:not(.analyst) #chart {
   }
   body:not(.analyst) .big {
     font-size: 36px;
-  }
-  body:not(.analyst) .chart-title {
-    margin-top: 8px;
-    padding-top: 8px;
   }
   body:not(.analyst) #chart {
     height: 70px;
@@ -1065,9 +990,6 @@ body:not(.analyst) #chart {
 }
 /* Map density is not an analysis permission. */
 body .analytical {
-  display: block;
-}
-body:not(.analyst) #quality {
   display: block;
 }
 .analytical summary {
@@ -1406,7 +1328,6 @@ body.analysis-open #comparePanel {
   border-radius: 6px;
   font-size: 13px;
 }
-
 /* ---------- Chrome: header, workspace switch, timeline bar ---------- */
 /* One layout system. Wide (>=1281px): everything on one header row, timeline
    settings inline. Medium (901-1280px): same header, settings in a popover.
@@ -1589,10 +1510,6 @@ body.analysis-open #comparePanel,
 body.analysis-open .timebar {
   display: none;
 }
-.detail #placeName {
-  position: static;
-}
-
 /* Timeline bar */
 .timebar {
   position: relative;
@@ -1766,7 +1683,6 @@ body[data-mode='exposure'] .scrubrow {
 #sourceDialog .close {
   float: right;
 }
-
 /* Wide: settings live in the bar; no popover, no caption. */
 @media (min-width: 1281px) and (pointer: fine) {
   #mobileControls,
@@ -1996,5 +1912,200 @@ body[data-mode='exposure'] .scrubrow {
   }
   body.analysis-open .header-actions {
     right: calc((100% - 1600px) / 2);
+  }
+}
+
+/* ---------- Selected-place panel: actions by the title, terse copy ---------- */
+.detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.detail-title {
+  min-width: 0;
+}
+.detail-title h2 {
+  margin: 4px 0 2px;
+  font-size: 23px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.detail-title #placeCountry {
+  margin: 0 0 6px;
+}
+.detail-tools {
+  display: flex;
+  gap: 6px;
+  flex: none;
+  margin-top: 2px;
+}
+.detail-tools .icon-button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+}
+#pin[aria-pressed='true'] {
+  color: var(--up);
+  border-color: #6eb89f;
+  background: #25423e;
+}
+#backToGlobe,
+#detailsToggle {
+  display: none;
+}
+.big-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.big-row .muted {
+  font-size: 12px;
+}
+.detail .delta {
+  margin: 4px 0 2px;
+}
+#explanation {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: help;
+}
+#quality {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+#quality:empty {
+  display: none;
+}
+.detail .chart-readout {
+  margin: 14px 0 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.analyst-toggle {
+  margin-top: 0;
+}
+.action-tip {
+  position: fixed;
+  z-index: 30;
+  padding: 6px 10px;
+  background: var(--panel);
+  border: 1px solid var(--up);
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+}
+@media (max-width: 900px),
+  (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
+  #backToGlobe {
+    display: inline-flex;
+  }
+  #detailsToggle {
+    display: block;
+  }
+  .detail-tools .icon-button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+}
+@media (min-width: 901px) and (max-height: 720px) {
+  body:not(.analyst) .big {
+    font-size: 36px;
+  }
+}
+
+/* Compared strip: one control row, short synced chart, Analyze for depth. */
+.compare-panel {
+  padding: 10px 16px 6px;
+  margin-top: 10px;
+}
+.compare-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.compare-bar h2 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+}
+.compare-bar #pinLabels {
+  flex: 1;
+  gap: 12px;
+  font-size: 13px;
+}
+.compare-bar select {
+  min-height: 34px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.compare-bar button {
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.compare-panel .chart-readout {
+  margin: 6px 0 0;
+  font-size: 11px;
+}
+@media (max-width: 900px) {
+  .compare-panel {
+    padding: 8px 10px 4px;
+  }
+  #comparison {
+    height: 140px;
+  }
+}
+
+/* Compared chips: click a name to select it; × removes only that place. */
+.pin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.pin-chip button {
+  background: transparent;
+  border: 0;
+  padding: 4px 4px;
+  min-height: 30px;
+  color: inherit;
+  font-size: 13px;
+  border-radius: 6px;
+}
+.pin-chip .pin-remove {
+  min-width: 30px;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.55;
+}
+.pin-chip .pin-remove:hover,
+.pin-chip .pin-remove:focus-visible {
+  opacity: 1;
+  background: #25434c;
+}
+@media (pointer: coarse) {
+  .pin-chip .pin-remove {
+    opacity: 0.9;
+    min-width: 40px;
+    min-height: 40px;
   }
 }

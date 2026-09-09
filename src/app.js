@@ -52,6 +52,23 @@ async function load(file) {
 function text(id, s) {
   $(id).textContent = s;
 }
+function pinState() {
+  const pinned = state.pins.includes(state.selected);
+  $('pin').setAttribute('aria-pressed', String(pinned));
+  $('pin').setAttribute('aria-label', pinned ? 'Remove from comparison' : 'Add to comparison');
+  $('pin').title = pinned ? 'Remove from comparison' : 'Add to comparison';
+}
+// Brief confirmation next to an icon button; the button itself stays put.
+function flash(id, message) {
+  const tip = $('actionTip');
+  const b = $(id).getBoundingClientRect();
+  tip.textContent = message;
+  tip.hidden = false;
+  tip.style.top = b.bottom + 6 + 'px';
+  tip.style.right = Math.max(8, innerWidth - b.right) + 'px';
+  clearTimeout(flash.timer);
+  flash.timer = setTimeout(() => (tip.hidden = true), 1800);
+}
 function element(tag, cls, content) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -206,8 +223,35 @@ function recompute() {
         state.index,
         state.metric,
         state.window,
-        state.baseline,
+        ...referenceArgs(p.id),
       );
+}
+// 'prior14' … 'prior91' set the reference length; 'year' aligns last year's rows
+// to the 2026 axis. Year-ago rows come from each place's lazily loaded history
+// file, so only places with loaded history get a year-ago comparison.
+function referenceArgs(id) {
+  const m = /^prior(\d+)$/.exec(state.baseline);
+  if (m) return ['prior', { baselineDays: Number(m[1]) }];
+  if (state.baseline !== 'year') return [state.baseline, {}];
+  const rows = historyCache[id];
+  if (!rows) return ['year', {}];
+  const byDate = new Map(rows.map((r) => [r[0], r.slice(1)]));
+  return [
+    'year',
+    {
+      yearAgo: dates.map((d) => byDate.get(String(Number(d.slice(0, 4)) - 1) + d.slice(4)) || null),
+    },
+  ];
+}
+function baselineLabel() {
+  const m = /^prior(\d+)$/.exec(state.baseline);
+  return m
+    ? `prior ${m[1]} days`
+    : state.baseline === 'prior'
+      ? 'prior 28 days'
+      : state.baseline === 'year'
+        ? 'same dates last year'
+        : 'Jan 1–28 reference';
 }
 function filteredPlaces() {
   const q = $('search').value.trim().toLocaleLowerCase(),
@@ -285,20 +329,7 @@ function makeList() {
     'coverage',
     `${list.length.toLocaleString()} matches${list.length > 80 ? ' · top 80 listed' : ''}`,
   );
-  text(
-    'listHint',
-    mode === 'change'
-      ? rank === 'percent'
-        ? 'Baseline floor: ' +
-          (state.metric < 4 ? '10 calls' : '1,000 tonnes') +
-          '/day. Complete windows only.'
-        : rank === 'activity'
-          ? 'Highest current activity first. Complete selected windows only.'
-          : 'Largest absolute shifts first. Search includes places with missing comparisons.'
-      : mode === 'connections'
-        ? 'Select a port. Historical links do not change with the observation date.'
-        : `${manifest.exposure.length} selected ports, not a global exposure ranking.`,
-  );
+  $('rank').title = $('rank').selectedOptions[0]?.title || '';
 }
 function sizeCanvas(canvas) {
   const b = canvas.getBoundingClientRect(),
@@ -530,12 +561,8 @@ function activityDetail() {
   text('value', fmt(s.current));
   text(
     'unit',
-    (state.window === 7 ? '7-day mean · ' : 'Daily · ') +
-      (state.metric < 4
-        ? p.kind === 'port'
-          ? 'port calls/day'
-          : 'transit calls/day'
-        : 'estimated metric tonnes/day'),
+    (state.window === 1 ? 'daily' : state.window + '-day mean') +
+      (state.metric < 4 ? ' · calls/day' : ' · est. tonnes/day'),
   );
   text(
     'delta',
@@ -545,34 +572,43 @@ function activityDetail() {
   );
   $('delta').className =
     'delta ' + (s.percent === null ? 'muted' : s.percent < 0 ? 'negative' : 'positive');
+  const yearAgoDate = (d) => String(Number(d.slice(0, 4)) - 1) + d.slice(4);
   const baselineDates =
-    s.baseStart >= 0 && s.baseEnd < dates.length
-      ? dates[s.baseStart] + ' → ' + dates[s.baseEnd]
-      : 'not available';
+    state.baseline === 'year'
+      ? s.start >= 0
+        ? yearAgoDate(dates[s.start]) + ' → ' + yearAgoDate(dates[state.index])
+        : 'not available'
+      : s.baseStart >= 0 && s.baseEnd < dates.length
+        ? dates[s.baseStart] + ' → ' + dates[s.baseEnd]
+        : 'not available';
   text(
     'explanation',
     s.difference === null
-      ? 'A complete current window and an earlier 28-day reference are required.'
-      : `${fmt(Math.abs(s.difference))} ${state.metric < 4 ? 'calls' : 'estimated tonnes'} per day ${s.difference < 0 ? 'below' : 'above'} the ${fmt(s.baseline)} reference mean (${baselineDates}).`,
+      ? state.baseline === 'year' && !historyCache[state.selected]
+        ? 'Load history below to compare with the same dates last year.'
+        : `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
+      : `vs ${fmt(s.baseline)} mean, ${baselineLabel()} (${baselineDates})`,
   );
+  $('explanation').title =
+    'Not seasonally adjusted. A deviation from a reference is descriptive, not a causal estimate or a measured loss.';
   text(
     'quality',
     !supported(p)
-      ? 'This measure is not available for this location type. Select a compatible port or passage.'
+      ? 'This measure is not available for this location type.'
       : s.current === 0
-        ? 'Zero recorded; not proof of no physical traffic.'
+        ? 'Zero recorded · not proof of no traffic'
         : s.current === null
-          ? `${s.currentCount}/${state.window} current observations. Missing days are not filled.`
-          : `${s.currentCount}/${state.window} current days · ${s.baselineCount}/28 baseline days. No seasonal adjustment.`,
+          ? `${s.currentCount}/${state.window} current days observed · missing days are not filled`
+          : s.currentCount < state.window || s.baselineCount < s.baselineExpected
+            ? `${s.currentCount}/${state.window} current · ${s.baselineCount}/${s.baselineExpected} reference days`
+            : '',
   );
   const data = series[state.selected] || [];
   let last = -1;
   data.forEach((r, i) => {
     if (Number.isFinite(r?.[state.metric])) last = i;
   });
-  text('lastDate', last >= 0 ? dates[last] : 'NO OBSERVATIONS');
   plot($('chart'), [{ id: state.selected, color: '#83dbc1' }]);
-  text('chartScale', state.metric < 4 ? 'Calls/day' : 'Est. tonnes/day');
   const dl = $('calculation');
   dl.replaceChildren();
   for (const [key, value] of [
@@ -583,6 +619,7 @@ function activityDetail() {
     ['Selected source ID', state.selected],
     ['Dataset snapshot', manifest.retrieved],
     ['Latest selected observation', last >= 0 ? dates[last] : 'none'],
+    ['Reference length', s.baselineExpected + ' days · ' + baselineLabel()],
   ])
     dl.append(element('dt', '', key), element('dd', '', value));
 }
@@ -723,7 +760,7 @@ function render() {
   $('networkDetail').hidden = state.mode !== 'connections';
   $('exposureDetail').hidden = state.mode !== 'exposure';
   $('pin').hidden = !activity;
-  text('pin', state.pins.includes(state.selected) ? '− Unpin' : '+ Compare');
+  pinState();
   text(
     'listTitle',
     activity
@@ -761,9 +798,9 @@ function render() {
     activity
       ? $('metric').options[state.metric].text +
           ' · ' +
-          (state.window === 7 ? '7-day mean' : 'daily') +
+          (state.window === 1 ? 'daily' : state.window + '-day mean') +
           ' · ' +
-          (state.baseline === 'january' ? 'Jan reference' : 'prior 28 days')
+          baselineLabel()
       : 'Historical/model data · timeline paused',
   );
   $('metric').value = state.metric;
@@ -824,15 +861,27 @@ function render() {
     text(
       'indexNote',
       $('comparisonScale').value === 'indexed'
-        ? 'Each series uses its complete Jan 1–28, 2026 mean as 100. Zero/incomplete references are omitted. Values before Jan 29 overlap the reference; this is retrospective normalization, not a real-time signal.'
-        : 'Daily values with one shared vertical scale.',
+        ? 'Each series indexed to its complete Jan 1–28, 2026 mean = 100; incomplete references omitted.'
+        : 'Daily values, one shared scale. Coincident changes do not establish rerouting or causation.',
     );
     const colors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
     $('pinLabels').replaceChildren(
       ...state.pins.map((id, i) => {
-        const s = element('span', '', placeById[id]?.name || id);
-        s.style.color = colors[i];
-        return s;
+        const name = placeById[id]?.name || id;
+        const chip = element('span', 'pin-chip', '');
+        chip.style.color = colors[i];
+        const label = element('button', 'pin-name', name);
+        label.title = 'Show ' + name;
+        label.onclick = () => choose(id);
+        const remove = element('button', 'pin-remove', '×');
+        remove.setAttribute('aria-label', 'Remove ' + name + ' from comparison');
+        remove.title = 'Remove from comparison';
+        remove.onclick = () => {
+          state.pins = state.pins.filter((x) => x !== id);
+          refresh();
+        };
+        chip.append(label, remove);
+        return chip;
       }),
     );
     plot(
@@ -1125,12 +1174,13 @@ function bind() {
       state.pins = state.pins.filter((id) => id !== state.selected);
     else if (state.pins.length < 4) state.pins.push(state.selected);
     else {
-      text('pin', 'Four pins maximum');
+      flash('pin', 'Four places maximum');
       return;
     }
-    text('pin', state.pins.includes(state.selected) ? '− Unpin' : '+ Compare');
+    pinState();
     refresh();
   };
+  $('openAnalyze').onclick = () => $('analyzeView').click();
   $('clearPins').onclick = () => {
     state.pins = [];
     refresh();
@@ -1160,9 +1210,9 @@ function bind() {
     history.replaceState(null, '', '#' + params);
     try {
       await navigator.clipboard.writeText(url);
-      text('share', 'Link copied');
+      flash('share', 'Link copied');
     } catch {
-      text('share', 'View saved in address bar');
+      flash('share', 'View saved in address bar');
     }
   };
   $('download').onclick = () => {
@@ -1298,8 +1348,9 @@ async function boot() {
     if (dates.includes(q.get('date'))) state.index = dates.indexOf(q.get('date'));
     if (['0', '1', '2', '3', '4', '5', '6'].includes(q.get('metric')))
       state.metric = Number(q.get('metric'));
-    if (q.get('window') === '1') state.window = 1;
-    if (q.get('baseline') === 'january') state.baseline = 'january';
+    if (['1', '7', '14', '28'].includes(q.get('window'))) state.window = Number(q.get('window'));
+    if (['prior', 'prior14', 'prior56', 'prior91', 'january', 'year'].includes(q.get('baseline')))
+      state.baseline = q.get('baseline');
     state.pins = (q.get('pins') || '')
       .split(',')
       .filter((id) => placeById[id])

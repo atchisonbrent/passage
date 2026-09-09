@@ -1,12 +1,19 @@
 /* Pure calculations shared by the browser and deterministic tests. */
 (function (root) {
-  function summarize(rows, index, metric, windowSize = 7, baselineMode = 'prior') {
+  // baselineMode: 'prior' (reference ends the day before the window), 'january'
+  // (fixed Jan 1–28) or 'year' (same calendar dates one year earlier; needs
+  // yearAgo rows aligned to the same axis). baselineDays sets reference length.
+  function summarize(rows, index, metric, windowSize = 7, baselineMode = 'prior', options = {}) {
+    const baselineDays = options.baselineDays || 28,
+      yearAgo = options.yearAgo || null;
     const start = index - windowSize + 1;
-    const baseEnd = baselineMode === 'january' ? 27 : start - 1;
-    const baseStart = baseEnd - 27;
-    function windowMean(a, b, expected) {
-      if (a < 0 || b >= rows.length || b < a) return { mean: null, count: 0 };
-      const values = rows
+    const source = baselineMode === 'year' ? yearAgo || [] : rows;
+    const baseEnd = baselineMode === 'january' ? 27 : baselineMode === 'year' ? index : start - 1;
+    const baseStart = baselineMode === 'year' ? start : baseEnd - baselineDays + 1;
+    const expectedBase = baselineMode === 'year' ? windowSize : baselineDays;
+    function windowMean(data, a, b, expected) {
+      if (a < 0 || b >= data.length || b < a) return { mean: null, count: 0 };
+      const values = data
         .slice(a, b + 1)
         .map((r) => r?.[metric])
         .filter(Number.isFinite);
@@ -15,9 +22,11 @@
         count: values.length,
       };
     }
-    const current = windowMean(start, index, windowSize);
+    const current = windowMean(rows, start, index, windowSize);
     const baseline =
-      baseEnd < start ? windowMean(baseStart, baseEnd, 28) : { mean: null, count: 0 };
+      baselineMode === 'year' || baseEnd < start
+        ? windowMean(source, baseStart, baseEnd, expectedBase)
+        : { mean: null, count: 0 };
     const difference =
       current.mean !== null && baseline.mean !== null ? current.mean - baseline.mean : null;
     return {
@@ -27,6 +36,7 @@
       percent: difference !== null && baseline.mean > 0 ? (difference / baseline.mean) * 100 : null,
       currentCount: current.count,
       baselineCount: baseline.count,
+      baselineExpected: expectedBase,
       start,
       baseStart,
       baseEnd,

@@ -58,6 +58,62 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   await click('#browseToggle');
   assert.equal(await js("document.getElementById('browseDialog').open"), true);
   await click('#closeBrowse');
+  // Panel actions sit beside the title, never below the chart.
+  assert.ok(
+    await js(
+      "(()=>{const t=document.getElementById('placeName').getBoundingClientRect(),p=document.getElementById('pin').getBoundingClientRect(),s=document.getElementById('share').getBoundingClientRect();return p.top<t.bottom&&s.top<t.bottom&&p.width>=38&&s.width>=38})()",
+    ),
+    'Compare and Copy link are in the panel heading',
+  );
+  await click('#pin');
+  assert.equal(await js("document.getElementById('pin').getAttribute('aria-pressed')"), 'true');
+  assert.equal(await js('state.pins.length'), 1);
+  assert.equal(await js("document.getElementById('comparePanel').hidden"), false);
+  await js("state.pins.push(places.find(p=>p.name==='Rotterdam').id);refresh()");
+  await delay(150);
+  assert.equal(await js('state.pins.length'), 2);
+  assert.equal(await js("document.querySelectorAll('#pinLabels .pin-remove').length"), 2);
+  await click('#pinLabels .pin-chip:last-child .pin-remove');
+  assert.deepEqual(
+    await js('state.pins'),
+    [await js('state.selected')],
+    'x removes only that place',
+  );
+  await click('#pin');
+  assert.equal(await js("document.getElementById('pin').getAttribute('aria-pressed')"), 'false');
+  await click('#share');
+  assert.equal(await js("document.getElementById('actionTip').hidden"), false);
+  assert.ok(await js('location.hash.includes("baseline=")'));
+  // Adjustable reference and window feed the ranking, detail and calculation.
+  const setValue = async (id, value) => {
+    await js(
+      `(()=>{const e=document.getElementById(${JSON.stringify(id)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('change'));})()`,
+    );
+    await delay(150);
+  };
+  const settingsInline = await js("matchMedia('(min-width: 1281px) and (pointer: fine)').matches");
+  if (!settingsInline) await click('#mobileControls');
+  await setValue('baseline', 'prior91');
+  await setValue('window', '14');
+  assert.deepEqual(await js('[state.baseline,state.window]'), ['prior91', 14]);
+  assert.equal(await js('stats[state.selected].baselineExpected'), 91);
+  assert.equal(await js('stats[state.selected].baseEnd-stats[state.selected].baseStart'), 90);
+  assert.ok(
+    await js("document.getElementById('explanation').textContent.includes('prior 91 days')"),
+  );
+  assert.ok(await js("document.getElementById('unit').textContent.startsWith('14-day mean')"));
+  await setValue('baseline', 'year');
+  assert.equal(
+    await js('stats[state.selected].baseline'),
+    null,
+    'year-ago reference needs loaded history, never silently zero',
+  );
+  assert.ok(
+    await js("document.getElementById('explanation').textContent.includes('Load history')"),
+  );
+  await setValue('baseline', 'prior');
+  await setValue('window', '7');
+  if (!settingsInline) await click('#closeTimeline');
   // Real pointer hover and selection at dense-port zoom, then restore landing.
   for (let i = 0; i < 26; i++) await click('#zoomin');
   assert.equal(await js('state.zoom'), 32);
@@ -355,8 +411,8 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
   };
   await click('#mobileControls');
   await select('#metric', 1);
-  await select('#window', 1);
-  await select('#baseline', 1);
+  await select('#window', 0);
+  await select('#baseline', 4);
   await select('#speed', 2);
   assert.deepEqual(
     await js(
@@ -403,6 +459,24 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
   await click('#depthPanel summary');
   await click('#loadHistory');
   await until(() => js('!!historyCache[state.selected]'));
+  await click('#mobileControls');
+  await select('#window', 1);
+  await select('#baseline', 5);
+  assert.equal(await js('state.baseline'), 'year');
+  const yearStats = await js(
+    '({b:stats[state.selected].baseline,e:stats[state.selected].baselineExpected})',
+  );
+  assert.equal(yearStats.e, 7, 'year-ago reference spans the current window length');
+  assert.ok(Number.isFinite(yearStats.b), 'loaded history yields a same-dates-last-year mean');
+  const expectedYear = await js(
+    '(()=>{const rows=historyCache[state.selected],by=new Map(rows.map(r=>[r[0],r[state.metric+1]]));const ds=dates.slice(state.index-6,state.index+1).map(d=>String(Number(d.slice(0,4))-1)+d.slice(4));const v=ds.map(d=>by.get(d));return v.every(Number.isFinite)?v.reduce((a,b)=>a+b,0)/7:null})()',
+  );
+  assert.equal(yearStats.b, expectedYear, 'year-ago mean matches an independent recomputation');
+  assert.ok(
+    await js("document.getElementById('explanation').textContent.includes('same dates last year')"),
+  );
+  await select('#baseline', 0);
+  await click('#closeTimeline');
   await js("document.querySelector('.detail').scrollTop=500");
   await delay(100);
   assert.ok(

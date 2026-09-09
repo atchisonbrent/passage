@@ -258,19 +258,6 @@ h3 {
 .missing {
   border: 1px solid var(--muted);
 }
-.detail h2 {
-  margin-top: 10px;
-}
-.detail-tools {
-  display: flex;
-  gap: 7px;
-  margin: 15px 0;
-}
-.detail-tools button {
-  font-size: 11px;
-  flex: 1;
-  padding: 7px;
-}
 .big {
   font-size: 45px;
   letter-spacing: -2px;
@@ -284,19 +271,6 @@ h3 {
 }
 #explanation {
   font-size: 13px;
-}
-.chart-title,
-.chart-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 9px;
-  gap: 5px;
-}
-.chart-title {
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
-  margin-top: 20px;
 }
 #chart {
   width: 100%;
@@ -394,7 +368,7 @@ dd {
   font-size: 18px;
 }
 #comparison {
-  height: 230px;
+  height: 170px;
   width: 100%;
 }
 #pinLabels {
@@ -587,9 +561,6 @@ main {
 .map-tools #reset {
   font-size: 12px;
 }
-body:not(.analyst) #quality {
-  display: none;
-}
 body[data-mode='connections'] .filterrow,
 body[data-mode='exposure'] .filterrow {
   display: none;
@@ -609,9 +580,6 @@ body[data-mode='exposure'] .filterrow {
     grid-column: 2;
     grid-row: 1;
     padding: 16px;
-  }
-  .detail h2 {
-    font-size: 23px;
   }
   .map-panel {
     min-height: 0;
@@ -672,10 +640,6 @@ body[data-mode='exposure'] .filterrow {
   .field input {
     font-size: 16px;
   }
-  .chart-title,
-  .chart-labels {
-    font-size: 11px;
-  }
 }
 @media (pointer: coarse) {
   button,
@@ -723,8 +687,7 @@ body[data-mode] .workspace {
 .compare-panel {
   flex-shrink: 0;
 }
-#detailsToggle,
-#backToGlobe {
+#detailsToggle {
   display: none;
 }
 @media (max-width: 900px),
@@ -751,9 +714,6 @@ body[data-mode] .workspace {
   .map-heading {
     padding-right: 100px;
   }
-  #backToGlobe {
-    display: block;
-  }
 }
 .detail {
   display: flex;
@@ -763,42 +723,11 @@ body[data-mode] .workspace {
 .detail > * {
   flex-shrink: 0;
 }
-body:not(.analyst)[data-mode='change'] .detail-tools {
-  order: 10;
-}
-body:not(.analyst) .detail h2 {
-  margin-top: 6px;
-  margin-bottom: 4px;
-}
-body:not(.analyst) #placeCountry {
-  margin-bottom: 8px;
-}
 body:not(.analyst) .delta {
   margin: 8px 0 4px;
 }
-body:not(.analyst) .chart-title {
-  margin-top: 12px;
-  padding-top: 12px;
-}
 body:not(.analyst) #chart {
   height: 100px;
-}
-@media (max-width: 900px),
-  (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
-  #backToGlobe {
-    position: absolute;
-    right: 12px;
-    top: 10px;
-    width: auto;
-    min-height: 38px;
-    flex: none;
-    padding: 6px 9px;
-    font-size: 11px;
-  }
-  .detail > #placeKind {
-    min-height: 44px;
-    padding-right: 90px;
-  }
 }
 /* Validated small-viewport adjustments; append to the owned stylesheet. */
 @media (max-width: 900px),
@@ -816,10 +745,6 @@ body:not(.analyst) #chart {
   }
   body:not(.analyst) .big {
     font-size: 36px;
-  }
-  body:not(.analyst) .chart-title {
-    margin-top: 8px;
-    padding-top: 8px;
   }
   body:not(.analyst) #chart {
     height: 70px;
@@ -1066,9 +991,6 @@ body:not(.analyst) #chart {
 }
 /* Map density is not an analysis permission. */
 body .analytical {
-  display: block;
-}
-body:not(.analyst) #quality {
   display: block;
 }
 .analytical summary {
@@ -1407,7 +1329,6 @@ body.analysis-open #comparePanel {
   border-radius: 6px;
   font-size: 13px;
 }
-
 /* ---------- Chrome: header, workspace switch, timeline bar ---------- */
 /* One layout system. Wide (>=1281px): everything on one header row, timeline
    settings inline. Medium (901-1280px): same header, settings in a popover.
@@ -1590,10 +1511,6 @@ body.analysis-open #comparePanel,
 body.analysis-open .timebar {
   display: none;
 }
-.detail #placeName {
-  position: static;
-}
-
 /* Timeline bar */
 .timebar {
   position: relative;
@@ -1767,7 +1684,6 @@ body[data-mode='exposure'] .scrubrow {
 #sourceDialog .close {
   float: right;
 }
-
 /* Wide: settings live in the bar; no popover, no caption. */
 @media (min-width: 1281px) and (pointer: fine) {
   #mobileControls,
@@ -1999,6 +1915,201 @@ body[data-mode='exposure'] .scrubrow {
     right: calc((100% - 1600px) / 2);
   }
 }
+
+/* ---------- Selected-place panel: actions by the title, terse copy ---------- */
+.detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.detail-title {
+  min-width: 0;
+}
+.detail-title h2 {
+  margin: 4px 0 2px;
+  font-size: 23px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.detail-title #placeCountry {
+  margin: 0 0 6px;
+}
+.detail-tools {
+  display: flex;
+  gap: 6px;
+  flex: none;
+  margin-top: 2px;
+}
+.detail-tools .icon-button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+}
+#pin[aria-pressed='true'] {
+  color: var(--up);
+  border-color: #6eb89f;
+  background: #25423e;
+}
+#backToGlobe,
+#detailsToggle {
+  display: none;
+}
+.big-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.big-row .muted {
+  font-size: 12px;
+}
+.detail .delta {
+  margin: 4px 0 2px;
+}
+#explanation {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: help;
+}
+#quality {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+#quality:empty {
+  display: none;
+}
+.detail .chart-readout {
+  margin: 14px 0 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.analyst-toggle {
+  margin-top: 0;
+}
+.action-tip {
+  position: fixed;
+  z-index: 30;
+  padding: 6px 10px;
+  background: var(--panel);
+  border: 1px solid var(--up);
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+}
+@media (max-width: 900px),
+  (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
+  #backToGlobe {
+    display: inline-flex;
+  }
+  #detailsToggle {
+    display: block;
+  }
+  .detail-tools .icon-button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+}
+@media (min-width: 901px) and (max-height: 720px) {
+  body:not(.analyst) .big {
+    font-size: 36px;
+  }
+}
+
+/* Compared strip: one control row, short synced chart, Analyze for depth. */
+.compare-panel {
+  padding: 10px 16px 6px;
+  margin-top: 10px;
+}
+.compare-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.compare-bar h2 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+}
+.compare-bar #pinLabels {
+  flex: 1;
+  gap: 12px;
+  font-size: 13px;
+}
+.compare-bar select {
+  min-height: 34px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.compare-bar button {
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.compare-panel .chart-readout {
+  margin: 6px 0 0;
+  font-size: 11px;
+}
+@media (max-width: 900px) {
+  .compare-panel {
+    padding: 8px 10px 4px;
+  }
+  #comparison {
+    height: 140px;
+  }
+}
+
+/* Compared chips: click a name to select it; × removes only that place. */
+.pin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.pin-chip button {
+  background: transparent;
+  border: 0;
+  padding: 4px 4px;
+  min-height: 30px;
+  color: inherit;
+  font-size: 13px;
+  border-radius: 6px;
+}
+.pin-chip .pin-remove {
+  min-width: 30px;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.55;
+}
+.pin-chip .pin-remove:hover,
+.pin-chip .pin-remove:focus-visible {
+  opacity: 1;
+  background: #25434c;
+}
+@media (pointer: coarse) {
+  .pin-chip .pin-remove {
+    opacity: 0.9;
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
 </style></head>
 <body>
 <header><a class="brand" href="/" aria-label="Passage home"><span class="orb">◎</span> passage</a><nav aria-label="Data lens"><button id="change" class="active">Change</button><button id="connections">Connections</button><button id="exposure">Exposure</button></nav><nav class="view-switch" aria-label="Workspace"><button id="exploreView" aria-pressed="true">Explore</button><button id="analyzeView" aria-pressed="false">Analyze</button><button id="eventsView" aria-expanded="false" aria-controls="eventCatalog">Events</button><button id="randomEvent" title="Open a random sourced event or qualifying data shift"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 4-3 6-6s4-6 6-6h3m-4-4 4 4-4 4"/></svg><span>Random</span></button></nav><div class="header-tools"><button id="browseToggle" aria-haspopup="dialog" aria-label="Find a place" title="Find a place"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="search-label">Find a place</span></button><button id="mobileExplore" aria-controls="morePanel" aria-expanded="false" aria-haspopup="true" aria-label="More" title="More"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>More</span></button></div><div class="header-actions" id="morePanel"><button id="sources">Sources &amp; methods</button><section class="promptbar" aria-label="Starting points"><span class="eyebrow">Start with a question</span><button data-story="hormuz">What changed at Hormuz?</button><button data-story="routes">Who connects to Jebel Ali?</button><button data-story="cape">Suez vs the Cape</button><button data-story="exposure">Who depends on Singapore?</button></section><div id="status" role="status">Loading the dated PortWatch snapshot…</div></div></header>
@@ -2025,11 +2136,11 @@ body[data-mode='exposure'] .scrubrow {
 
 
 <section class="workspace">
-<aside class="discovery"><div class="panel-heading"><h1 id="listTitle">Find the change</h1><span id="coverage" class="muted"></span></div><label class="analyst-toggle"><input id="analyst" type="checkbox"> Show all places</label><label class="field">Find a port or passage<input id="search" type="search" placeholder="Try Rotterdam, Panama, Japan…" autocomplete="off"></label><div class="filterrow"><label class="field">Places<select id="kind"><option value="all">Ports + passages</option><option value="port">Ports</option><option value="chokepoint">Chokepoints</option></select></label><label class="field">Rank by<select id="rank"><option value="absolute">Size of change</option><option value="percent">Percentage change</option><option value="activity">Activity</option></select></label></div><p id="listHint" class="hint"></p><div id="locations" class="locations" aria-label="Search results and ranked places"></div></aside>
+<aside class="discovery"><div class="panel-heading"><h1 id="listTitle">Find the change</h1><span id="coverage" class="muted"></span></div><label class="analyst-toggle"><input id="analyst" type="checkbox"> Show all places</label><label class="field">Find a port or passage<input id="search" type="search" placeholder="Try Rotterdam, Panama, Japan…" autocomplete="off"></label><div class="filterrow"><label class="field">Places<select id="kind"><option value="all">Ports + passages</option><option value="port">Ports</option><option value="chokepoint">Chokepoints</option></select></label><label class="field">Rank by<select id="rank"><option value="absolute" title="Largest absolute shifts first; search includes places with missing comparisons">Size of change</option><option value="percent" title="Percentage change; reference floor 10 calls/day or 1,000 tonnes/day, complete windows only">Percentage change</option><option value="activity" title="Highest current activity first; complete windows only">Activity</option></select></label></div><div id="locations" class="locations" aria-label="Search results and ranked places"></div></aside>
 <section class="map-panel" aria-label="Interactive maritime globe"><div class="map-heading"><button id="detailsToggle">Details</button><span id="lensBadge" class="badge">Observed · AIS-derived estimates</span><h2 id="mapTitle">A world of changing activity</h2><p id="mapSubtitle">Color reveals the change. Select a place to understand it.</p></div><div class="scroll-edge left" aria-hidden="true"></div><div class="scroll-edge right" aria-hidden="true"></div><canvas id="globe" tabindex="0" aria-label="Maritime globe. Drag to rotate; arrow keys rotate; plus and minus zoom. Select places using the searchable list as an accessible alternative."></canvas><div class="map-tools"><button id="zoomout" aria-label="Zoom out">−</button><button id="zoomin" aria-label="Zoom in">+</button><button id="reset">Reset view</button></div><div class="legend" id="legend"><span class="dot down"></span> Below baseline <span class="dot up"></span> Above <span class="dot missing"></span> No comparison<br><small>Ring = baseline · filled circle = current activity</small></div><div id="story" class="story" hidden></div></section>
-<aside class="detail"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p><div class="detail-tools"><button id="backToGlobe">Globe</button><button id="pin">+ Compare</button><button id="share">Copy view link</button></div><section id="activityDetail"><div class="big" id="value">—</div><div id="unit" class="muted"></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><div class="chart-title"><span>Daily observations · 2026</span><span id="chartScale"></span></div><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="hint">Drag ↔ or tap to select a date. Arrow keys move a day; Shift moves a week.</p><div class="chart-labels"><span>Latest observation</span><span id="lastDate"></span></div><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, separate from the globe’s 2026 timeline.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><p id="networkSummary"></p><label class="field">Direction<select id="direction"><option value="out">Outgoing</option><option value="in">Incoming</option></select></label><p class="hint">Schematic great-circle links, not navigable shipping routes. Moving dashes show direction, not vessels.</p><div id="routes"></div><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><p>Modeled trade passing through the selected port. <strong>Exposure, not predicted losses.</strong></p><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label><label class="field">Trade measure<select id="trade"><option value="daily_import_value_at_risk">Imports at risk</option><option value="daily_export_value_at_risk">Exports at risk</option></select></label><p id="exposureSummary" class="hint"></p><div id="countries"></div><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
+<aside class="detail"><div class="detail-heading"><div class="detail-title"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p></div><div class="detail-tools"><button id="backToGlobe" class="icon-button" aria-label="Back to globe" title="Back to globe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button id="pin" class="icon-button" aria-label="Add to comparison" title="Add to comparison" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16M6 15V9m6 6V5m6 10v-4"/></svg></button><button id="share" class="icon-button" aria-label="Copy view link" title="Copy view link"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button></div></div><section id="activityDetail"><div class="big-row"><div class="big" id="value">—</div><div id="unit" class="muted"></div></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="sr-only">Drag horizontally or tap to select a date. Arrow keys move a day; Shift moves a week.</p><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, separate from the globe’s 2026 timeline.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><p id="networkSummary"></p><label class="field">Direction<select id="direction"><option value="out">Outgoing</option><option value="in">Incoming</option></select></label><p class="hint">Schematic great-circle links, not navigable shipping routes. Moving dashes show direction, not vessels.</p><div id="routes"></div><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><p>Modeled trade passing through the selected port. <strong>Exposure, not predicted losses.</strong></p><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label><label class="field">Trade measure<select id="trade"><option value="daily_import_value_at_risk">Imports at risk</option><option value="daily_export_value_at_risk">Exports at risk</option></select></label><p id="exposureSummary" class="hint"></p><div id="countries"></div><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
 </section>
-<section id="comparePanel" class="compare-panel" hidden><div class="panel-heading"><h2>Pinned histories</h2><button id="clearPins">Clear comparison</button></div><p class="hint">Daily values, shared vertical scale and date axis. Coincident changes do not establish rerouting or causation.</p><label class="field">Comparison scale<select id="comparisonScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · Jan 1–28 mean = 100</option></select></label><p id="indexNote" class="hint"></p><div id="pinLabels"></div><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
+<section id="comparePanel" class="compare-panel" hidden><div class="compare-bar"><h2>Compared</h2><div id="pinLabels"></div><select id="comparisonScale" aria-label="Comparison scale" title="Indexed: each series relative to its complete Jan 1–28, 2026 mean = 100"><option value="absolute">Daily values</option><option value="indexed">Indexed · Jan = 100</option></select><button id="openAnalyze" title="Open these places in Analyze with adjustable periods and references">Analyze</button><button id="clearPins" title="Clear comparison">Clear</button></div><p id="indexNote" class="sr-only"></p><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
 </main>
 <section class="timebar" aria-label="Playback and date controls">
  <div class="time-controls"><button id="play" aria-label="Play"><svg class="ico ico-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 5v14l12-7z" fill="currentColor" stroke="none"/></svg><svg class="ico ico-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14" stroke-width="2.6"/></svg><span id="playLabel">Play</span></button><button id="back" aria-label="Previous day">‹</button><input id="dateInput" type="date" aria-label="Observation date"><button id="forward" aria-label="Next day">›</button><button id="latest">Latest</button><button id="mobileControls" aria-controls="timelineSettings" aria-expanded="false"><svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3m0 13v3M2.5 12h3m13 0h3M5.3 5.3l2.1 2.1m9.2 9.2 2.1 2.1M5.3 18.7l2.1-2.1m9.2-9.2 2.1-2.1"/></svg><span>Settings</span><svg class="settings-chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4 10 4-4 4 4"/></svg></button></div>
@@ -2037,21 +2148,29 @@ body[data-mode='exposure'] .scrubrow {
  <div class="scrubrow"><span id="startLabel">JAN 2026</span><input type="range" id="scrub" min="0" max="1" value="0" aria-label="Observation timeline"><span id="endLabel">Latest available</span></div>
  <div id="timelineSettings" class="timeline-settings" role="region" aria-label="Playback settings" hidden>
   <div class="settings-heading"><strong>Playback settings</strong><button id="closeTimeline" class="icon-button" aria-label="Close playback settings"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
-  <div class="settings-fields"><label id="metricLabel">Measure <select id="metric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports</option><option value="5">Estimated exports</option><option value="6">Passage capacity</option></select></label><label>Window <select id="window"><option value="7">7-day mean</option><option value="1">Daily value</option></select></label><label>Compare with <select id="baseline"><option value="prior">Prior 28 days</option><option value="january">Jan 1–28, 2026</option></select></label><label>Speed <select id="speed"><option value="1">1 day / sec</option><option value="7" selected>1 week / sec</option><option value="28">4 weeks / sec</option></select></label></div>
+  <div class="settings-fields"><label id="metricLabel">Measure <select id="metric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports</option><option value="5">Estimated exports</option><option value="6">Passage capacity</option></select></label><label>Window <select id="window"><option value="1">Daily value</option><option value="7" selected>7-day mean</option><option value="14">14-day mean</option><option value="28">28-day mean</option></select></label><label>Compare with <select id="baseline"><option value="prior">Prior 28 days</option><option value="prior14">Prior 14 days</option><option value="prior56">Prior 56 days</option><option value="prior91">Prior 91 days</option><option value="january">Jan 1–28, 2026</option><option value="year">Same dates last year</option></select></label><label>Speed <select id="speed"><option value="1">1 day / sec</option><option value="7" selected>1 week / sec</option><option value="28">4 weeks / sec</option></select></label></div>
   <p id="clockNote" class="hint">Daily observations, not live traffic.</p>
  </div>
 </section>
+<div id="actionTip" class="action-tip" role="status" hidden></div>
 <dialog id="browseDialog" aria-label="Find a port or passage"><div class="browse-dialog-heading"><strong>Find a place</strong><button id="closeBrowse" class="icon-button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div></dialog>
 <dialog id="sourceDialog"><button id="closeDialog" class="close icon-button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button><h2>What this atlas can—and cannot—tell you</h2><p>Independent, noncommercial visualization of <a href="https://portwatch.imf.org/" target="_blank" rel="noopener noreferrer">IMF PortWatch</a>. Not an IMF product or endorsement.</p><h3>Observed activity</h3><p>Sources: UN Global Platform; IMF PortWatch (portwatch.imf.org). Network and economic-model sources: University of Oxford; IMF PortWatch.</p><p>Daily AIS-derived port calls, transit calls and estimated trade/capacity. Ports and passages count different events; do not sum their calls as unique ships. Tonnes are estimates, not customs declarations or trade value. AIS gaps, spoofing and revisions can affect observations. Zero recorded activity is not proof of no physical traffic.</p><p>Current means require every day in the selected window. Baselines require 28 observations and must finish before the current window starts. Missing or incomplete windows are excluded from change rankings. Percentage rankings require a baseline of at least 10 calls/day or 1,000 estimated tonnes/day. These are screening thresholds, not significance tests. Rankings follow the filters; they are not a global trade index. Colors use a ±5% neutral band, not a statistical-significance threshold. Reference rings are shown for passages and the selected port; marker sizes are bounded for legibility. The default globe shows up to 80 ranked matches plus the selected location. Enable Show all places for the full filtered map catalog. Measure, window and reference controls sit with the timeline.</p><h3>Reading the comparisons</h3><p>Recent changes, historical context and disruption recovery answer different questions. Inspect the reference dates before interpreting a percentage. Historical ranges are descriptive, not statistical significance tests.</p><p>Share a view link to preserve the selected place, date, lens, metric, reference, pins and analyst setting. These comparisons are descriptive—not causal identification or statistically tested anomalies.</p><h3>Historical connections · 2019–2024</h3><p>Previous/next port-call connections and average transit days. Capacity at risk is a historical network/model measure, not today's cargo or an ETA. Incoming reverses the selected endpoint, not the source's meaning of relative exposure. Only the strongest 20 links are drawn; full filtered links are downloadable. Self-connections are excluded from the diagram.</p><h3>Modeled exposure · 2022 base year</h3><p>Country/sector trade allocations from OxMarTrans, available here for explicitly listed selected ports. No adaptation or actual loss is inferred. The model and observed timeline do not share a clock. We do not apply port exposure tables directly to Hormuz, add up exposures across ports, or animate a claimed shock arrival.</p><p><a href="https://portwatch.imf.org/pages/data-and-methodology" target="_blank" rel="noopener noreferrer">Methodology</a> · <a href="https://www.arcgis.com/home/item.html?id=9d2ad0a4c5c5460bbd95cfe933464b7a" target="_blank" rel="noopener noreferrer">Port network</a> · <a href="https://www.arcgis.com/home/item.html?id=86842d9b6e8948f29200710a8df206f5" target="_blank" rel="noopener noreferrer">Country model</a> · <a href="https://www.imf.org/external/terms.htm" target="_blank" rel="noopener noreferrer">IMF reuse terms</a></p><p>Geography: Natural Earth, public domain. Links are schematic and may cross land. Browser processing stays on your device; no analytics are included by this application.</p><pre id="provenance"></pre><a href="/data/manifest.json" download>Download snapshot manifest</a></dialog>
 <script>/* Pure calculations shared by the browser and deterministic tests. */
 (function (root) {
-  function summarize(rows, index, metric, windowSize = 7, baselineMode = 'prior') {
+  // baselineMode: 'prior' (reference ends the day before the window), 'january'
+  // (fixed Jan 1–28) or 'year' (same calendar dates one year earlier; needs
+  // yearAgo rows aligned to the same axis). baselineDays sets reference length.
+  function summarize(rows, index, metric, windowSize = 7, baselineMode = 'prior', options = {}) {
+    const baselineDays = options.baselineDays || 28,
+      yearAgo = options.yearAgo || null;
     const start = index - windowSize + 1;
-    const baseEnd = baselineMode === 'january' ? 27 : start - 1;
-    const baseStart = baseEnd - 27;
-    function windowMean(a, b, expected) {
-      if (a < 0 || b >= rows.length || b < a) return { mean: null, count: 0 };
-      const values = rows
+    const source = baselineMode === 'year' ? yearAgo || [] : rows;
+    const baseEnd = baselineMode === 'january' ? 27 : baselineMode === 'year' ? index : start - 1;
+    const baseStart = baselineMode === 'year' ? start : baseEnd - baselineDays + 1;
+    const expectedBase = baselineMode === 'year' ? windowSize : baselineDays;
+    function windowMean(data, a, b, expected) {
+      if (a < 0 || b >= data.length || b < a) return { mean: null, count: 0 };
+      const values = data
         .slice(a, b + 1)
         .map((r) => r?.[metric])
         .filter(Number.isFinite);
@@ -2060,9 +2179,11 @@ body[data-mode='exposure'] .scrubrow {
         count: values.length,
       };
     }
-    const current = windowMean(start, index, windowSize);
+    const current = windowMean(rows, start, index, windowSize);
     const baseline =
-      baseEnd < start ? windowMean(baseStart, baseEnd, 28) : { mean: null, count: 0 };
+      baselineMode === 'year' || baseEnd < start
+        ? windowMean(source, baseStart, baseEnd, expectedBase)
+        : { mean: null, count: 0 };
     const difference =
       current.mean !== null && baseline.mean !== null ? current.mean - baseline.mean : null;
     return {
@@ -2072,6 +2193,7 @@ body[data-mode='exposure'] .scrubrow {
       percent: difference !== null && baseline.mean > 0 ? (difference / baseline.mean) * 100 : null,
       currentCount: current.count,
       baselineCount: baseline.count,
+      baselineExpected: expectedBase,
       start,
       baseStart,
       baseEnd,
@@ -2626,6 +2748,23 @@ async function load(file) {
 function text(id, s) {
   $(id).textContent = s;
 }
+function pinState() {
+  const pinned = state.pins.includes(state.selected);
+  $('pin').setAttribute('aria-pressed', String(pinned));
+  $('pin').setAttribute('aria-label', pinned ? 'Remove from comparison' : 'Add to comparison');
+  $('pin').title = pinned ? 'Remove from comparison' : 'Add to comparison';
+}
+// Brief confirmation next to an icon button; the button itself stays put.
+function flash(id, message) {
+  const tip = $('actionTip');
+  const b = $(id).getBoundingClientRect();
+  tip.textContent = message;
+  tip.hidden = false;
+  tip.style.top = b.bottom + 6 + 'px';
+  tip.style.right = Math.max(8, innerWidth - b.right) + 'px';
+  clearTimeout(flash.timer);
+  flash.timer = setTimeout(() => (tip.hidden = true), 1800);
+}
 function element(tag, cls, content) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -2780,8 +2919,35 @@ function recompute() {
         state.index,
         state.metric,
         state.window,
-        state.baseline,
+        ...referenceArgs(p.id),
       );
+}
+// 'prior14' … 'prior91' set the reference length; 'year' aligns last year's rows
+// to the 2026 axis. Year-ago rows come from each place's lazily loaded history
+// file, so only places with loaded history get a year-ago comparison.
+function referenceArgs(id) {
+  const m = /^prior(\d+)$/.exec(state.baseline);
+  if (m) return ['prior', { baselineDays: Number(m[1]) }];
+  if (state.baseline !== 'year') return [state.baseline, {}];
+  const rows = historyCache[id];
+  if (!rows) return ['year', {}];
+  const byDate = new Map(rows.map((r) => [r[0], r.slice(1)]));
+  return [
+    'year',
+    {
+      yearAgo: dates.map((d) => byDate.get(String(Number(d.slice(0, 4)) - 1) + d.slice(4)) || null),
+    },
+  ];
+}
+function baselineLabel() {
+  const m = /^prior(\d+)$/.exec(state.baseline);
+  return m
+    ? `prior ${m[1]} days`
+    : state.baseline === 'prior'
+      ? 'prior 28 days'
+      : state.baseline === 'year'
+        ? 'same dates last year'
+        : 'Jan 1–28 reference';
 }
 function filteredPlaces() {
   const q = $('search').value.trim().toLocaleLowerCase(),
@@ -2859,20 +3025,7 @@ function makeList() {
     'coverage',
     `${list.length.toLocaleString()} matches${list.length > 80 ? ' · top 80 listed' : ''}`,
   );
-  text(
-    'listHint',
-    mode === 'change'
-      ? rank === 'percent'
-        ? 'Baseline floor: ' +
-          (state.metric < 4 ? '10 calls' : '1,000 tonnes') +
-          '/day. Complete windows only.'
-        : rank === 'activity'
-          ? 'Highest current activity first. Complete selected windows only.'
-          : 'Largest absolute shifts first. Search includes places with missing comparisons.'
-      : mode === 'connections'
-        ? 'Select a port. Historical links do not change with the observation date.'
-        : `${manifest.exposure.length} selected ports, not a global exposure ranking.`,
-  );
+  $('rank').title = $('rank').selectedOptions[0]?.title || '';
 }
 function sizeCanvas(canvas) {
   const b = canvas.getBoundingClientRect(),
@@ -3104,12 +3257,8 @@ function activityDetail() {
   text('value', fmt(s.current));
   text(
     'unit',
-    (state.window === 7 ? '7-day mean · ' : 'Daily · ') +
-      (state.metric < 4
-        ? p.kind === 'port'
-          ? 'port calls/day'
-          : 'transit calls/day'
-        : 'estimated metric tonnes/day'),
+    (state.window === 1 ? 'daily' : state.window + '-day mean') +
+      (state.metric < 4 ? ' · calls/day' : ' · est. tonnes/day'),
   );
   text(
     'delta',
@@ -3119,34 +3268,43 @@ function activityDetail() {
   );
   $('delta').className =
     'delta ' + (s.percent === null ? 'muted' : s.percent < 0 ? 'negative' : 'positive');
+  const yearAgoDate = (d) => String(Number(d.slice(0, 4)) - 1) + d.slice(4);
   const baselineDates =
-    s.baseStart >= 0 && s.baseEnd < dates.length
-      ? dates[s.baseStart] + ' → ' + dates[s.baseEnd]
-      : 'not available';
+    state.baseline === 'year'
+      ? s.start >= 0
+        ? yearAgoDate(dates[s.start]) + ' → ' + yearAgoDate(dates[state.index])
+        : 'not available'
+      : s.baseStart >= 0 && s.baseEnd < dates.length
+        ? dates[s.baseStart] + ' → ' + dates[s.baseEnd]
+        : 'not available';
   text(
     'explanation',
     s.difference === null
-      ? 'A complete current window and an earlier 28-day reference are required.'
-      : `${fmt(Math.abs(s.difference))} ${state.metric < 4 ? 'calls' : 'estimated tonnes'} per day ${s.difference < 0 ? 'below' : 'above'} the ${fmt(s.baseline)} reference mean (${baselineDates}).`,
+      ? state.baseline === 'year' && !historyCache[state.selected]
+        ? 'Load history below to compare with the same dates last year.'
+        : `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
+      : `vs ${fmt(s.baseline)} mean, ${baselineLabel()} (${baselineDates})`,
   );
+  $('explanation').title =
+    'Not seasonally adjusted. A deviation from a reference is descriptive, not a causal estimate or a measured loss.';
   text(
     'quality',
     !supported(p)
-      ? 'This measure is not available for this location type. Select a compatible port or passage.'
+      ? 'This measure is not available for this location type.'
       : s.current === 0
-        ? 'Zero recorded; not proof of no physical traffic.'
+        ? 'Zero recorded · not proof of no traffic'
         : s.current === null
-          ? `${s.currentCount}/${state.window} current observations. Missing days are not filled.`
-          : `${s.currentCount}/${state.window} current days · ${s.baselineCount}/28 baseline days. No seasonal adjustment.`,
+          ? `${s.currentCount}/${state.window} current days observed · missing days are not filled`
+          : s.currentCount < state.window || s.baselineCount < s.baselineExpected
+            ? `${s.currentCount}/${state.window} current · ${s.baselineCount}/${s.baselineExpected} reference days`
+            : '',
   );
   const data = series[state.selected] || [];
   let last = -1;
   data.forEach((r, i) => {
     if (Number.isFinite(r?.[state.metric])) last = i;
   });
-  text('lastDate', last >= 0 ? dates[last] : 'NO OBSERVATIONS');
   plot($('chart'), [{ id: state.selected, color: '#83dbc1' }]);
-  text('chartScale', state.metric < 4 ? 'Calls/day' : 'Est. tonnes/day');
   const dl = $('calculation');
   dl.replaceChildren();
   for (const [key, value] of [
@@ -3157,6 +3315,7 @@ function activityDetail() {
     ['Selected source ID', state.selected],
     ['Dataset snapshot', manifest.retrieved],
     ['Latest selected observation', last >= 0 ? dates[last] : 'none'],
+    ['Reference length', s.baselineExpected + ' days · ' + baselineLabel()],
   ])
     dl.append(element('dt', '', key), element('dd', '', value));
 }
@@ -3297,7 +3456,7 @@ function render() {
   $('networkDetail').hidden = state.mode !== 'connections';
   $('exposureDetail').hidden = state.mode !== 'exposure';
   $('pin').hidden = !activity;
-  text('pin', state.pins.includes(state.selected) ? '− Unpin' : '+ Compare');
+  pinState();
   text(
     'listTitle',
     activity
@@ -3335,9 +3494,9 @@ function render() {
     activity
       ? $('metric').options[state.metric].text +
           ' · ' +
-          (state.window === 7 ? '7-day mean' : 'daily') +
+          (state.window === 1 ? 'daily' : state.window + '-day mean') +
           ' · ' +
-          (state.baseline === 'january' ? 'Jan reference' : 'prior 28 days')
+          baselineLabel()
       : 'Historical/model data · timeline paused',
   );
   $('metric').value = state.metric;
@@ -3398,15 +3557,27 @@ function render() {
     text(
       'indexNote',
       $('comparisonScale').value === 'indexed'
-        ? 'Each series uses its complete Jan 1–28, 2026 mean as 100. Zero/incomplete references are omitted. Values before Jan 29 overlap the reference; this is retrospective normalization, not a real-time signal.'
-        : 'Daily values with one shared vertical scale.',
+        ? 'Each series indexed to its complete Jan 1–28, 2026 mean = 100; incomplete references omitted.'
+        : 'Daily values, one shared scale. Coincident changes do not establish rerouting or causation.',
     );
     const colors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
     $('pinLabels').replaceChildren(
       ...state.pins.map((id, i) => {
-        const s = element('span', '', placeById[id]?.name || id);
-        s.style.color = colors[i];
-        return s;
+        const name = placeById[id]?.name || id;
+        const chip = element('span', 'pin-chip', '');
+        chip.style.color = colors[i];
+        const label = element('button', 'pin-name', name);
+        label.title = 'Show ' + name;
+        label.onclick = () => choose(id);
+        const remove = element('button', 'pin-remove', '×');
+        remove.setAttribute('aria-label', 'Remove ' + name + ' from comparison');
+        remove.title = 'Remove from comparison';
+        remove.onclick = () => {
+          state.pins = state.pins.filter((x) => x !== id);
+          refresh();
+        };
+        chip.append(label, remove);
+        return chip;
       }),
     );
     plot(
@@ -3699,12 +3870,13 @@ function bind() {
       state.pins = state.pins.filter((id) => id !== state.selected);
     else if (state.pins.length < 4) state.pins.push(state.selected);
     else {
-      text('pin', 'Four pins maximum');
+      flash('pin', 'Four places maximum');
       return;
     }
-    text('pin', state.pins.includes(state.selected) ? '− Unpin' : '+ Compare');
+    pinState();
     refresh();
   };
+  $('openAnalyze').onclick = () => $('analyzeView').click();
   $('clearPins').onclick = () => {
     state.pins = [];
     refresh();
@@ -3734,9 +3906,9 @@ function bind() {
     history.replaceState(null, '', '#' + params);
     try {
       await navigator.clipboard.writeText(url);
-      text('share', 'Link copied');
+      flash('share', 'Link copied');
     } catch {
-      text('share', 'View saved in address bar');
+      flash('share', 'View saved in address bar');
     }
   };
   $('download').onclick = () => {
@@ -3872,8 +4044,9 @@ async function boot() {
     if (dates.includes(q.get('date'))) state.index = dates.indexOf(q.get('date'));
     if (['0', '1', '2', '3', '4', '5', '6'].includes(q.get('metric')))
       state.metric = Number(q.get('metric'));
-    if (q.get('window') === '1') state.window = 1;
-    if (q.get('baseline') === 'january') state.baseline = 'january';
+    if (['1', '7', '14', '28'].includes(q.get('window'))) state.window = Number(q.get('window'));
+    if (['prior', 'prior14', 'prior56', 'prior91', 'january', 'year'].includes(q.get('baseline')))
+      state.baseline = q.get('baseline');
     state.pins = (q.get('pins') || '')
       .split(',')
       .filter((id) => placeById[id])
