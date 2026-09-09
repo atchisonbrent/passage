@@ -894,7 +894,8 @@ body:not(.analyst) #chart {
   height: 160px;
 }
 #chart,
-#comparison {
+#comparison,
+#analysisChart {
   touch-action: pan-y pinch-zoom;
   cursor: ew-resize;
   user-select: none;
@@ -1791,8 +1792,18 @@ body[data-mode='exposure'] .scrubrow {
   }
 }
 @media (max-width: 480px) {
+  /* Two header rows, not three: workspace switch stays on one line with an
+     icon-only Random, matching its medium-width treatment. */
   header .view-switch {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 44px;
+  }
+  header .view-switch button {
+    padding: 6px 2px;
+    font-size: 11.5px;
+    min-height: 40px;
+  }
+  #randomEvent > span {
+    display: none;
   }
   header nav:not(.view-switch) {
     min-width: 0;
@@ -1840,7 +1851,7 @@ body[data-mode='exposure'] .scrubrow {
 @media (pointer: coarse) {
   #browseToggle,
   #mobileExplore,
-  header nav button,
+  header nav:not(.view-switch) button,
   .time-controls button,
   .time-controls input {
     min-height: 44px;
@@ -2105,6 +2116,75 @@ body[data-mode='exposure'] .scrubrow {
 }
 .analysis-result-heading h2 {
   margin: 0;
+}
+/* The selected chart day is the page's date: table dates select it, and the
+   recovery study adopts it, so no date is typed that is already on screen. */
+.analysis-plot-heading .quiet,
+.recovery-controls button {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.day-select {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.day-select:hover,
+.day-select:focus-visible {
+  color: var(--up);
+  background: none;
+}
+.recovery-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.recovery-controls .field {
+  flex: 1 1 150px;
+  min-width: 140px;
+}
+.recovery-controls button {
+  flex: 1 1 200px;
+  align-self: flex-end;
+  margin-bottom: 1px;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 900px) {
+  .recovery-controls .field,
+  .recovery-controls button {
+    flex-grow: 0;
+  }
+}
+#analysisDaily tr.selected-day > * {
+  background: rgba(131, 219, 193, 0.12);
+}
+#analysisDaily tr.selected-day .day-select {
+  color: var(--up);
+  text-decoration-style: solid;
+}
+.analysis-controls input[type='date']:read-only {
+  color: var(--muted);
+  border-style: dashed;
+}
+.chart-day-tools .hint {
+  margin: 0;
+}
+.chart-day-tools button {
+  min-height: 30px;
+  padding: 3px 10px;
+  font-size: 12px;
+}
+#analysisReferenceNote {
+  margin: 4px 0 8px;
 }
 .analysis-result-tools {
   display: flex;

@@ -46,13 +46,23 @@ function comparisonCompatible(id) {
 }
 function comparisonReference() {
   const start = $('analysisStart').value,
-    end = $('analysisEnd').value;
+    end = $('analysisEnd').value,
+    mode = $('analysisReference').value;
+  // Preset references are derived, so their date fields are read-only; choosing
+  // Custom dates unlocks them instead of a hidden edit flipping the preset.
+  for (const id of ['analysisRefStart', 'analysisRefEnd']) $(id).readOnly = mode !== 'custom';
+  text(
+    'analysisReferenceNote',
+    mode === 'custom'
+      ? 'Reference must end before the observations start.'
+      : 'Dates follow the observation range. Choose Custom dates to edit them.',
+  );
   if (!comparisonMath.validDate(start) || !comparisonMath.validDate(end)) return;
-  if ($('analysisReference').value === 'prior') {
+  if (mode === 'prior') {
     $('analysisRefStart').value = comparisonMath.shift(start, -28);
     $('analysisRefEnd').value = comparisonMath.shift(start, -1);
   }
-  if ($('analysisReference').value === 'year') {
+  if (mode === 'year') {
     const prev = (d) => {
       let s = Number(d.slice(0, 4)) - 1 + d.slice(4);
       return comparisonMath.validDate(s) ? s : s.slice(0, 8) + '28';
@@ -60,6 +70,26 @@ function comparisonReference() {
     $('analysisRefStart').value = prev(start);
     $('analysisRefEnd').value = prev(end);
   }
+}
+// Plain-language period description for the collapsed setup summary.
+function comparisonSpanLabel(a, b) {
+  if (!comparisonMath.validDate(a) || !comparisonMath.validDate(b)) return `${a} → ${b}`;
+  const f = (d, withYear) =>
+    new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      ...(withYear ? { year: 'numeric' } : {}),
+      timeZone: 'UTC',
+    });
+  return a.slice(0, 4) === b.slice(0, 4)
+    ? `${f(a)} – ${f(b, true)}`
+    : `${f(a, true)} – ${f(b, true)}`;
+}
+function comparisonReferenceLabel(rs, re) {
+  const mode = $('analysisReference').value;
+  if (mode === 'prior') return 'the 28 days before';
+  if (mode === 'year') return 'the same dates in ' + rs.slice(0, 4);
+  return comparisonSpanLabel(rs, re);
 }
 function comparisonTable(id, caption, heads, rows) {
   const table = $(id);
@@ -76,7 +106,8 @@ function comparisonTable(id, caption, heads, rows) {
   for (const row of rows) {
     const tr = document.createElement('tr');
     row.forEach((v, i) => {
-      const cell = element(i === 0 ? 'th' : 'td', '', v);
+      const cell = element(i === 0 ? 'th' : 'td', '', v instanceof Node ? '' : v);
+      if (v instanceof Node) cell.append(v);
       if (i === 0) cell.scope = 'row';
       tr.append(cell);
     });
@@ -156,7 +187,7 @@ function comparisonDaily() {
   const rows = comparison.axis
     .slice(comparison.page * 50, (comparison.page + 1) * 50)
     .map((d) => [
-      d,
+      comparisonDayButton(d),
       d >= $('analysisStart').value
         ? 'Observation'
         : d >= $('analysisRefStart').value && d <= $('analysisRefEnd').value
@@ -183,11 +214,49 @@ function comparisonDaily() {
     `Page ${comparison.page + 1} / ${pages} · ${comparison.axis.length} calendar days`,
   );
 }
+// The chart cursor is the page's selected day: dates in the daily table select
+// it, and the recovery study can adopt it as the disruption start.
+function comparisonSelectedDayUi() {
+  const day = comparison.axis[Math.max(0, Math.min(comparison.axis.length - 1, comparison.day))];
+  text('analysisEventFromChart', day ? 'Use chart day · ' + day : 'Use chart day');
+  $('analysisEventFromChart').disabled = !day || day === $('analysisEventStart').value;
+  for (const b of document.querySelectorAll('#analysisDaily .day-select'))
+    b.closest('tr').classList.toggle('selected-day', b.textContent === day);
+}
+function comparisonSelectDay(date) {
+  const i = comparison.axis.indexOf(date);
+  if (i < 0) return;
+  comparison.day = i;
+  comparisonRenderChart();
+  comparisonSelectedDayUi();
+}
+function comparisonDayButton(date) {
+  const b = element('button', 'day-select', date);
+  b.type = 'button';
+  b.title = 'Select this day on the chart';
+  b.onclick = () => comparisonSelectDay(date);
+  return b;
+}
+function comparisonSetDisruptionStart(date) {
+  if (!comparisonMath.validDate(date)) return;
+  comparison.recoveryAuto = false;
+  $('analysisEventStart').value = date;
+  $('analysisRecovery').open = true;
+  comparisonInvalidate();
+}
 function comparisonRecovery() {
   const start = $('analysisEventStart').value,
     end = $('analysisEnd').value,
     col = Number($('analysisMetric').value) + 1;
   const valid = comparisonMath.validDate(start) && start >= '2019-01-01' && start <= end;
+  text(
+    'analysisRecoveryNote',
+    (valid
+      ? `Reference: the 28 days before ${start} (${comparisonMath.shift(start, -28)} → ${comparisonMath.shift(start, -1)}). Follow-up runs to ${end}. `
+      : 'Choose a disruption start within the observation range. ') +
+      (comparison.recoveryAuto ? 'Start follows the first observed day until you set one. ' : '') +
+      'Missing days break recovery runs; a confirmed recovery can still relapse.',
+  );
   comparisonTable(
     'recoveryResults',
     'Pre-disruption reference and follow-up · means per day; cumulative totals in ' +
@@ -205,7 +274,7 @@ function comparisonRecovery() {
       if (!valid || !comparisonCompatible(id))
         return [
           placeById[id].name,
-          'Choose a valid start and compatible measure',
+          !valid ? 'Disruption start outside the observation range' : 'Measure not available here',
           '',
           '',
           '',
@@ -248,6 +317,9 @@ function renderWorkspace() {
     rs = $('analysisRefStart').value,
     re = $('analysisRefEnd').value,
     col = Number($('analysisMetric').value) + 1;
+  // Until the reader sets one, the disruption start tracks the observation start.
+  if (comparison.recoveryAuto && $('analysisEventStart').value !== start)
+    $('analysisEventStart').value = start;
   const key = [
     ...comparisonValueIds.map((id) => $(id).value),
     comparison.ids.join(','),
@@ -267,9 +339,27 @@ function renderWorkspace() {
     [start, end].every(
       (d) => comparisonMath.validDate(d) && d >= '2019-01-01' && d <= dates.at(-1),
     ) && start <= end;
+  // Say which field is wrong; a generic rule sends the reader back to guessing.
+  const problem = !comparisonMath.validDate(start)
+    ? 'Choose an observation start date.'
+    : !comparisonMath.validDate(end)
+      ? 'Choose an observation end date.'
+      : start > end
+        ? 'Observations end before they start: swap From and Through.'
+        : end > dates.at(-1)
+          ? `Observations end after the latest snapshot day (${dates.at(-1)}).`
+          : start < '2019-01-01'
+            ? 'Observations start before the earliest source data (2019-01-01).'
+            : !comparisonMath.validDate(rs) || !comparisonMath.validDate(re)
+              ? 'Choose both reference dates.'
+              : rs > re
+                ? 'Reference ends before it starts.'
+                : re >= start
+                  ? `Reference must end before the observations start (${start}).`
+                  : '';
   text(
     'analysisSetupSummary',
-    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} vs ${rs} → ${re} · ${comparisonLabels[col - 1]}`,
+    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${comparisonSpanLabel(start, end)} vs ${comparisonReferenceLabel(rs, re)} · ${comparisonLabels[col - 1]}`,
   );
   const plotStart =
     $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
@@ -307,11 +397,13 @@ function renderWorkspace() {
   $('analysisLoad').disabled = comparison.busy;
   text('analysisLoad', 'Retry history download');
   const loading = comparison.busy || missing.some((id) => historyRequests[id]);
-  $('analysisStatus').hidden = valid && comparison.ids.length > 0 && !loading && !failed.length;
+  const usable = valid && !problem;
+  $('analysisStatus').hidden = usable && comparison.ids.length > 0 && !loading && !failed.length;
+  if (!usable) $('analysisSetup').open = true;
   text(
     'analysisStatus',
-    !valid
-      ? 'Choose an observation range within 2019 and the snapshot cutoff; references must end before the observations start.'
+    !usable
+      ? problem
       : !comparison.ids.length
         ? 'Add up to four places to compare.'
         : loading
@@ -399,6 +491,7 @@ function renderWorkspace() {
   comparisonDaily();
   comparisonRecovery();
   comparisonRenderChart();
+  comparisonSelectedDayUi();
 }
 
 function bindWorkspace(q) {
@@ -520,13 +613,30 @@ function bindWorkspace(q) {
     state.pins = [];
     comparisonInvalidate();
   };
+  comparison.recoveryAuto =
+    !comparisonMath.validDate($('analysisEventStart').value) ||
+    $('analysisEventStart').value === $('analysisStart').value;
   for (const id of comparisonValueIds)
     $(id).onchange = () => {
       if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) comparisonReference();
-      if (['analysisRefStart', 'analysisRefEnd'].includes(id))
-        $('analysisReference').value = 'custom';
+      if (id === 'analysisEventStart')
+        comparison.recoveryAuto = !comparisonMath.validDate($('analysisEventStart').value);
       comparisonInvalidate();
     };
+  $('analysisEventFromChart').onclick = () =>
+    comparisonSetDisruptionStart(comparison.axis[comparison.day]);
+  // Chart day → observation bounds. Keep the range valid rather than rejecting it.
+  const fromChart = (field) => () => {
+    const day = comparison.axis[comparison.day];
+    if (!comparisonMath.validDate(day)) return;
+    $(field).value = day;
+    if ($('analysisStart').value > $('analysisEnd').value)
+      $(field === 'analysisStart' ? 'analysisEnd' : 'analysisStart').value = day;
+    comparisonReference();
+    comparisonInvalidate();
+  };
+  $('analysisStartFromChart').onclick = fromChart('analysisStart');
+  $('analysisEndFromChart').onclick = fromChart('analysisEnd');
   for (const b of document.querySelectorAll('[data-range]'))
     b.onclick = () => {
       const end = $('analysisEnd').value;
@@ -576,6 +686,7 @@ function bindWorkspace(q) {
     onSelect: (i) => {
       comparison.day = i;
       comparisonRenderChart();
+      comparisonSelectedDayUi();
     },
   });
   new ResizeObserver(() => {

@@ -895,7 +895,8 @@ body:not(.analyst) #chart {
   height: 160px;
 }
 #chart,
-#comparison {
+#comparison,
+#analysisChart {
   touch-action: pan-y pinch-zoom;
   cursor: ew-resize;
   user-select: none;
@@ -1792,8 +1793,18 @@ body[data-mode='exposure'] .scrubrow {
   }
 }
 @media (max-width: 480px) {
+  /* Two header rows, not three: workspace switch stays on one line with an
+     icon-only Random, matching its medium-width treatment. */
   header .view-switch {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 44px;
+  }
+  header .view-switch button {
+    padding: 6px 2px;
+    font-size: 11.5px;
+    min-height: 40px;
+  }
+  #randomEvent > span {
+    display: none;
   }
   header nav:not(.view-switch) {
     min-width: 0;
@@ -1841,7 +1852,7 @@ body[data-mode='exposure'] .scrubrow {
 @media (pointer: coarse) {
   #browseToggle,
   #mobileExplore,
-  header nav button,
+  header nav:not(.view-switch) button,
   .time-controls button,
   .time-controls input {
     min-height: 44px;
@@ -2107,6 +2118,75 @@ body[data-mode='exposure'] .scrubrow {
 .analysis-result-heading h2 {
   margin: 0;
 }
+/* The selected chart day is the page's date: table dates select it, and the
+   recovery study adopts it, so no date is typed that is already on screen. */
+.analysis-plot-heading .quiet,
+.recovery-controls button {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.day-select {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.day-select:hover,
+.day-select:focus-visible {
+  color: var(--up);
+  background: none;
+}
+.recovery-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.recovery-controls .field {
+  flex: 1 1 150px;
+  min-width: 140px;
+}
+.recovery-controls button {
+  flex: 1 1 200px;
+  align-self: flex-end;
+  margin-bottom: 1px;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 900px) {
+  .recovery-controls .field,
+  .recovery-controls button {
+    flex-grow: 0;
+  }
+}
+#analysisDaily tr.selected-day > * {
+  background: rgba(131, 219, 193, 0.12);
+}
+#analysisDaily tr.selected-day .day-select {
+  color: var(--up);
+  text-decoration-style: solid;
+}
+.analysis-controls input[type='date']:read-only {
+  color: var(--muted);
+  border-style: dashed;
+}
+.chart-day-tools .hint {
+  margin: 0;
+}
+.chart-day-tools button {
+  min-height: 30px;
+  padding: 3px 10px;
+  font-size: 12px;
+}
+#analysisReferenceNote {
+  margin: 4px 0 8px;
+}
 .analysis-result-tools {
   display: flex;
   gap: 6px;
@@ -2158,8 +2238,8 @@ body[data-mode='exposure'] .scrubrow {
  <section id="eventContext" hidden class="event-context" aria-label="Selected event"></section>
  <details id="analysisSetup" open><summary id="analysisSetupSummary">Places & periods</summary><div class="analysis-controls">
   <section><h2>Places</h2><div id="analysisPins" class="analysis-pins"></div><label class="field">Add a place<input id="analysisSearch" type="search" placeholder="Search places or countries" autocomplete="off"></label><div id="analysisMatches"></div><button id="analysisClear">Clear</button></section>
-  <section><h2>Observations</h2><div class="range-shortcuts"><button data-range="90">90 days</button><button data-range="365">1 year</button><button data-range="all">All history</button></div><div class="date-pair"><label class="field">From<input type="date" id="analysisStart"></label><label class="field">Through<input type="date" id="analysisEnd"></label></div><label class="field">Measure<select id="analysisMetric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports · ports</option><option value="5">Estimated exports · ports</option><option value="6">Passage capacity · chokepoints</option></select></label></section>
-  <section><h2>Reference</h2><label class="field">Reference<select id="analysisReference"><option value="prior">Prior 28 days</option><option value="year">Same dates last year</option><option value="custom">Custom dates</option></select></label><div class="date-pair"><label class="field">From<input type="date" id="analysisRefStart"></label><label class="field">Through<input type="date" id="analysisRefEnd"></label></div><label class="field">Scale<select id="analysisScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · reference mean = 100</option></select></label></section>
+  <section><h2>Observations</h2><div class="range-shortcuts"><button data-range="90">90 days</button><button data-range="365">1 year</button><button data-range="all">All history</button></div><div class="date-pair"><label class="field">From<input type="date" id="analysisStart"></label><label class="field">Through<input type="date" id="analysisEnd"></label></div><div class="range-shortcuts chart-day-tools"><span class="hint">Chart day →</span><button id="analysisStartFromChart" type="button" title="Start the observations at the day selected on the chart">From</button><button id="analysisEndFromChart" type="button" title="End the observations at the day selected on the chart">Through</button></div><label class="field">Measure<select id="analysisMetric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports · ports</option><option value="5">Estimated exports · ports</option><option value="6">Passage capacity · chokepoints</option></select></label></section>
+  <section><h2>Reference</h2><label class="field">Reference<select id="analysisReference"><option value="prior">The 28 days before</option><option value="year">Same dates last year</option><option value="custom">Custom dates</option></select></label><div class="date-pair"><label class="field">From<input type="date" id="analysisRefStart"></label><label class="field">Through<input type="date" id="analysisRefEnd"></label></div><p id="analysisReferenceNote" class="hint"></p><label class="field">Scale<select id="analysisScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · reference mean = 100</option></select></label></section>
  </div>
  </details>
  <p id="analysisStatus" role="status"></p>
@@ -2168,7 +2248,7 @@ body[data-mode='exposure'] .scrubrow {
 <section id="analysisDailyPanel" hidden><h2>Daily observations</h2><div class="table-scroll" tabindex="0" role="region" aria-label="Daily observation table"><table id="analysisDaily"></table></div><div class="analysis-actions"><button id="analysisPrev">Previous rows</button><span id="analysisPage"></span><button id="analysisNext">Next rows</button></div></section>
 </div><section class="analysis-result-column"><div class="analysis-result-heading"><h2>Period comparison</h2><div class="analysis-result-tools"><button id="analysisLoad" hidden>Retry history download</button><button id="analysisExport" title="Download results and daily observations as CSV">CSV</button><button id="analysisShare" title="Copy a link to this comparison">Copy link</button></div></div><div class="table-scroll" tabindex="0" role="region" aria-label="Period comparison results"><table id="analysisResults"></table></div><div id="analysisQuality" class="hint"></div><details class="method-note"><summary>How these numbers are computed</summary><p id="analysisCoverage" class="hint"></p></details></section></div>
 <details id="analysisSensitivity"><summary>Does the reference change the conclusion?</summary><p class="hint">The same observation range compared with 28-day references ending immediately before it, one week earlier, and four weeks earlier. This is reference sensitivity, not significance testing.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Reference sensitivity"><table id="sensitivityResults"></table></div></details>
- <details id="analysisRecovery"><summary>Disruption & recovery</summary><label class="field">Disruption start (not necessarily the report date)<input id="analysisEventStart" type="date"></label><div class="date-pair"><label class="field">Recovery threshold<select id="analysisThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100%</option><option value="0.8">80%</option></select></label><label class="field">Consecutive days<select id="analysisSustain"><option value="7">7 days</option><option value="14">14 days</option></select></label></div><p class="hint">Uses its own 28 days immediately before the disruption start, not the comparison reference above. Follow-up ends at Through. Missing days break recovery runs; relapse remains possible.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Recovery results"><table id="recoveryResults"></table></div></details>
+ <details id="analysisRecovery"><summary>Disruption & recovery</summary><div class="recovery-controls"><label class="field">Disruption start<input id="analysisEventStart" type="date"></label><button id="analysisEventFromChart" type="button" title="Use the day selected on the chart or in the daily table">Use chart day</button><label class="field">Recovery threshold<select id="analysisThreshold"><option value="0.9">90% of pre-disruption mean</option><option value="1">100%</option><option value="0.8">80%</option></select></label><label class="field">Consecutive days<select id="analysisSustain"><option value="7">7 days</option><option value="14">14 days</option></select></label></div><p id="analysisRecoveryNote" class="hint"></p><div class="table-scroll" tabindex="0" role="region" aria-label="Recovery results"><table id="recoveryResults"></table></div></details>
 </section>
 
 
@@ -2562,6 +2642,7 @@ const passageEvents = [
     title: 'Hormuz: the February break',
     date: '2026-02-28',
     dateKind: 'Disruption start reported by IMF',
+    disruptionStart: '2026-02-28',
     published: null,
     source: 'IMF PortWatch',
     url: 'https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1',
@@ -4729,13 +4810,23 @@ function comparisonCompatible(id) {
 }
 function comparisonReference() {
   const start = $('analysisStart').value,
-    end = $('analysisEnd').value;
+    end = $('analysisEnd').value,
+    mode = $('analysisReference').value;
+  // Preset references are derived, so their date fields are read-only; choosing
+  // Custom dates unlocks them instead of a hidden edit flipping the preset.
+  for (const id of ['analysisRefStart', 'analysisRefEnd']) $(id).readOnly = mode !== 'custom';
+  text(
+    'analysisReferenceNote',
+    mode === 'custom'
+      ? 'Reference must end before the observations start.'
+      : 'Dates follow the observation range. Choose Custom dates to edit them.',
+  );
   if (!comparisonMath.validDate(start) || !comparisonMath.validDate(end)) return;
-  if ($('analysisReference').value === 'prior') {
+  if (mode === 'prior') {
     $('analysisRefStart').value = comparisonMath.shift(start, -28);
     $('analysisRefEnd').value = comparisonMath.shift(start, -1);
   }
-  if ($('analysisReference').value === 'year') {
+  if (mode === 'year') {
     const prev = (d) => {
       let s = Number(d.slice(0, 4)) - 1 + d.slice(4);
       return comparisonMath.validDate(s) ? s : s.slice(0, 8) + '28';
@@ -4743,6 +4834,26 @@ function comparisonReference() {
     $('analysisRefStart').value = prev(start);
     $('analysisRefEnd').value = prev(end);
   }
+}
+// Plain-language period description for the collapsed setup summary.
+function comparisonSpanLabel(a, b) {
+  if (!comparisonMath.validDate(a) || !comparisonMath.validDate(b)) return `${a} → ${b}`;
+  const f = (d, withYear) =>
+    new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      ...(withYear ? { year: 'numeric' } : {}),
+      timeZone: 'UTC',
+    });
+  return a.slice(0, 4) === b.slice(0, 4)
+    ? `${f(a)} – ${f(b, true)}`
+    : `${f(a, true)} – ${f(b, true)}`;
+}
+function comparisonReferenceLabel(rs, re) {
+  const mode = $('analysisReference').value;
+  if (mode === 'prior') return 'the 28 days before';
+  if (mode === 'year') return 'the same dates in ' + rs.slice(0, 4);
+  return comparisonSpanLabel(rs, re);
 }
 function comparisonTable(id, caption, heads, rows) {
   const table = $(id);
@@ -4759,7 +4870,8 @@ function comparisonTable(id, caption, heads, rows) {
   for (const row of rows) {
     const tr = document.createElement('tr');
     row.forEach((v, i) => {
-      const cell = element(i === 0 ? 'th' : 'td', '', v);
+      const cell = element(i === 0 ? 'th' : 'td', '', v instanceof Node ? '' : v);
+      if (v instanceof Node) cell.append(v);
       if (i === 0) cell.scope = 'row';
       tr.append(cell);
     });
@@ -4839,7 +4951,7 @@ function comparisonDaily() {
   const rows = comparison.axis
     .slice(comparison.page * 50, (comparison.page + 1) * 50)
     .map((d) => [
-      d,
+      comparisonDayButton(d),
       d >= $('analysisStart').value
         ? 'Observation'
         : d >= $('analysisRefStart').value && d <= $('analysisRefEnd').value
@@ -4866,11 +4978,49 @@ function comparisonDaily() {
     `Page ${comparison.page + 1} / ${pages} · ${comparison.axis.length} calendar days`,
   );
 }
+// The chart cursor is the page's selected day: dates in the daily table select
+// it, and the recovery study can adopt it as the disruption start.
+function comparisonSelectedDayUi() {
+  const day = comparison.axis[Math.max(0, Math.min(comparison.axis.length - 1, comparison.day))];
+  text('analysisEventFromChart', day ? 'Use chart day · ' + day : 'Use chart day');
+  $('analysisEventFromChart').disabled = !day || day === $('analysisEventStart').value;
+  for (const b of document.querySelectorAll('#analysisDaily .day-select'))
+    b.closest('tr').classList.toggle('selected-day', b.textContent === day);
+}
+function comparisonSelectDay(date) {
+  const i = comparison.axis.indexOf(date);
+  if (i < 0) return;
+  comparison.day = i;
+  comparisonRenderChart();
+  comparisonSelectedDayUi();
+}
+function comparisonDayButton(date) {
+  const b = element('button', 'day-select', date);
+  b.type = 'button';
+  b.title = 'Select this day on the chart';
+  b.onclick = () => comparisonSelectDay(date);
+  return b;
+}
+function comparisonSetDisruptionStart(date) {
+  if (!comparisonMath.validDate(date)) return;
+  comparison.recoveryAuto = false;
+  $('analysisEventStart').value = date;
+  $('analysisRecovery').open = true;
+  comparisonInvalidate();
+}
 function comparisonRecovery() {
   const start = $('analysisEventStart').value,
     end = $('analysisEnd').value,
     col = Number($('analysisMetric').value) + 1;
   const valid = comparisonMath.validDate(start) && start >= '2019-01-01' && start <= end;
+  text(
+    'analysisRecoveryNote',
+    (valid
+      ? `Reference: the 28 days before ${start} (${comparisonMath.shift(start, -28)} → ${comparisonMath.shift(start, -1)}). Follow-up runs to ${end}. `
+      : 'Choose a disruption start within the observation range. ') +
+      (comparison.recoveryAuto ? 'Start follows the first observed day until you set one. ' : '') +
+      'Missing days break recovery runs; a confirmed recovery can still relapse.',
+  );
   comparisonTable(
     'recoveryResults',
     'Pre-disruption reference and follow-up · means per day; cumulative totals in ' +
@@ -4888,7 +5038,7 @@ function comparisonRecovery() {
       if (!valid || !comparisonCompatible(id))
         return [
           placeById[id].name,
-          'Choose a valid start and compatible measure',
+          !valid ? 'Disruption start outside the observation range' : 'Measure not available here',
           '',
           '',
           '',
@@ -4931,6 +5081,9 @@ function renderWorkspace() {
     rs = $('analysisRefStart').value,
     re = $('analysisRefEnd').value,
     col = Number($('analysisMetric').value) + 1;
+  // Until the reader sets one, the disruption start tracks the observation start.
+  if (comparison.recoveryAuto && $('analysisEventStart').value !== start)
+    $('analysisEventStart').value = start;
   const key = [
     ...comparisonValueIds.map((id) => $(id).value),
     comparison.ids.join(','),
@@ -4950,9 +5103,27 @@ function renderWorkspace() {
     [start, end].every(
       (d) => comparisonMath.validDate(d) && d >= '2019-01-01' && d <= dates.at(-1),
     ) && start <= end;
+  // Say which field is wrong; a generic rule sends the reader back to guessing.
+  const problem = !comparisonMath.validDate(start)
+    ? 'Choose an observation start date.'
+    : !comparisonMath.validDate(end)
+      ? 'Choose an observation end date.'
+      : start > end
+        ? 'Observations end before they start: swap From and Through.'
+        : end > dates.at(-1)
+          ? `Observations end after the latest snapshot day (${dates.at(-1)}).`
+          : start < '2019-01-01'
+            ? 'Observations start before the earliest source data (2019-01-01).'
+            : !comparisonMath.validDate(rs) || !comparisonMath.validDate(re)
+              ? 'Choose both reference dates.'
+              : rs > re
+                ? 'Reference ends before it starts.'
+                : re >= start
+                  ? `Reference must end before the observations start (${start}).`
+                  : '';
   text(
     'analysisSetupSummary',
-    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} vs ${rs} → ${re} · ${comparisonLabels[col - 1]}`,
+    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${comparisonSpanLabel(start, end)} vs ${comparisonReferenceLabel(rs, re)} · ${comparisonLabels[col - 1]}`,
   );
   const plotStart =
     $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
@@ -4990,11 +5161,13 @@ function renderWorkspace() {
   $('analysisLoad').disabled = comparison.busy;
   text('analysisLoad', 'Retry history download');
   const loading = comparison.busy || missing.some((id) => historyRequests[id]);
-  $('analysisStatus').hidden = valid && comparison.ids.length > 0 && !loading && !failed.length;
+  const usable = valid && !problem;
+  $('analysisStatus').hidden = usable && comparison.ids.length > 0 && !loading && !failed.length;
+  if (!usable) $('analysisSetup').open = true;
   text(
     'analysisStatus',
-    !valid
-      ? 'Choose an observation range within 2019 and the snapshot cutoff; references must end before the observations start.'
+    !usable
+      ? problem
       : !comparison.ids.length
         ? 'Add up to four places to compare.'
         : loading
@@ -5082,6 +5255,7 @@ function renderWorkspace() {
   comparisonDaily();
   comparisonRecovery();
   comparisonRenderChart();
+  comparisonSelectedDayUi();
 }
 
 function bindWorkspace(q) {
@@ -5203,13 +5377,30 @@ function bindWorkspace(q) {
     state.pins = [];
     comparisonInvalidate();
   };
+  comparison.recoveryAuto =
+    !comparisonMath.validDate($('analysisEventStart').value) ||
+    $('analysisEventStart').value === $('analysisStart').value;
   for (const id of comparisonValueIds)
     $(id).onchange = () => {
       if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) comparisonReference();
-      if (['analysisRefStart', 'analysisRefEnd'].includes(id))
-        $('analysisReference').value = 'custom';
+      if (id === 'analysisEventStart')
+        comparison.recoveryAuto = !comparisonMath.validDate($('analysisEventStart').value);
       comparisonInvalidate();
     };
+  $('analysisEventFromChart').onclick = () =>
+    comparisonSetDisruptionStart(comparison.axis[comparison.day]);
+  // Chart day → observation bounds. Keep the range valid rather than rejecting it.
+  const fromChart = (field) => () => {
+    const day = comparison.axis[comparison.day];
+    if (!comparisonMath.validDate(day)) return;
+    $(field).value = day;
+    if ($('analysisStart').value > $('analysisEnd').value)
+      $(field === 'analysisStart' ? 'analysisEnd' : 'analysisStart').value = day;
+    comparisonReference();
+    comparisonInvalidate();
+  };
+  $('analysisStartFromChart').onclick = fromChart('analysisStart');
+  $('analysisEndFromChart').onclick = fromChart('analysisEnd');
   for (const b of document.querySelectorAll('[data-range]'))
     b.onclick = () => {
       const end = $('analysisEnd').value;
@@ -5259,6 +5450,7 @@ function bindWorkspace(q) {
     onSelect: (i) => {
       comparison.day = i;
       comparisonRenderChart();
+      comparisonSelectedDayUi();
     },
   });
   new ResizeObserver(() => {
@@ -5284,7 +5476,10 @@ function comparisonEvent(id) {
   $('analysisReference').value = 'custom';
   $('analysisRefStart').value = event.referenceStart;
   $('analysisRefEnd').value = event.referenceEnd;
-  $('analysisEventStart').value = event.id === 'hormuz-2026' ? '2026-02-28' : '';
+  // Only a reported disruption onset seeds the recovery study; report and
+  // statement dates leave the start tracking the observation range.
+  $('analysisEventStart').value = event.disruptionStart || '';
+  comparison.recoveryAuto = !event.disruptionStart;
   comparison.day = 0;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
@@ -5441,6 +5636,7 @@ function comparisonShift(id) {
   $('analysisRefEnd').value = h.referenceEnd;
   $('analysisReference').value = 'custom';
   $('analysisEventStart').value = '';
+  comparison.recoveryAuto = true;
   $('analysisSpan').value = 'reference';
   comparison.day = 28;
   $('eventCatalog').open = false;

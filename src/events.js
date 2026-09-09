@@ -5,6 +5,7 @@ const passageEvents = [
     title: 'Hormuz: the February break',
     date: '2026-02-28',
     dateKind: 'Disruption start reported by IMF',
+    disruptionStart: '2026-02-28',
     published: null,
     source: 'IMF PortWatch',
     url: 'https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1',

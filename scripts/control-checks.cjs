@@ -561,6 +561,64 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
     await js("document.getElementById('analysisDisplay').getBoundingClientRect().width>0"),
     'Display control stays visible in table mode',
   );
+  // Dates on the page are the date picker: a table date selects the chart day,
+  // the recovery study adopts it, and the start never sits empty.
+  assert.ok(
+    await js("document.querySelectorAll('#analysisDaily .day-select').length>0"),
+    'daily table dates are buttons',
+  );
+  const tableDay = await js(
+    "document.querySelector('#analysisDaily tbody tr:nth-child(5) .day-select').textContent",
+  );
+  await click('#analysisDaily tbody tr:nth-child(5) .day-select');
+  assert.equal(await js('comparison.axis[comparison.day]'), tableDay);
+  assert.ok(
+    await js("document.querySelector('#analysisDaily tr.selected-day')!==null"),
+    'selected day highlighted in table',
+  );
+  assert.equal(
+    await js("document.getElementById('analysisEventFromChart').textContent"),
+    'Use chart day · ' + tableDay,
+  );
+  assert.equal(
+    await js("document.getElementById('analysisEventStart').value"),
+    await js("document.getElementById('analysisStart').value"),
+    'disruption start defaults to the observation start',
+  );
+  assert.equal(await js('comparison.recoveryAuto'), true);
+  await js("document.getElementById('analysisRecovery').open=true");
+  await click('#analysisEventFromChart');
+  assert.equal(await js("document.getElementById('analysisEventStart').value"), tableDay);
+  assert.equal(await js('comparison.recoveryAuto'), false);
+  assert.equal(await js("document.getElementById('analysisRecovery').open"), true);
+  assert.ok(
+    await js(
+      "document.getElementById('analysisRecoveryNote').textContent.includes('28 days before " +
+        tableDay +
+        "')",
+    ),
+  );
+  assert.ok(
+    await js(
+      "document.querySelector('#recoveryResults tbody td').textContent!=='Disruption start outside the observation range'",
+    ),
+    'recovery table has a result, not a prompt to fill a field',
+  );
+  // Chart day → observation From; presets stay read-only until Custom dates.
+  await click('#analysisSetup summary');
+  await click('#analysisStartFromChart');
+  assert.equal(await js("document.getElementById('analysisStart').value"), tableDay);
+  assert.equal(await js("document.getElementById('analysisRefStart').readOnly"), true);
+  await select('#analysisReference', 2);
+  assert.equal(await js("document.getElementById('analysisRefStart').readOnly"), false);
+  await select('#analysisReference', 0);
+  await click('#analysisSetup summary');
+  assert.ok(
+    await js(
+      "/\\d{1,2} \\w{3} .* vs the 28 days before/.test(document.getElementById('analysisSetupSummary').textContent)",
+    ),
+    'setup summary reads as prose',
+  );
   await select('#analysisDisplay', 0);
   assert.equal(await js("document.getElementById('analysisChartPanel').hidden"), false);
   assert.equal(await js("document.getElementById('analysisDailyPanel').hidden"), true);

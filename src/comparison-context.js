@@ -15,7 +15,10 @@ function comparisonEvent(id) {
   $('analysisReference').value = 'custom';
   $('analysisRefStart').value = event.referenceStart;
   $('analysisRefEnd').value = event.referenceEnd;
-  $('analysisEventStart').value = event.id === 'hormuz-2026' ? '2026-02-28' : '';
+  // Only a reported disruption onset seeds the recovery study; report and
+  // statement dates leave the start tracking the observation range.
+  $('analysisEventStart').value = event.disruptionStart || '';
+  comparison.recoveryAuto = !event.disruptionStart;
   comparison.day = 0;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
@@ -172,6 +175,7 @@ function comparisonShift(id) {
   $('analysisRefEnd').value = h.referenceEnd;
   $('analysisReference').value = 'custom';
   $('analysisEventStart').value = '';
+  comparison.recoveryAuto = true;
   $('analysisSpan').value = 'reference';
   comparison.day = 28;
   $('eventCatalog').open = false;
