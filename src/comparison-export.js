@@ -119,6 +119,9 @@ function comparisonParams() {
     shift: comparison.signal || '',
   });
   for (const id of comparisonValueIds) q.set(id, $(id).value);
+  // An automatic disruption start is derived, not chosen: share it as empty so
+  // the restored page keeps following the observation start.
+  if (comparison.recoveryAuto) q.set('analysisEventStart', '');
   q.set('analysisDay', String(comparison.day));
   return q;
 }

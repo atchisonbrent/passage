@@ -19,6 +19,7 @@ function comparisonEvent(id) {
   // statement dates leave the start tracking the observation range.
   $('analysisEventStart').value = event.disruptionStart || '';
   comparison.recoveryAuto = !event.disruptionStart;
+  comparisonReference();
   comparison.day = 0;
   $('eventCatalog').open = false;
   $('analysisSetup').open = false;
@@ -176,6 +177,7 @@ function comparisonShift(id) {
   $('analysisReference').value = 'custom';
   $('analysisEventStart').value = '';
   comparison.recoveryAuto = true;
+  comparisonReference();
   $('analysisSpan').value = 'reference';
   comparison.day = 28;
   $('eventCatalog').open = false;

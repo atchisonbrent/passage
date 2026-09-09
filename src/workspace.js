@@ -217,11 +217,28 @@ function comparisonDaily() {
 // The chart cursor is the page's selected day: dates in the daily table select
 // it, and the recovery study can adopt it as the disruption start.
 function comparisonSelectedDayUi() {
-  const day = comparison.axis[Math.max(0, Math.min(comparison.axis.length - 1, comparison.day))];
+  const day = comparison.axis[comparison.day];
   text('analysisEventFromChart', day ? 'Use chart day · ' + day : 'Use chart day');
   $('analysisEventFromChart').disabled = !day || day === $('analysisEventStart').value;
   for (const b of document.querySelectorAll('#analysisDaily .day-select'))
     b.closest('tr').classList.toggle('selected-day', b.textContent === day);
+  if ($('analysisChartPanel').hidden) {
+    // No chart to paint the readout: name the selected day from the rows.
+    const col = Number($('analysisMetric').value) + 1;
+    text(
+      'analysisReadout',
+      day
+        ? day +
+            ' · ' +
+            comparison.ids
+              .map((id, j) => {
+                const v = comparison.rows[id]?.find((r) => r[0] === day)?.[col];
+                return `${j + 1}. ${placeById[id].name}: ${Number.isFinite(v) ? fmt(v) + ' ' + comparisonUnit() : 'unavailable'}`;
+              })
+              .join(' · ')
+        : '',
+    );
+  }
 }
 function comparisonSelectDay(date) {
   const i = comparison.axis.indexOf(date);
@@ -253,8 +270,10 @@ function comparisonRecovery() {
     'analysisRecoveryNote',
     (valid
       ? `Reference: the 28 days before ${start} (${comparisonMath.shift(start, -28)} → ${comparisonMath.shift(start, -1)}). Follow-up runs to ${end}. `
-      : 'Choose a disruption start within the observation range. ') +
-      (comparison.recoveryAuto ? 'Start follows the first observed day until you set one. ' : '') +
+      : `Choose a disruption start between 2019-01-01 and ${end}. `) +
+      (comparison.recoveryAuto
+        ? 'Start follows the observation From date until you set one. '
+        : '') +
       'Missing days break recovery runs; a confirmed recovery can still relapse.',
   );
   comparisonTable(
@@ -274,7 +293,9 @@ function comparisonRecovery() {
       if (!valid || !comparisonCompatible(id))
         return [
           placeById[id].name,
-          !valid ? 'Disruption start outside the observation range' : 'Measure not available here',
+          !valid
+            ? 'Disruption start must fall between 2019-01-01 and Through'
+            : 'Measure not available here',
           '',
           '',
           '',
@@ -367,7 +388,13 @@ function renderWorkspace() {
         ? '2019-01-01'
         : rs
       : start;
+  const selectedDay = comparison.axis[comparison.day];
   comparison.axis = valid ? comparisonMath.days(plotStart, end) : [];
+  // The selection is a calendar date, not an index: keep it where the axis
+  // still contains it, otherwise clamp regardless of whether a chart is drawn.
+  const kept = selectedDay ? comparison.axis.indexOf(selectedDay) : -1;
+  comparison.day =
+    kept >= 0 ? kept : Math.max(0, Math.min(comparison.axis.length - 1, comparison.day));
   comparison.rows = Object.fromEntries(comparison.ids.map((id) => [id, combinedHistory(id)]));
   comparison.summaries = comparison.ids.map((id) =>
     comparisonMath.summary(
@@ -613,9 +640,9 @@ function bindWorkspace(q) {
     state.pins = [];
     comparisonInvalidate();
   };
-  comparison.recoveryAuto =
-    !comparisonMath.validDate($('analysisEventStart').value) ||
-    $('analysisEventStart').value === $('analysisStart').value;
+  // Ownership comes from the link itself: an explicit date means the reader
+  // chose it, even when it happens to equal the observation start.
+  comparison.recoveryAuto = !comparisonMath.validDate($('analysisEventStart').value);
   for (const id of comparisonValueIds)
     $(id).onchange = () => {
       if (['analysisStart', 'analysisEnd', 'analysisReference'].includes(id)) comparisonReference();
@@ -665,10 +692,12 @@ function bindWorkspace(q) {
   $('analysisPrev').onclick = () => {
     comparison.page = Math.max(0, comparison.page - 1);
     comparisonDaily();
+    comparisonSelectedDayUi();
   };
   $('analysisNext').onclick = () => {
     comparison.page++;
     comparisonDaily();
+    comparisonSelectedDayUi();
   };
   $('analysisShare').onclick = async () => {
     const url = location.origin + '/#' + comparisonParams();

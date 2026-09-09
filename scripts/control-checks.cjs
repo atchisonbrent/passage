@@ -540,6 +540,9 @@ exports.checkLenses = async ({ call, js, click, hover, navigate, delay, until, b
     'no idle timeline bar in the connections lens',
   );
   // The lens list ranks hubs by network weight and says so on each row.
+  await until(() =>
+    js("document.querySelector('#locations .location .rankvalue')?.textContent.includes('onward')"),
+  );
   assert.ok(
     await js(
       "document.querySelector('#locations .location .rankvalue')?.textContent.includes('onward')",
@@ -663,17 +666,113 @@ exports.checkLenses = async ({ call, js, click, hover, navigate, delay, until, b
   await click('#analysisSetup summary');
   await click('#analysisStartFromChart');
   assert.equal(await js("document.getElementById('analysisStart').value"), tableDay);
+  assert.equal(
+    await js('comparison.axis[comparison.day]'),
+    tableDay,
+    'selected calendar day survives the axis rebuild',
+  );
+  assert.equal(
+    await js("document.getElementById('analysisEventFromChart').disabled"),
+    true,
+    'button is disabled once the start already equals the selected day',
+  );
   assert.equal(await js("document.getElementById('analysisRefStart').readOnly"), true);
   await select('#analysisReference', 2);
   assert.equal(await js("document.getElementById('analysisRefStart').readOnly"), false);
   await select('#analysisReference', 0);
+  // Table mode: pick a late date, make it the observation start (axis shrinks),
+  // then also the end (axis collapses to one day). The selection must follow
+  // the calendar date, clamp without a chart, and the button must still act.
+  await click('#analysisSetup summary');
+  await select('#analysisSpan', 1);
+  await click('#analysisDaily tbody tr:last-child .day-select');
+  const lateDay = await js('comparison.axis[comparison.day]');
+  const before = await js('comparison.axis.length');
+  await click('#analysisSetup summary');
+  await click('#analysisStartFromChart');
+  assert.ok(
+    (await js('comparison.axis.length')) < before,
+    'observations shrink to the selected start',
+  );
+  assert.equal(await js('comparison.axis[comparison.day]'), lateDay, 'selection follows the date');
+  await click('#analysisEndFromChart');
+  assert.equal(await js('comparison.axis.length'), 1, 'From = Through collapses to one day');
+  assert.equal(await js('comparison.axis[comparison.day]'), lateDay);
+  assert.equal(await js("document.getElementById('analysisEventStart').value"), tableDay);
+  assert.equal(await js("document.getElementById('analysisEventFromChart').disabled"), false);
+  await js("document.getElementById('analysisRecovery').open=true");
+  await click('#analysisEventFromChart');
+  assert.equal(
+    await js("document.getElementById('analysisEventStart').value"),
+    lateDay,
+    'Use chart day acts on the clamped selection in table mode',
+  );
+  assert.ok(
+    await js(
+      "document.getElementById('analysisReadout').textContent.startsWith('" + lateDay + "')",
+    ),
+    'readout names the selected day without a chart',
+  );
+  await select('#analysisSpan', 0);
+  await click('#analysisSetup summary');
+  await click('[data-range="90"]');
+  await click('#analysisSetup summary');
+  // Ownership round trip: an explicit date equal to From stays explicit after
+  // restoring the link and moving From; an automatic one keeps following.
+  const start0 = await js("document.getElementById('analysisStart').value");
+  await js(
+    "(()=>{const e=document.getElementById('analysisEventStart');e.value=document.getElementById('analysisStart').value;e.dispatchEvent(new Event('change'));})()",
+  );
+  assert.equal(await js('comparison.recoveryAuto'), false);
+  assert.equal(
+    await js("new URLSearchParams(comparisonParams()).get('analysisEventStart')"),
+    start0,
+    'explicit start is shared',
+  );
+  await navigate(base + '#' + (await js('comparisonParams().toString()')));
+  await until(() => js('comparison.open'));
+  assert.equal(await js('comparison.recoveryAuto'), false, 'explicit ownership restored');
+  await click('#analysisSetup summary');
+  await click('[data-range="365"]');
+  assert.equal(
+    await js("document.getElementById('analysisEventStart').value"),
+    start0,
+    'explicit start does not follow From after restore',
+  );
+  await js(
+    "(()=>{const e=document.getElementById('analysisEventStart');e.value='';e.dispatchEvent(new Event('change'));})()",
+  );
+  assert.equal(await js('comparison.recoveryAuto'), true);
+  assert.equal(
+    await js("new URLSearchParams(comparisonParams()).get('analysisEventStart')"),
+    '',
+    'automatic start is shared as empty',
+  );
+  await navigate(base + '#' + (await js('comparisonParams().toString()')));
+  await until(() => js('comparison.open'));
+  assert.equal(await js('comparison.recoveryAuto'), true, 'automatic ownership restored');
+  assert.equal(
+    await js("document.getElementById('analysisEventStart').value"),
+    await js("document.getElementById('analysisStart').value"),
+  );
+  // Discovery sets Custom dates programmatically; the fields must unlock.
+  await js("document.getElementById('analysisReference').value='prior'");
+  await js('comparisonReference()');
+  await js('comparisonShift(passageShifts[0].id)');
+  await until(() => js("document.getElementById('analysisReference').value==='custom'"));
+  assert.equal(
+    await js("document.getElementById('analysisRefStart').readOnly"),
+    false,
+    'shift selection leaves custom reference dates editable',
+  );
   await click('#analysisSetup summary');
   assert.ok(
     await js(
-      "/\\d{1,2} \\w{3} .* vs the 28 days before/.test(document.getElementById('analysisSetupSummary').textContent)",
+      "/\\d{1,2} \\w{3} .* vs \\d{1,2} \\w{3}/.test(document.getElementById('analysisSetupSummary').textContent)",
     ),
     'setup summary reads as prose',
   );
+  await select('#analysisDisplay', 1);
   await select('#analysisDisplay', 0);
   assert.equal(await js("document.getElementById('analysisChartPanel').hidden"), false);
   assert.equal(await js("document.getElementById('analysisDailyPanel').hidden"), true);

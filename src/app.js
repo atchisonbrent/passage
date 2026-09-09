@@ -716,10 +716,10 @@ function networkDetail() {
         : 'Loading historical network…'
       : !links.length
         ? 'No historical connections recorded for this port.'
-        : `${links.length} ports ${out ? 'received ships next after' : 'sent ships directly to'} ${place()?.name || 'this port'} (2019–2024). ` +
+        : `${links.length} ports ${out ? 'received ships next after' : 'sent ships directly to'} ${place()?.name || 'this port'} in 2019–2024` +
           (total > 0
-            ? `The top five carry ${fmt((top5 / total) * 100)}% of the ${short(total)} t/day of capacity that routes through here.`
-            : ''),
+            ? `; the top five carry ${fmt((top5 / total) * 100)}% of the ${short(total)} t/day of capacity at risk.`
+            : '.'),
   );
   const frag = document.createDocumentFragment();
   links.slice(0, 20).forEach((edge, i) => {
@@ -739,9 +739,9 @@ function networkDetail() {
       element(
         'small',
         '',
-        `${short(edge[3])} t/day` +
+        `${short(edge[3])} t/day at risk` +
           (total > 0 ? ` · ${fmt((edge[3] / total) * 100)}%` : '') +
-          ` · ${fmt(edge[2])}-day passage`,
+          ` · ${fmt(edge[2])} days mean transit`,
       ),
     );
     b.onclick = () => choose(id);
@@ -851,11 +851,7 @@ function render() {
   pinState();
   text(
     'listTitle',
-    activity
-      ? 'Find the change'
-      : state.mode === 'connections'
-        ? 'Busiest hubs'
-        : 'Most exposed ports',
+    activity ? 'Find the change' : state.mode === 'connections' ? 'Busiest hubs' : 'Modeled ports',
   );
   text(
     'lensBadge',
@@ -1236,7 +1232,7 @@ function bind() {
     if (state.mode === 'connections' && network) {
       const out = $('direction').value === 'out',
         edge = links.find((e) => e[out ? 1 : 0] === target.id);
-      if (edge) detail = `${short(edge[3])} t/day · ${fmt(edge[2])}-day passage`;
+      if (edge) detail = `${short(edge[3])} t/day at risk · ${fmt(edge[2])} days mean transit`;
       else if (target.id === state.selected) detail = `${links.length} connections`;
     } else if (state.mode === 'change') {
       const s = stats[target.id];
