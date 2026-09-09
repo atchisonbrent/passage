@@ -1,5 +1,6 @@
 """Deterministic activity refresh. No credentials, cache, model or news fetches."""
 
+import collections
 import datetime as dt
 import math
 
@@ -48,14 +49,23 @@ def merge_rows(old, fresh, identifiers, start, end):
         seen[key] = row
         deduplicated.append(row)
     if len(seen) != len(identifiers) * ((last - first).days + 1):
-        raise ValueError("Incomplete source date/place coverage")
+        # Name what is missing: a silent catalog change upstream (places dropped
+        # or renamed) must be diagnosable from the failed-run log alone.
+        present = collections.Counter(key[0] for key in seen)
+        expected_days = (last - first).days + 1
+        absent = sorted(p for p in identifiers if present[p] == 0)
+        partial = sorted(p for p in identifiers if 0 < present[p] < expected_days)
+        raise ValueError(
+            "Incomplete source date/place coverage: "
+            f"{len(absent)} catalogued places absent ({', '.join(absent[:12])}"
+            f"{', …' if len(absent) > 12 else ''}); {len(partial)} with missing days"
+        )
     if old and max(r[1] for r in old) > end:
         raise ValueError("Source cutoff regressed")
     return sorted([r for r in old if r[1] < start] + deduplicated, key=lambda r: (r[0], r[1]))
 
 
 import argparse
-import collections
 import hashlib
 import json
 from pathlib import Path
