@@ -49,6 +49,26 @@ def build():
         manifest["assets"].append(
             {"file": name, "bytes": len(content), "sha256": hashlib.sha256(content).hexdigest()}
         )
+    # Port totals from the source "Total" rows so the Exposure list can rank
+    # ports before any per-port model file is downloaded. Derived at build time
+    # from pinned reference assets; not part of the published-baseline contract.
+    manifest["exposureTotals"] = {}
+    for entry in manifest.get("exposure", []):
+        rows = json.loads((data / entry["file"]).read_text())
+        totals = {"import": 0.0, "export": 0.0}
+        for row in rows:
+            if row.get("industry") != "Total" or row.get("unit") != "US Dollars":
+                continue
+            if row.get("scale") != "Unit":
+                continue
+            for key, field in [
+                ("import", "daily_import_value_at_risk"),
+                ("export", "daily_export_value_at_risk"),
+            ]:
+                value = row.get(field)
+                if isinstance(value, (int, float)) and value >= 0:
+                    totals[key] += value
+        manifest["exposureTotals"][entry["id"]] = {k: round(v) for k, v in totals.items()}
     (data / "manifest.json").write_text(json.dumps(manifest, separators=(",", ":")))
     html = (source / "index.html").read_text()
     scripts = script_bundles(source)

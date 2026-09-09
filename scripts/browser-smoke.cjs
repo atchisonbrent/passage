@@ -107,6 +107,17 @@ async function until(fn) {
       });
       await delay(150);
     };
+    const hover = async (selector) => {
+      await js(
+        `document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'center'})`,
+      );
+      await delay(100);
+      const b = await js(
+        `(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+Math.min(12,r.width/2),y:r.y+Math.min(12,r.height/2)}})()`,
+      );
+      await call('Input.dispatchMouseEvent', { type: 'mouseMoved', ...b });
+      await delay(120);
+    };
     const navigate = async (url) => {
       await call('Page.navigate', { url: 'about:blank' });
       await until(() => js("location.href==='about:blank'"));
@@ -194,7 +205,7 @@ async function until(fn) {
       await navigate(base + hash);
       assert.equal(await js('comparison.signal'), ident);
     }
-    await checkLenses({ call, js, click, navigate, delay, until, base, out });
+    await checkLenses({ call, js, click, hover, navigate, delay, until, base, out });
     assert.deepEqual(errors, []);
     fs.writeFileSync(
       path.join(out, 'browser.json'),

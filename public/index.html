@@ -404,14 +404,15 @@ pre {
 body:not(.analyst) #rank {
   max-width: 100%;
 }
+/* Connections and Exposure have no timeline; the globe takes that height. */
 body[data-mode='connections'] main,
 body[data-mode='exposure'] main {
-  padding-bottom: 80px;
+  padding-bottom: 0;
 }
 @media (min-width: 801px) {
   body[data-mode='connections'] .workspace,
   body[data-mode='exposure'] .workspace {
-    height: calc(100dvh - 240px);
+    height: calc(100dvh - 150px);
   }
 }
 @media (min-width: 1650px) {
@@ -562,7 +563,9 @@ main {
   font-size: 12px;
 }
 body[data-mode='connections'] .filterrow,
-body[data-mode='exposure'] .filterrow {
+body[data-mode='exposure'] .filterrow,
+body[data-mode='connections'] .analyst-toggle,
+body[data-mode='exposure'] .analyst-toggle {
   display: none;
 }
 @media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
@@ -595,7 +598,7 @@ body[data-mode='exposure'] .filterrow {
   }
   body[data-mode='connections'] .workspace,
   body[data-mode='exposure'] .workspace {
-    height: calc(100dvh - 185px);
+    height: calc(100dvh - 130px);
   }
 }
 @media (max-width: 900px),
@@ -1596,8 +1599,10 @@ body.analysis-open .timebar {
 body[data-mode='connections'] .time-controls,
 body[data-mode='connections'] .scrubrow,
 body[data-mode='exposure'] .time-controls,
-body[data-mode='exposure'] .scrubrow {
-  display: none;
+body[data-mode='exposure'] .scrubrow,
+body[data-mode='connections'] .timebar,
+body[data-mode='exposure'] .timebar {
+  display: none !important;
 }
 .browse-dialog-heading {
   display: flex;
@@ -2187,6 +2192,52 @@ body[data-mode='exposure'] .scrubrow {
 #analysisReferenceNote {
   margin: 4px 0 8px;
 }
+/* Connections / Exposure rows: rank, name, value on one line; bar or passage
+   detail beneath; hover lights the matching globe marker. */
+.route,
+.country {
+  padding: 8px 4px;
+  margin: 0 -4px;
+  border-radius: 6px;
+}
+.route:hover,
+.country:hover {
+  background: rgba(133, 188, 232, 0.08);
+}
+.route-head,
+.country-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.route-head span,
+.country-head span {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.route small {
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.country .bar {
+  margin-top: 5px;
+}
+#networkSummary,
+#exposureSummary {
+  font-size: 13px;
+  margin: 6px 0 4px;
+}
+#networkDetail .method-note,
+#exposureDetail .method-note {
+  margin-top: 10px;
+}
+#networkDetail .field,
+#exposureDetail .field {
+  margin-top: 2px;
+}
 .analysis-result-tools {
   display: flex;
   gap: 6px;
@@ -2255,7 +2306,7 @@ body[data-mode='exposure'] .scrubrow {
 <section class="workspace">
 <aside class="discovery"><div class="panel-heading"><h1 id="listTitle">Find the change</h1><span id="coverage" class="muted"></span></div><label class="analyst-toggle"><input id="analyst" type="checkbox"> Show all places</label><label class="field">Find a port or passage<input id="search" type="search" placeholder="Try Rotterdam, Panama, Japan…" autocomplete="off"></label><div class="filterrow"><label class="field">Places<select id="kind"><option value="all">Ports + passages</option><option value="port">Ports</option><option value="chokepoint">Chokepoints</option></select></label><label class="field">Rank by<select id="rank"><option value="absolute" title="Largest absolute shifts first; search includes places with missing comparisons">Size of change</option><option value="percent" title="Percentage change; reference floor 10 calls/day or 1,000 tonnes/day, complete windows only">Percentage change</option><option value="activity" title="Highest current activity first; complete windows only">Activity</option></select></label></div><div id="locations" class="locations" aria-label="Search results and ranked places"></div></aside>
 <section class="map-panel" aria-label="Interactive maritime globe"><div class="map-heading"><button id="detailsToggle">Details</button><span id="lensBadge" class="badge">Observed · AIS-derived estimates</span><h2 id="mapTitle">A world of changing activity</h2><p id="mapSubtitle">Color reveals the change. Select a place to understand it.</p></div><div class="scroll-edge left" aria-hidden="true"></div><div class="scroll-edge right" aria-hidden="true"></div><canvas id="globe" tabindex="0" aria-label="Maritime globe. Drag to rotate; arrow keys rotate; plus and minus zoom. Select places using the searchable list as an accessible alternative."></canvas><div class="map-tools"><button id="zoomout" aria-label="Zoom out">−</button><button id="zoomin" aria-label="Zoom in">+</button><button id="reset">Reset view</button></div><div class="legend" id="legend"><span class="dot down"></span> Below baseline <span class="dot up"></span> Above <span class="dot missing"></span> No comparison<br><small>Ring = baseline · filled circle = current activity</small></div><div id="story" class="story" hidden></div></section>
-<aside class="detail"><div class="detail-heading"><div class="detail-title"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p></div><div class="detail-tools"><button id="backToGlobe" class="icon-button" aria-label="Back to globe" title="Back to globe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button id="pin" class="icon-button" aria-label="Compare this place" title="Add to comparison" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16M6 15V9m6 6V5m6 10v-4"/></svg></button><button id="share" class="icon-button" aria-label="Copy view link" title="Copy view link"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button></div></div><section id="activityDetail"><div class="big-row"><div class="big" id="value">—</div><div id="unit" class="muted"></div></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="sr-only">Drag horizontally or tap to select a date. Arrow keys move a day; Shift moves a week.</p><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, separate from the globe’s 2026 timeline.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><p id="networkSummary"></p><label class="field">Direction<select id="direction"><option value="out">Outgoing</option><option value="in">Incoming</option></select></label><p class="hint">Schematic great-circle links, not navigable shipping routes. Moving dashes show direction, not vessels.</p><div id="routes"></div><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><p>Modeled trade passing through the selected port. <strong>Exposure, not predicted losses.</strong></p><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label><label class="field">Trade measure<select id="trade"><option value="daily_import_value_at_risk">Imports at risk</option><option value="daily_export_value_at_risk">Exports at risk</option></select></label><p id="exposureSummary" class="hint"></p><div id="countries"></div><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
+<aside class="detail"><div class="detail-heading"><div class="detail-title"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p></div><div class="detail-tools"><button id="backToGlobe" class="icon-button" aria-label="Back to globe" title="Back to globe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button id="pin" class="icon-button" aria-label="Compare this place" title="Add to comparison" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16M6 15V9m6 6V5m6 10v-4"/></svg></button><button id="share" class="icon-button" aria-label="Copy view link" title="Copy view link"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button></div></div><section id="activityDetail"><div class="big-row"><div class="big" id="value">—</div><div id="unit" class="muted"></div></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="sr-only">Drag horizontally or tap to select a date. Arrow keys move a day; Shift moves a week.</p><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, separate from the globe’s 2026 timeline.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><label class="field">Direction<select id="direction"><option value="out">Next port after this one</option><option value="in">Previous port before this one</option></select></label><p id="networkSummary"></p><div id="routes"></div><details class="method-note"><summary>About these links</summary><p class="hint">Historical previous/next port calls, 2019–2024, weighted by the daily loaded capacity that would be affected if this port stopped. Schematic great-circle links, not shipping routes or final cargo destinations; concentration, not resilience.</p></details><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><div class="date-pair"><label class="field">Trade<select id="trade"><option value="daily_import_value_at_risk">Imports via this port</option><option value="daily_export_value_at_risk">Exports via this port</option></select></label><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label></div><p id="exposureSummary"></p><div id="countries"></div><details class="method-note"><summary>About this model</summary><p class="hint">Modeled 2022 trade value (USD/day) that passes through this port for each partner country, from the Oxford/IMF spillover model. Exposure, not predicted loss. Only the source Total row is used for All sectors; missing values are excluded, not zero. Top 40 shown; the export keeps every row.</p></details><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
 </section>
 <section id="comparePanel" class="compare-panel" hidden><div class="compare-bar"><h2>Compared</h2><div id="pinLabels"></div><select id="comparisonScale" aria-label="Comparison scale" title="Indexed: each series relative to its complete Jan 1–28, 2026 mean = 100"><option value="absolute">Daily values</option><option value="indexed">Indexed · Jan = 100</option></select><button id="openAnalyze" title="Open these places in Analyze with adjustable periods and references">Analyze</button><button id="clearPins" title="Clear comparison">Clear</button></div><p id="indexNote" class="hint compare-note"></p><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
 </main>
@@ -2847,6 +2898,7 @@ let manifest,
   exposureErrors = {},
   stats = {},
   ranking = [],
+  highlight = null,
   links = [],
   countryRows = [],
   hitpoints = [],
@@ -3094,10 +3146,52 @@ function filteredPlaces() {
       (!q || (p.name + ' ' + p.country).toLocaleLowerCase().includes(q)),
   );
 }
+// Connections lens: rank ports by their historical network weight so the list
+// is an entry point (which hubs matter) rather than an alphabet.
+let networkIndex = null;
+function networkWeights() {
+  if (!network) return null;
+  if (!networkIndex) {
+    networkIndex = {};
+    for (const e of network.edges) {
+      if (e[0] === e[1]) continue;
+      for (const [id, key] of [
+        [e[0], 'out'],
+        [e[1], 'in'],
+      ]) {
+        const n = (networkIndex[id] ||= { out: 0, in: 0, outW: 0, inW: 0 });
+        n[key]++;
+        n[key + 'W'] += Number.isFinite(e[3]) && e[3] > 0 ? e[3] : 0;
+      }
+    }
+  }
+  return networkIndex;
+}
+// Hovering a list row lights its marker; repainting the globe is cheap.
+function setHighlight(id) {
+  if (highlight === id) return;
+  highlight = id;
+  globe();
+}
+function exposureTotal(id) {
+  const t = manifest?.exposureTotals?.[id];
+  if (!t) return null;
+  return $('trade').value === 'daily_export_value_at_risk' ? t.export : t.import;
+}
 function makeList() {
   const mode = state.mode,
     rank = $('rank').value;
   let list = filteredPlaces();
+  if (mode === 'connections') {
+    const idx = networkWeights(),
+      dir = $('direction').value,
+      w = (p) => idx?.[p.id]?.[dir + 'W'] ?? -1;
+    if (idx && !$('search').value.trim()) list = list.filter((p) => idx[p.id]);
+    list.sort((a, b) => w(b) - w(a) || a.name.localeCompare(b.name));
+  } else if (mode === 'exposure') {
+    const total = (p) => exposureTotal(p.id) ?? -1;
+    list.sort((a, b) => total(b) - total(a) || a.name.localeCompare(b.name));
+  }
   if (mode === 'change') {
     if (!$('search').value.trim())
       list = list.filter((p) =>
@@ -3117,7 +3211,7 @@ function makeList() {
             : Math.abs(s?.difference ?? 0);
       return (score(y) ?? -1) - (score(x) ?? -1) || a.name.localeCompare(b.name);
     });
-  } else list.sort((a, b) => a.name.localeCompare(b.name));
+  }
   ranking = list;
   const frag = document.createDocumentFragment();
   for (const p of list.slice(0, 80)) {
@@ -3138,6 +3232,19 @@ function makeList() {
       b.append(
         element('span', 'rankvalue ' + (v > 0 ? 'positive' : v < 0 ? 'negative' : ''), label),
       );
+    } else if (mode === 'connections') {
+      const n = networkWeights()?.[p.id],
+        dir = $('direction').value;
+      if (n)
+        b.append(
+          element(
+            'span',
+            'rankvalue',
+            `${n[dir]} ${dir === 'out' ? 'onward' : 'feeder'} · ${short(n[dir + 'W'])} t/day`,
+          ),
+        );
+    } else if (mode === 'exposure' && Number.isFinite(exposureTotal(p.id))) {
+      b.append(element('span', 'rankvalue', '$' + short(exposureTotal(p.id)) + '/day'));
     }
     b.onclick = () => choose(p.id);
     frag.append(b);
@@ -3365,19 +3472,26 @@ function globe() {
         ctx.fill();
         ctx.restore();
       }
-      const endpoint = $('direction').value === 'out' ? b : a;
-      marker(endpoint, '#85bce8', 3, w > 480 && links.indexOf(edge) < 6);
+      const endpoint = $('direction').value === 'out' ? b : a,
+        lit = highlight === endpoint.id;
+      marker(
+        endpoint,
+        lit ? '#ffffff' : '#85bce8',
+        lit ? 6 : 3,
+        lit || (w > 480 && links.indexOf(edge) < 6),
+      );
     }
     marker(place(), '#83dbc1', 7, true);
   } else if (state.mode === 'exposure') {
     const max = Math.max(1, ...countryRows.map((r) => r.value));
     for (const r of countryRows.slice(0, 40)) {
       drawLine(ctx, M.arc([place().lon, place().lat], [r.lon, r.lat]), '#85bce835', 0.7);
+      const lit = highlight === 'country-' + r.iso;
       marker(
         { id: 'country-' + r.iso, name: r.name, lon: r.lon, lat: r.lat },
-        '#85bce8',
+        lit ? '#ffffff' : '#85bce8',
         3 + 13 * Math.sqrt(r.value / max),
-        w > 480 && countryRows.indexOf(r) < 4 && r.name !== place().name,
+        lit || (w > 480 && countryRows.indexOf(r) < 4 && r.name !== place().name),
       );
     }
     if (place()) marker(place(), '#83dbc1', 6, true);
@@ -3455,50 +3569,52 @@ function networkDetail() {
         .sort((a, b) => (b[3] || 0) - (a[3] || 0))
     : [];
   $('downloadNetwork').disabled = !network;
+  const out = $('direction').value === 'out',
+    valid = links.filter((e) => Number.isFinite(e[3]) && e[3] >= 0),
+    total = valid.reduce((s, e) => s + e[3], 0),
+    top5 = valid.slice(0, 5).reduce((s, e) => s + e[3], 0);
   text(
     'networkSummary',
     !network
       ? networkError
         ? 'Network download failed. Select Connections again to retry. Observed activity remains available.'
         : 'Loading historical network…'
-      : links.length
-        ? `${links.length} historical ${$('direction').value === 'out' ? 'outgoing' : 'incoming'} connections. Showing the strongest ${Math.min(20, links.length)} by daily loaded capacity at risk.`
-        : 'No matching historical connections in this snapshot.',
+      : !links.length
+        ? 'No historical connections recorded for this port.'
+        : `${links.length} ports ${out ? 'received ships next after' : 'sent ships directly to'} ${place()?.name || 'this port'} (2019–2024). ` +
+          (total > 0
+            ? `The top five carry ${fmt((top5 / total) * 100)}% of the ${short(total)} t/day of capacity that routes through here.`
+            : ''),
   );
-  if (network && links.length) {
-    const valid = links.filter((e) => Number.isFinite(e[3]) && e[3] >= 0),
-      total = valid.reduce((s, e) => s + e[3], 0);
-    if (total > 0) {
-      const top = valid.slice(0, 5).reduce((s, e) => s + e[3], 0);
-      text(
-        'networkSummary',
-        $('networkSummary').textContent +
-          ' Top five account for ' +
-          fmt((top / total) * 100) +
-          '% of the selected historical capacity weight. ' +
-          (links.length - valid.length) +
-          ' links excluded for missing/invalid weights. This is concentration, not resilience or available substitute capacity.',
-      );
-    }
-  }
   const frag = document.createDocumentFragment();
-  for (const edge of links.slice(0, 20)) {
-    const id = edge[$('direction').value === 'out' ? 1 : 0],
+  links.slice(0, 20).forEach((edge, i) => {
+    const id = edge[out ? 1 : 0],
       p = network.nodes[id],
       r = element('div', 'route'),
       b = element('button', '');
+    r.dataset.place = id;
+    b.title = `Select ${p?.name || id}`;
+    const head = element('div', 'route-head');
+    head.append(
+      element('b', '', `${i + 1}. ${p?.name || id}`),
+      element('span', '', p?.country || ''),
+    );
     b.append(
-      element('b', '', p?.name || id),
+      head,
       element(
         'small',
         '',
-        `${fmt(edge[2])} days historical mean · ${short(edge[3])} tonnes/day capacity at risk`,
+        `${short(edge[3])} t/day` +
+          (total > 0 ? ` · ${fmt((edge[3] / total) * 100)}%` : '') +
+          ` · ${fmt(edge[2])}-day passage`,
       ),
     );
     b.onclick = () => choose(id);
+    r.onpointerenter = () => setHighlight(id);
+    r.onpointerleave = () => setHighlight(null);
     r.append(b);
     frag.append(r);
-  }
+  });
   $('routes').replaceChildren(frag);
 }
 function exposureDetail() {
@@ -3522,7 +3638,7 @@ function exposureDetail() {
   if ($('sector').dataset.port !== state.selected) {
     $('sector').replaceChildren(
       ...sectors.map((s) => {
-        const o = element('option', '', s === 'all' ? 'All sectors (source Total)' : s);
+        const o = element('option', '', s === 'all' ? 'All sectors' : s);
         o.value = s;
         return o;
       }),
@@ -3548,20 +3664,34 @@ function exposureDetail() {
       value: r[field],
     }))
     .sort((a, b) => b.value - a.value);
+  const sum = countryRows.reduce((s, r) => s + r.value, 0),
+    measure = field === 'daily_export_value_at_risk' ? 'exports' : 'imports',
+    top5 = countryRows.slice(0, 5).reduce((s, r) => s + r.value, 0);
   text(
     'exposureSummary',
-    `${countryRows.length} countries with reported values · USD/day · 2022 modeled allocation. Missing values excluded, not zero. Top 40 mapped and listed; export retains all selected source rows.`,
+    sum > 0
+      ? `$${short(sum)}/day of ${measure}${sector === 'all' ? '' : ' in ' + sector} across ${countryRows.length} countries; the top five carry ${fmt((top5 / sum) * 100)}%.`
+      : `No reported ${measure} values for this selection.`,
   );
   const max = Math.max(1, ...countryRows.map((r) => r.value)),
     frag = document.createDocumentFragment();
-  for (const row of countryRows.slice(0, 40)) {
+  countryRows.slice(0, 40).forEach((row, i) => {
     const r = element('div', 'country');
-    r.append(element('b', '', row.name + ' · $' + short(row.value) + '/day'));
+    r.dataset.iso = row.iso;
+    r.title = `${row.name}: $${short(row.value)}/day · ${fmt((row.value / sum) * 100)}% of this port's modeled ${measure}`;
+    const head = element('div', 'country-head');
+    head.append(
+      element('b', '', `${i + 1}. ${row.name}`),
+      element('span', '', '$' + short(row.value) + '/day · ' + fmt((row.value / sum) * 100) + '%'),
+    );
+    r.append(head);
     const bar = element('div', 'bar');
     bar.style.width = (row.value / max) * 100 + '%';
     r.append(bar);
+    r.onpointerenter = () => setHighlight('country-' + row.iso);
+    r.onpointerleave = () => setHighlight(null);
     frag.append(r);
-  }
+  });
   $('countries').replaceChildren(frag);
 }
 function render() {
@@ -3589,8 +3719,8 @@ function render() {
     activity
       ? 'Find the change'
       : state.mode === 'connections'
-        ? 'Trace the connections'
-        : 'Explore dependence',
+        ? 'Busiest hubs'
+        : 'Most exposed ports',
   );
   text(
     'lensBadge',
@@ -3671,8 +3801,8 @@ function render() {
         ? 'Full catalog · reference rings for passages/selection · coral < −5% / mint > +5% · hollow: no comparison'
         : 'Up to 80 ranked matches + selected · coral < −5% / mint > +5%'
       : state.mode === 'connections'
-        ? 'Arrow = direction · width = historical capacity · top 20 schematic links'
-        : 'Country size = modeled USD/day at risk · top 40 · no scenario clock',
+        ? 'Top 20 links · width = capacity · arrows show direction'
+        : 'Top 40 countries · size = modeled USD/day',
   );
   if (activity) {
     activityDetail();
@@ -3949,14 +4079,41 @@ function bind() {
   tooltip.id = 'mapHover';
   tooltip.hidden = true;
   document.body.append(tooltip);
-  function mapTarget(e) {
+  function mapTarget(e, hoverOnly = false) {
     const b = c.getBoundingClientRect(),
       x = e.clientX - b.left,
       y = e.clientY - b.top;
     return hitpoints
-      .filter((p) => !p.id.startsWith('country-'))
+      .filter((p) => hoverOnly || !p.id.startsWith('country-'))
       .sort((a, b) => Math.hypot(x - a.x, y - a.y) - Math.hypot(x - b.x, y - b.y))
       .find((p) => Math.hypot(x - p.x, y - p.y) < p.size + (e.pointerType === 'touch' ? 8 : 4));
+  }
+  // What a marker means depends on the lens; the tooltip says the number, the
+  // panel says the method.
+  function hoverText(target) {
+    if (target.id.startsWith('country-')) {
+      const row = countryRows.find((r) => 'country-' + r.iso === target.id);
+      return row ? `${row.name} · $${short(row.value)}/day` : null;
+    }
+    const port = placeById[target.id] || network?.nodes[target.id];
+    if (!port) return null;
+    let detail = port.country || '';
+    if (state.mode === 'connections' && network) {
+      const out = $('direction').value === 'out',
+        edge = links.find((e) => e[out ? 1 : 0] === target.id);
+      if (edge) detail = `${short(edge[3])} t/day · ${fmt(edge[2])}-day passage`;
+      else if (target.id === state.selected) detail = `${links.length} connections`;
+    } else if (state.mode === 'change') {
+      const s = stats[target.id];
+      if (s && s.current !== null)
+        detail =
+          fmt(s.current) +
+          (state.metric < 4 ? ' calls/day' : ' t/day') +
+          (s.percent !== null && s.percent !== undefined
+            ? ` · ${s.percent > 0 ? '+' : ''}${fmt(s.percent)}%`
+            : '');
+    }
+    return port.name + (detail ? ' · ' + detail : '');
   }
   function clearHover() {
     tooltip.hidden = true;
@@ -3967,14 +4124,14 @@ function bind() {
       clearHover();
       return;
     }
-    const target = mapTarget(e),
-      port = target && (placeById[target.id] || network?.nodes[target.id]);
-    if (!port) {
+    const target = mapTarget(e, true),
+      label = target && hoverText(target);
+    if (!label) {
       clearHover();
       return;
     }
-    c.style.cursor = 'pointer';
-    tooltip.textContent = port.name + (port.country ? ' · ' + port.country : '');
+    c.style.cursor = target.id.startsWith('country-') ? '' : 'pointer';
+    tooltip.textContent = label;
     tooltip.hidden = false;
     tooltip.style.left =
       Math.max(8, Math.min(innerWidth - tooltip.offsetWidth - 8, e.clientX + 14)) + 'px';

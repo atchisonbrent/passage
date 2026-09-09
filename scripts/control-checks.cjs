@@ -433,7 +433,7 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   );
   await click('#exploreView');
 };
-exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, out }) => {
+exports.checkLenses = async ({ call, js, click, hover, navigate, delay, until, base, out }) => {
   await call('Emulation.setDeviceMetricsOverride', {
     width: 1210,
     height: 702,
@@ -534,13 +534,68 @@ exports.checkLenses = async ({ call, js, click, navigate, delay, until, base, ou
     await js("getComputedStyle(document.querySelector('.time-controls')).display"),
     'none',
   );
+  assert.equal(
+    await js("getComputedStyle(document.querySelector('.timebar')).display"),
+    'none',
+    'no idle timeline bar in the connections lens',
+  );
+  // The lens list ranks hubs by network weight and says so on each row.
+  assert.ok(
+    await js(
+      "document.querySelector('#locations .location .rankvalue')?.textContent.includes('onward')",
+    ),
+    'connections list rows carry a ranking value',
+  );
+  assert.ok(
+    await js("document.querySelector('#routes .route .route-head span')!==null"),
+    'route rows show the partner country',
+  );
+  assert.ok(
+    await js(
+      "/^\\d+ ports (received|sent)/.test(document.getElementById('networkSummary').textContent)",
+    ),
+    'network summary is a sentence about this port',
+  );
   await select('#direction', 1);
   assert.equal(await js("document.getElementById('direction').value"), 'in');
   assert.ok((await js('links.length')) > 0);
+  assert.ok(
+    await js(
+      "document.querySelector('#locations .location .rankvalue')?.textContent.includes('feeder')",
+    ),
+    'list ranking follows the direction control',
+  );
+  await hover('#routes .route');
+  assert.equal(
+    await js('highlight'),
+    await js("document.querySelector('#routes .route').dataset.place"),
+    'hovering a route lights its globe marker',
+  );
   await click('#exposure');
   await until(() => js("state.mode==='exposure'&&countryRows.length>0"));
+  assert.ok(
+    await js(
+      "/^\\$[\\d.]+[KMB]\\/day of imports/.test(document.getElementById('exposureSummary').textContent)",
+    ),
+    'exposure summary leads with the port total',
+  );
+  assert.ok(
+    await js(
+      "document.querySelector('#countries .country .country-head span').textContent.includes('%')",
+    ),
+    'country rows carry share of total',
+  );
+  assert.ok(
+    await js(
+      "document.querySelector('#locations .location .rankvalue')?.textContent.startsWith('$')",
+    ),
+    'exposure list ranks ports by modeled total',
+  );
   await select('#trade', 1);
   assert.equal(await js("document.getElementById('trade').value"), 'daily_export_value_at_risk');
+  assert.ok(
+    await js("document.getElementById('exposureSummary').textContent.includes('of exports')"),
+  );
   assert.equal(
     await js("getComputedStyle(document.querySelector('.time-controls')).display"),
     'none',

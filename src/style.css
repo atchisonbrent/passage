@@ -403,14 +403,15 @@ pre {
 body:not(.analyst) #rank {
   max-width: 100%;
 }
+/* Connections and Exposure have no timeline; the globe takes that height. */
 body[data-mode='connections'] main,
 body[data-mode='exposure'] main {
-  padding-bottom: 80px;
+  padding-bottom: 0;
 }
 @media (min-width: 801px) {
   body[data-mode='connections'] .workspace,
   body[data-mode='exposure'] .workspace {
-    height: calc(100dvh - 240px);
+    height: calc(100dvh - 150px);
   }
 }
 @media (min-width: 1650px) {
@@ -561,7 +562,9 @@ main {
   font-size: 12px;
 }
 body[data-mode='connections'] .filterrow,
-body[data-mode='exposure'] .filterrow {
+body[data-mode='exposure'] .filterrow,
+body[data-mode='connections'] .analyst-toggle,
+body[data-mode='exposure'] .analyst-toggle {
   display: none;
 }
 @media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
@@ -594,7 +597,7 @@ body[data-mode='exposure'] .filterrow {
   }
   body[data-mode='connections'] .workspace,
   body[data-mode='exposure'] .workspace {
-    height: calc(100dvh - 185px);
+    height: calc(100dvh - 130px);
   }
 }
 @media (max-width: 900px),
@@ -1595,8 +1598,10 @@ body.analysis-open .timebar {
 body[data-mode='connections'] .time-controls,
 body[data-mode='connections'] .scrubrow,
 body[data-mode='exposure'] .time-controls,
-body[data-mode='exposure'] .scrubrow {
-  display: none;
+body[data-mode='exposure'] .scrubrow,
+body[data-mode='connections'] .timebar,
+body[data-mode='exposure'] .timebar {
+  display: none !important;
 }
 .browse-dialog-heading {
   display: flex;
@@ -2185,6 +2190,52 @@ body[data-mode='exposure'] .scrubrow {
 }
 #analysisReferenceNote {
   margin: 4px 0 8px;
+}
+/* Connections / Exposure rows: rank, name, value on one line; bar or passage
+   detail beneath; hover lights the matching globe marker. */
+.route,
+.country {
+  padding: 8px 4px;
+  margin: 0 -4px;
+  border-radius: 6px;
+}
+.route:hover,
+.country:hover {
+  background: rgba(133, 188, 232, 0.08);
+}
+.route-head,
+.country-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.route-head span,
+.country-head span {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.route small {
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.country .bar {
+  margin-top: 5px;
+}
+#networkSummary,
+#exposureSummary {
+  font-size: 13px;
+  margin: 6px 0 4px;
+}
+#networkDetail .method-note,
+#exposureDetail .method-note {
+  margin-top: 10px;
+}
+#networkDetail .field,
+#exposureDetail .field {
+  margin-top: 2px;
 }
 .analysis-result-tools {
   display: flex;

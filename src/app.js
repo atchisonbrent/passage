@@ -33,6 +33,7 @@ let manifest,
   exposureErrors = {},
   stats = {},
   ranking = [],
+  highlight = null,
   links = [],
   countryRows = [],
   hitpoints = [],
@@ -280,10 +281,52 @@ function filteredPlaces() {
       (!q || (p.name + ' ' + p.country).toLocaleLowerCase().includes(q)),
   );
 }
+// Connections lens: rank ports by their historical network weight so the list
+// is an entry point (which hubs matter) rather than an alphabet.
+let networkIndex = null;
+function networkWeights() {
+  if (!network) return null;
+  if (!networkIndex) {
+    networkIndex = {};
+    for (const e of network.edges) {
+      if (e[0] === e[1]) continue;
+      for (const [id, key] of [
+        [e[0], 'out'],
+        [e[1], 'in'],
+      ]) {
+        const n = (networkIndex[id] ||= { out: 0, in: 0, outW: 0, inW: 0 });
+        n[key]++;
+        n[key + 'W'] += Number.isFinite(e[3]) && e[3] > 0 ? e[3] : 0;
+      }
+    }
+  }
+  return networkIndex;
+}
+// Hovering a list row lights its marker; repainting the globe is cheap.
+function setHighlight(id) {
+  if (highlight === id) return;
+  highlight = id;
+  globe();
+}
+function exposureTotal(id) {
+  const t = manifest?.exposureTotals?.[id];
+  if (!t) return null;
+  return $('trade').value === 'daily_export_value_at_risk' ? t.export : t.import;
+}
 function makeList() {
   const mode = state.mode,
     rank = $('rank').value;
   let list = filteredPlaces();
+  if (mode === 'connections') {
+    const idx = networkWeights(),
+      dir = $('direction').value,
+      w = (p) => idx?.[p.id]?.[dir + 'W'] ?? -1;
+    if (idx && !$('search').value.trim()) list = list.filter((p) => idx[p.id]);
+    list.sort((a, b) => w(b) - w(a) || a.name.localeCompare(b.name));
+  } else if (mode === 'exposure') {
+    const total = (p) => exposureTotal(p.id) ?? -1;
+    list.sort((a, b) => total(b) - total(a) || a.name.localeCompare(b.name));
+  }
   if (mode === 'change') {
     if (!$('search').value.trim())
       list = list.filter((p) =>
@@ -303,7 +346,7 @@ function makeList() {
             : Math.abs(s?.difference ?? 0);
       return (score(y) ?? -1) - (score(x) ?? -1) || a.name.localeCompare(b.name);
     });
-  } else list.sort((a, b) => a.name.localeCompare(b.name));
+  }
   ranking = list;
   const frag = document.createDocumentFragment();
   for (const p of list.slice(0, 80)) {
@@ -324,6 +367,19 @@ function makeList() {
       b.append(
         element('span', 'rankvalue ' + (v > 0 ? 'positive' : v < 0 ? 'negative' : ''), label),
       );
+    } else if (mode === 'connections') {
+      const n = networkWeights()?.[p.id],
+        dir = $('direction').value;
+      if (n)
+        b.append(
+          element(
+            'span',
+            'rankvalue',
+            `${n[dir]} ${dir === 'out' ? 'onward' : 'feeder'} · ${short(n[dir + 'W'])} t/day`,
+          ),
+        );
+    } else if (mode === 'exposure' && Number.isFinite(exposureTotal(p.id))) {
+      b.append(element('span', 'rankvalue', '$' + short(exposureTotal(p.id)) + '/day'));
     }
     b.onclick = () => choose(p.id);
     frag.append(b);
@@ -551,19 +607,26 @@ function globe() {
         ctx.fill();
         ctx.restore();
       }
-      const endpoint = $('direction').value === 'out' ? b : a;
-      marker(endpoint, '#85bce8', 3, w > 480 && links.indexOf(edge) < 6);
+      const endpoint = $('direction').value === 'out' ? b : a,
+        lit = highlight === endpoint.id;
+      marker(
+        endpoint,
+        lit ? '#ffffff' : '#85bce8',
+        lit ? 6 : 3,
+        lit || (w > 480 && links.indexOf(edge) < 6),
+      );
     }
     marker(place(), '#83dbc1', 7, true);
   } else if (state.mode === 'exposure') {
     const max = Math.max(1, ...countryRows.map((r) => r.value));
     for (const r of countryRows.slice(0, 40)) {
       drawLine(ctx, M.arc([place().lon, place().lat], [r.lon, r.lat]), '#85bce835', 0.7);
+      const lit = highlight === 'country-' + r.iso;
       marker(
         { id: 'country-' + r.iso, name: r.name, lon: r.lon, lat: r.lat },
-        '#85bce8',
+        lit ? '#ffffff' : '#85bce8',
         3 + 13 * Math.sqrt(r.value / max),
-        w > 480 && countryRows.indexOf(r) < 4 && r.name !== place().name,
+        lit || (w > 480 && countryRows.indexOf(r) < 4 && r.name !== place().name),
       );
     }
     if (place()) marker(place(), '#83dbc1', 6, true);
@@ -641,50 +704,52 @@ function networkDetail() {
         .sort((a, b) => (b[3] || 0) - (a[3] || 0))
     : [];
   $('downloadNetwork').disabled = !network;
+  const out = $('direction').value === 'out',
+    valid = links.filter((e) => Number.isFinite(e[3]) && e[3] >= 0),
+    total = valid.reduce((s, e) => s + e[3], 0),
+    top5 = valid.slice(0, 5).reduce((s, e) => s + e[3], 0);
   text(
     'networkSummary',
     !network
       ? networkError
         ? 'Network download failed. Select Connections again to retry. Observed activity remains available.'
         : 'Loading historical network…'
-      : links.length
-        ? `${links.length} historical ${$('direction').value === 'out' ? 'outgoing' : 'incoming'} connections. Showing the strongest ${Math.min(20, links.length)} by daily loaded capacity at risk.`
-        : 'No matching historical connections in this snapshot.',
+      : !links.length
+        ? 'No historical connections recorded for this port.'
+        : `${links.length} ports ${out ? 'received ships next after' : 'sent ships directly to'} ${place()?.name || 'this port'} (2019–2024). ` +
+          (total > 0
+            ? `The top five carry ${fmt((top5 / total) * 100)}% of the ${short(total)} t/day of capacity that routes through here.`
+            : ''),
   );
-  if (network && links.length) {
-    const valid = links.filter((e) => Number.isFinite(e[3]) && e[3] >= 0),
-      total = valid.reduce((s, e) => s + e[3], 0);
-    if (total > 0) {
-      const top = valid.slice(0, 5).reduce((s, e) => s + e[3], 0);
-      text(
-        'networkSummary',
-        $('networkSummary').textContent +
-          ' Top five account for ' +
-          fmt((top / total) * 100) +
-          '% of the selected historical capacity weight. ' +
-          (links.length - valid.length) +
-          ' links excluded for missing/invalid weights. This is concentration, not resilience or available substitute capacity.',
-      );
-    }
-  }
   const frag = document.createDocumentFragment();
-  for (const edge of links.slice(0, 20)) {
-    const id = edge[$('direction').value === 'out' ? 1 : 0],
+  links.slice(0, 20).forEach((edge, i) => {
+    const id = edge[out ? 1 : 0],
       p = network.nodes[id],
       r = element('div', 'route'),
       b = element('button', '');
+    r.dataset.place = id;
+    b.title = `Select ${p?.name || id}`;
+    const head = element('div', 'route-head');
+    head.append(
+      element('b', '', `${i + 1}. ${p?.name || id}`),
+      element('span', '', p?.country || ''),
+    );
     b.append(
-      element('b', '', p?.name || id),
+      head,
       element(
         'small',
         '',
-        `${fmt(edge[2])} days historical mean · ${short(edge[3])} tonnes/day capacity at risk`,
+        `${short(edge[3])} t/day` +
+          (total > 0 ? ` · ${fmt((edge[3] / total) * 100)}%` : '') +
+          ` · ${fmt(edge[2])}-day passage`,
       ),
     );
     b.onclick = () => choose(id);
+    r.onpointerenter = () => setHighlight(id);
+    r.onpointerleave = () => setHighlight(null);
     r.append(b);
     frag.append(r);
-  }
+  });
   $('routes').replaceChildren(frag);
 }
 function exposureDetail() {
@@ -708,7 +773,7 @@ function exposureDetail() {
   if ($('sector').dataset.port !== state.selected) {
     $('sector').replaceChildren(
       ...sectors.map((s) => {
-        const o = element('option', '', s === 'all' ? 'All sectors (source Total)' : s);
+        const o = element('option', '', s === 'all' ? 'All sectors' : s);
         o.value = s;
         return o;
       }),
@@ -734,20 +799,34 @@ function exposureDetail() {
       value: r[field],
     }))
     .sort((a, b) => b.value - a.value);
+  const sum = countryRows.reduce((s, r) => s + r.value, 0),
+    measure = field === 'daily_export_value_at_risk' ? 'exports' : 'imports',
+    top5 = countryRows.slice(0, 5).reduce((s, r) => s + r.value, 0);
   text(
     'exposureSummary',
-    `${countryRows.length} countries with reported values · USD/day · 2022 modeled allocation. Missing values excluded, not zero. Top 40 mapped and listed; export retains all selected source rows.`,
+    sum > 0
+      ? `$${short(sum)}/day of ${measure}${sector === 'all' ? '' : ' in ' + sector} across ${countryRows.length} countries; the top five carry ${fmt((top5 / sum) * 100)}%.`
+      : `No reported ${measure} values for this selection.`,
   );
   const max = Math.max(1, ...countryRows.map((r) => r.value)),
     frag = document.createDocumentFragment();
-  for (const row of countryRows.slice(0, 40)) {
+  countryRows.slice(0, 40).forEach((row, i) => {
     const r = element('div', 'country');
-    r.append(element('b', '', row.name + ' · $' + short(row.value) + '/day'));
+    r.dataset.iso = row.iso;
+    r.title = `${row.name}: $${short(row.value)}/day · ${fmt((row.value / sum) * 100)}% of this port's modeled ${measure}`;
+    const head = element('div', 'country-head');
+    head.append(
+      element('b', '', `${i + 1}. ${row.name}`),
+      element('span', '', '$' + short(row.value) + '/day · ' + fmt((row.value / sum) * 100) + '%'),
+    );
+    r.append(head);
     const bar = element('div', 'bar');
     bar.style.width = (row.value / max) * 100 + '%';
     r.append(bar);
+    r.onpointerenter = () => setHighlight('country-' + row.iso);
+    r.onpointerleave = () => setHighlight(null);
     frag.append(r);
-  }
+  });
   $('countries').replaceChildren(frag);
 }
 function render() {
@@ -775,8 +854,8 @@ function render() {
     activity
       ? 'Find the change'
       : state.mode === 'connections'
-        ? 'Trace the connections'
-        : 'Explore dependence',
+        ? 'Busiest hubs'
+        : 'Most exposed ports',
   );
   text(
     'lensBadge',
@@ -857,8 +936,8 @@ function render() {
         ? 'Full catalog · reference rings for passages/selection · coral < −5% / mint > +5% · hollow: no comparison'
         : 'Up to 80 ranked matches + selected · coral < −5% / mint > +5%'
       : state.mode === 'connections'
-        ? 'Arrow = direction · width = historical capacity · top 20 schematic links'
-        : 'Country size = modeled USD/day at risk · top 40 · no scenario clock',
+        ? 'Top 20 links · width = capacity · arrows show direction'
+        : 'Top 40 countries · size = modeled USD/day',
   );
   if (activity) {
     activityDetail();
@@ -1135,14 +1214,41 @@ function bind() {
   tooltip.id = 'mapHover';
   tooltip.hidden = true;
   document.body.append(tooltip);
-  function mapTarget(e) {
+  function mapTarget(e, hoverOnly = false) {
     const b = c.getBoundingClientRect(),
       x = e.clientX - b.left,
       y = e.clientY - b.top;
     return hitpoints
-      .filter((p) => !p.id.startsWith('country-'))
+      .filter((p) => hoverOnly || !p.id.startsWith('country-'))
       .sort((a, b) => Math.hypot(x - a.x, y - a.y) - Math.hypot(x - b.x, y - b.y))
       .find((p) => Math.hypot(x - p.x, y - p.y) < p.size + (e.pointerType === 'touch' ? 8 : 4));
+  }
+  // What a marker means depends on the lens; the tooltip says the number, the
+  // panel says the method.
+  function hoverText(target) {
+    if (target.id.startsWith('country-')) {
+      const row = countryRows.find((r) => 'country-' + r.iso === target.id);
+      return row ? `${row.name} · $${short(row.value)}/day` : null;
+    }
+    const port = placeById[target.id] || network?.nodes[target.id];
+    if (!port) return null;
+    let detail = port.country || '';
+    if (state.mode === 'connections' && network) {
+      const out = $('direction').value === 'out',
+        edge = links.find((e) => e[out ? 1 : 0] === target.id);
+      if (edge) detail = `${short(edge[3])} t/day · ${fmt(edge[2])}-day passage`;
+      else if (target.id === state.selected) detail = `${links.length} connections`;
+    } else if (state.mode === 'change') {
+      const s = stats[target.id];
+      if (s && s.current !== null)
+        detail =
+          fmt(s.current) +
+          (state.metric < 4 ? ' calls/day' : ' t/day') +
+          (s.percent !== null && s.percent !== undefined
+            ? ` · ${s.percent > 0 ? '+' : ''}${fmt(s.percent)}%`
+            : '');
+    }
+    return port.name + (detail ? ' · ' + detail : '');
   }
   function clearHover() {
     tooltip.hidden = true;
@@ -1153,14 +1259,14 @@ function bind() {
       clearHover();
       return;
     }
-    const target = mapTarget(e),
-      port = target && (placeById[target.id] || network?.nodes[target.id]);
-    if (!port) {
+    const target = mapTarget(e, true),
+      label = target && hoverText(target);
+    if (!label) {
       clearHover();
       return;
     }
-    c.style.cursor = 'pointer';
-    tooltip.textContent = port.name + (port.country ? ' · ' + port.country : '');
+    c.style.cursor = target.id.startsWith('country-') ? '' : 'pointer';
+    tooltip.textContent = label;
     tooltip.hidden = false;
     tooltip.style.left =
       Math.max(8, Math.min(innerWidth - tooltip.offsetWidth - 8, e.clientX + 14)) + 'px';
