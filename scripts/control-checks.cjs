@@ -103,13 +103,18 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   );
   assert.ok(await js("document.getElementById('unit').textContent.startsWith('14-day mean')"));
   await setValue('baseline', 'year');
-  assert.equal(
-    await js('stats[state.selected].baseline'),
-    null,
-    'year-ago reference needs loaded history, never silently zero',
+  // The selected place fetches its own history; until then the reference is
+  // null (never silently zero), and other places stay null too.
+  const other = await js('Object.keys(stats).find(id=>id!==state.selected&&!historyCache[id])');
+  assert.equal(await js(`stats[${JSON.stringify(other)}].baseline`), null);
+  for (let i = 0; i < 100 && !(await js('!!historyCache[state.selected]')); i++) await delay(100);
+  await delay(200);
+  assert.ok(
+    await js('Number.isFinite(stats[state.selected].baseline)'),
+    'selected place gains a same-dates-last-year reference once history loads',
   );
   assert.ok(
-    await js("document.getElementById('explanation').textContent.includes('Load history')"),
+    await js("document.getElementById('explanation').textContent.includes('same dates last year')"),
   );
   await setValue('baseline', 'prior');
   await setValue('window', '7');

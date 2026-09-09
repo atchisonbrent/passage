@@ -234,7 +234,12 @@ function referenceArgs(id) {
   if (m) return ['prior', { baselineDays: Number(m[1]) }];
   if (state.baseline !== 'year') return [state.baseline, {}];
   const rows = historyCache[id];
-  if (!rows) return ['year', {}];
+  if (!rows) {
+    // The selected place fetches its own history; other places keep a null
+    // reference until theirs is loaded, so rankings never mix references.
+    if (id === state.selected && !historyRequests[id] && !historyErrors[id]) fetchHistory(id);
+    return ['year', {}];
+  }
   const byDate = new Map(rows.map((r) => [r[0], r.slice(1)]));
   return [
     'year',
@@ -585,7 +590,9 @@ function activityDetail() {
     'explanation',
     s.difference === null
       ? state.baseline === 'year' && !historyCache[state.selected]
-        ? 'Load history below to compare with the same dates last year.'
+        ? historyErrors[state.selected]
+          ? 'History download failed · open History below to retry.'
+          : 'Loading last year’s observations…'
         : `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
       : `vs ${fmt(s.baseline)} mean, ${baselineLabel()} (${baselineDates})`,
   );

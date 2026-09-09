@@ -269,7 +269,7 @@ function renderWorkspace() {
     ) && start <= end;
   text(
     'analysisSetupSummary',
-    `Edit comparison · ${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} · ${comparisonLabels[col - 1]}`,
+    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} vs ${rs} → ${re} · ${comparisonLabels[col - 1]}`,
   );
   const plotStart =
     $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
@@ -297,51 +297,36 @@ function renderWorkspace() {
       comparisonMath.validDate(eventStart) ? comparisonMath.shift(eventStart, -28) : start,
     ].sort()[0],
     need = earliest < manifest.start;
-  $('analysisLoad').hidden = !need;
-  $('analysisLoad').disabled =
-    comparison.busy ||
-    !comparison.ids.length ||
-    !need ||
-    comparison.ids.every((id) => historyCache[id]);
-  text(
-    'analysisLoad',
-    comparison.busy
-      ? 'Loading selected historical files…'
-      : need
-        ? 'Load / retry selected historical files'
-        : 'Bundled activity already available',
-  );
-  $('analysisStatus').hidden =
-    valid &&
-    comparison.ids.length > 0 &&
-    !comparison.ids.some(
-      (id) => historyErrors[id] || historyRequests[id] || (need && !historyCache[id]),
-    );
+  // History files load on demand when a period reaches before the bundled
+  // 2026 activity; the button remains only as a retry after a failed download.
+  const missing = comparison.ids.filter((id) => need && !historyCache[id]);
+  const failed = missing.filter((id) => historyErrors[id]);
+  if (valid && !comparison.busy && missing.some((id) => !historyErrors[id] && !historyRequests[id]))
+    queueMicrotask(() => $('analysisLoad').onclick());
+  $('analysisLoad').hidden = !failed.length || comparison.busy;
+  $('analysisLoad').disabled = comparison.busy;
+  text('analysisLoad', 'Retry history download');
+  const loading = comparison.busy || missing.some((id) => historyRequests[id]);
+  $('analysisStatus').hidden = valid && comparison.ids.length > 0 && !loading && !failed.length;
   text(
     'analysisStatus',
     !valid
-      ? 'Choose an observation range within 2019 and the snapshot cutoff; invalid or overlapping references make comparisons unavailable.'
+      ? 'Choose an observation range within 2019 and the snapshot cutoff; references must end before the observations start.'
       : !comparison.ids.length
         ? 'Add up to four places to compare.'
-        : comparison.ids
-            .map(
-              (id) =>
-                placeById[id].name +
-                ': ' +
-                (historyErrors[id]
-                  ? 'history failed; retry'
-                  : historyRequests[id]
-                    ? 'loading'
-                    : need && !historyCache[id]
-                      ? 'earlier history not loaded'
-                      : 'requested files available'),
-            )
-            .join(' · '),
+        : loading
+          ? 'Loading history…'
+          : failed.length
+            ? `History download failed for ${failed.map((id) => placeById[id].name).join(', ')}.`
+            : '',
   );
-  text(
-    'analysisCoverage',
-    `Snapshot: ports ${manifest.Daily_Ports_Data_latest} · passages ${manifest.Daily_Chokepoints_Data_latest}. ${$('analysisScale').value === 'indexed' ? 'Index: positive complete reference = 100.' : 'Shared absolute scale.'} Missing ≠ zero.`,
-  );
+  $('analysisCoverage').title =
+    `Snapshot: ports through ${manifest.Daily_Ports_Data_latest}, passages through ${manifest.Daily_Chokepoints_Data_latest}. ` +
+    ($('analysisScale').value === 'indexed'
+      ? 'Indexed: each place relative to its complete reference mean = 100. '
+      : '') +
+    'Means require every calendar day in each period; missing is not zero. Net deviation is against the reference, not lost trade.';
+  text('analysisCoverage', 'How these numbers are computed');
   comparisonTable(
     'analysisResults',
     `${start} → ${end}; reference ${rs} → ${re} · means in ${comparisonUnit()}/day; net deviation in ${comparisonUnit()}`,
@@ -481,7 +466,6 @@ function bindWorkspace(q) {
     else comparisonShift(next.id);
     const details = $('eventContext').querySelector('details');
     if (details) details.open = true;
-    if (!$('analysisLoad').hidden && !$('analysisLoad').disabled) $('analysisLoad').onclick();
   };
   $('shiftPeriod').onchange = comparisonShiftCards;
   comparisonShiftCards();
@@ -517,6 +501,7 @@ function bindWorkspace(q) {
   $('analyzeView').onclick = () => {
     comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
     setMode('change');
+    $('analysisSetup').open = false;
     comparisonOpen();
   };
   $('eventsView').onclick = () => {

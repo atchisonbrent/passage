@@ -1013,16 +1013,6 @@ body.analysis-open #comparePanel {
 #analysisWorkspace[hidden] {
   display: none;
 }
-.analysis-heading {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-#analysisWorkspace h1 {
-  font-size: 25px;
-}
 #analysisWorkspace h2 {
   font-size: 17px;
   margin: 12px 0;
@@ -1091,7 +1081,6 @@ body.analysis-open #comparePanel {
   font-size: 16px;
   min-height: 44px;
 }
-.analysis-actions,
 .analysis-pins,
 .range-shortcuts {
   display: flex;
@@ -1099,9 +1088,6 @@ body.analysis-open #comparePanel {
   align-items: center;
   flex-wrap: wrap;
   margin: 8px 0;
-}
-.analysis-actions .field {
-  margin: 0;
 }
 .analysis-pins button {
   white-space: normal;
@@ -1186,12 +1172,6 @@ body.analysis-open #comparePanel {
   #analysisChart {
     height: 240px;
   }
-  .analysis-heading h1 {
-    font-size: 22px;
-  }
-  .analysis-heading > button {
-    width: 100%;
-  }
   .date-pair {
     gap: 6px;
   }
@@ -1209,48 +1189,14 @@ body.analysis-open #comparePanel {
 #analysisWorkspace #analysisSetup {
   margin: 8px 0;
 }
-.analysis-heading .hint {
-  margin-bottom: 8px;
-}
-.analysis-heading h1 {
-  margin-bottom: 4px;
-}
 #eventCatalog:not([open]) {
   display: none;
-}
-#analysisWorkspace .analysis-actions > .field {
-  flex: 1 1 160px;
-  max-width: 260px;
 }
 #analysisWorkspace #analysisLoad[hidden],
 #analysisStatus[hidden] {
   display: none;
 }
 @media (max-width: 600px) {
-  .analysis-heading {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
-  }
-  .analysis-heading > button {
-    width: auto;
-    max-width: 100px;
-    padding: 6px 9px;
-    font-size: 12px;
-  }
-  .analysis-heading h1 {
-    font-size: 19px;
-  }
-  .analysis-heading .hint {
-    font-size: 11px;
-  }
-  .analysis-actions {
-    gap: 8px;
-  }
-  #analysisWorkspace .analysis-actions > .field {
-    flex: 1 1 120px;
-    max-width: none;
-  }
   .event-context summary {
     font-size: 13px;
   }
@@ -1914,7 +1860,6 @@ body[data-mode='exposure'] .scrubrow {
     right: calc((100% - 1600px) / 2);
   }
 }
-
 /* ---------- Selected-place panel: actions by the title, terse copy ---------- */
 .detail-heading {
   display: flex;
@@ -2028,7 +1973,6 @@ body[data-mode='exposure'] .scrubrow {
     font-size: 36px;
   }
 }
-
 /* Compared strip: one control row, short synced chart, Analyze for depth. */
 .compare-panel {
   padding: 10px 16px 6px;
@@ -2075,7 +2019,6 @@ body[data-mode='exposure'] .scrubrow {
     height: 140px;
   }
 }
-
 /* Compared chips: click a name to select it; × removes only that place. */
 .pin-chip {
   display: inline-flex;
@@ -2108,4 +2051,73 @@ body[data-mode='exposure'] .scrubrow {
     min-width: 40px;
     min-height: 40px;
   }
+}
+
+/* Analyze: results lead, setup collapses, method notes on hover. */
+.analysis-pins,
+.range-shortcuts {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.analysis-plot-heading,
+.analysis-result-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 6px;
+}
+.analysis-plot-heading #analysisReadout {
+  flex: 1;
+  min-width: 200px;
+  margin: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.field.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.field.inline select {
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.analysis-result-heading h2 {
+  margin: 0;
+}
+.analysis-result-tools {
+  display: flex;
+  gap: 6px;
+}
+.analysis-result-tools button {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.analysis-daily-tools,
+#analysisDailyPanel .analysis-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.method-hint {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+#analysisStatus:empty,
+#analysisStatus[hidden] {
+  display: none;
+}
+#analysisWorkspace {
+  padding-top: 8px;
 }

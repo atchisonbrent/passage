@@ -1014,16 +1014,6 @@ body.analysis-open #comparePanel {
 #analysisWorkspace[hidden] {
   display: none;
 }
-.analysis-heading {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-#analysisWorkspace h1 {
-  font-size: 25px;
-}
 #analysisWorkspace h2 {
   font-size: 17px;
   margin: 12px 0;
@@ -1092,7 +1082,6 @@ body.analysis-open #comparePanel {
   font-size: 16px;
   min-height: 44px;
 }
-.analysis-actions,
 .analysis-pins,
 .range-shortcuts {
   display: flex;
@@ -1100,9 +1089,6 @@ body.analysis-open #comparePanel {
   align-items: center;
   flex-wrap: wrap;
   margin: 8px 0;
-}
-.analysis-actions .field {
-  margin: 0;
 }
 .analysis-pins button {
   white-space: normal;
@@ -1187,12 +1173,6 @@ body.analysis-open #comparePanel {
   #analysisChart {
     height: 240px;
   }
-  .analysis-heading h1 {
-    font-size: 22px;
-  }
-  .analysis-heading > button {
-    width: 100%;
-  }
   .date-pair {
     gap: 6px;
   }
@@ -1210,48 +1190,14 @@ body.analysis-open #comparePanel {
 #analysisWorkspace #analysisSetup {
   margin: 8px 0;
 }
-.analysis-heading .hint {
-  margin-bottom: 8px;
-}
-.analysis-heading h1 {
-  margin-bottom: 4px;
-}
 #eventCatalog:not([open]) {
   display: none;
-}
-#analysisWorkspace .analysis-actions > .field {
-  flex: 1 1 160px;
-  max-width: 260px;
 }
 #analysisWorkspace #analysisLoad[hidden],
 #analysisStatus[hidden] {
   display: none;
 }
 @media (max-width: 600px) {
-  .analysis-heading {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
-  }
-  .analysis-heading > button {
-    width: auto;
-    max-width: 100px;
-    padding: 6px 9px;
-    font-size: 12px;
-  }
-  .analysis-heading h1 {
-    font-size: 19px;
-  }
-  .analysis-heading .hint {
-    font-size: 11px;
-  }
-  .analysis-actions {
-    gap: 8px;
-  }
-  #analysisWorkspace .analysis-actions > .field {
-    flex: 1 1 120px;
-    max-width: none;
-  }
   .event-context summary {
     font-size: 13px;
   }
@@ -1915,7 +1861,6 @@ body[data-mode='exposure'] .scrubrow {
     right: calc((100% - 1600px) / 2);
   }
 }
-
 /* ---------- Selected-place panel: actions by the title, terse copy ---------- */
 .detail-heading {
   display: flex;
@@ -2029,7 +1974,6 @@ body[data-mode='exposure'] .scrubrow {
     font-size: 36px;
   }
 }
-
 /* Compared strip: one control row, short synced chart, Analyze for depth. */
 .compare-panel {
   padding: 10px 16px 6px;
@@ -2076,7 +2020,6 @@ body[data-mode='exposure'] .scrubrow {
     height: 140px;
   }
 }
-
 /* Compared chips: click a name to select it; × removes only that place. */
 .pin-chip {
   display: inline-flex;
@@ -2110,27 +2053,95 @@ body[data-mode='exposure'] .scrubrow {
     min-height: 40px;
   }
 }
+
+/* Analyze: results lead, setup collapses, method notes on hover. */
+.analysis-pins,
+.range-shortcuts {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.analysis-plot-heading,
+.analysis-result-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 6px;
+}
+.analysis-plot-heading #analysisReadout {
+  flex: 1;
+  min-width: 200px;
+  margin: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.field.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.field.inline select {
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.analysis-result-heading h2 {
+  margin: 0;
+}
+.analysis-result-tools {
+  display: flex;
+  gap: 6px;
+}
+.analysis-result-tools button {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.analysis-daily-tools,
+#analysisDailyPanel .analysis-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.method-hint {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+#analysisStatus:empty,
+#analysisStatus[hidden] {
+  display: none;
+}
+#analysisWorkspace {
+  padding-top: 8px;
+}
 </style></head>
 <body>
 <header><a class="brand" href="/" aria-label="Passage home"><span class="orb">◎</span> passage</a><nav aria-label="Data lens"><button id="change" class="active">Change</button><button id="connections">Connections</button><button id="exposure">Exposure</button></nav><nav class="view-switch" aria-label="Workspace"><button id="exploreView" aria-pressed="true">Explore</button><button id="analyzeView" aria-pressed="false">Analyze</button><button id="eventsView" aria-expanded="false" aria-controls="eventCatalog">Events</button><button id="randomEvent" title="Open a random sourced event or qualifying data shift"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 4-3 6-6s4-6 6-6h3m-4-4 4 4-4 4"/></svg><span>Random</span></button></nav><div class="header-tools"><button id="browseToggle" aria-haspopup="dialog" aria-label="Find a place" title="Find a place"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="search-label">Find a place</span></button><button id="mobileExplore" aria-controls="morePanel" aria-expanded="false" aria-haspopup="true" aria-label="More" title="More"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>More</span></button></div><div class="header-actions" id="morePanel"><button id="sources">Sources &amp; methods</button><section class="promptbar" aria-label="Starting points"><span class="eyebrow">Start with a question</span><button data-story="hormuz">What changed at Hormuz?</button><button data-story="routes">Who connects to Jebel Ali?</button><button data-story="cape">Suez vs the Cape</button><button data-story="exposure">Who depends on Singapore?</button></section><div id="status" role="status">Loading the dated PortWatch snapshot…</div></div></header>
 <main>
 <p id="freshness" class="hint" role="status"></p>
 <section id="analysisWorkspace" hidden aria-label="Comparison analysis">
- <div class="analysis-heading"><div><h1>Compare observations</h1><p class="hint">Historical observation ranges are independent of the globe date. Comparisons are descriptive, not causal.</p></div><button id="analysisShare">Copy link</button></div>
  <details id="eventCatalog"><summary>Events & context</summary><p class="hint">Curated on 2026-09-07, not a live or exhaustive news feed. Recent reporting and historical context are labeled separately. Follow the original sources for developments after publication.</p><nav class="event-jumps" aria-label="Discovery sections"><a href="#shiftHeading">Data shifts</a><a href="#eventHeading">Reported events</a></nav><h2 id="shiftHeading">Notable shifts in the data</h2><details class="signal-method"><summary>How shifts are selected</summary><p class="hint">Calls screened across the bundled activity catalog: complete 7-day mean versus preceding 28 days, reference ≥20 calls/day, shift ≥50%, all seven days on the same side of the reference. One strongest absolute shift per place; ranked retrospectively, not statistically significant anomalies. Context is separately researched. Unmatched shifts remain unexplained.</p></details><label class="field">Discovery period<select id="shiftPeriod"><option value="recent">Recent · last 30 observed days</option><option value="archive">Historical discoveries</option></select></label><p id="shiftPeriodNote" class="hint"></p><div id="shiftCards" class="event-cards"></div><h2 id="eventHeading">Reported events & historical context</h2><div id="eventCards" class="event-cards"></div></details>
  <section id="eventContext" hidden class="event-context" aria-label="Selected event"></section>
  <details id="analysisSetup" open><summary id="analysisSetupSummary">Places & periods</summary><div class="analysis-controls">
-  <section><h2>Places</h2><div id="analysisPins" class="analysis-pins"></div><label class="field">Add a place<input id="analysisSearch" type="search" placeholder="Search places or countries" autocomplete="off"></label><div id="analysisMatches"></div><button id="analysisClear">Clear comparison</button></section>
-  <section><h2>Observation range</h2><div class="range-shortcuts"><button data-range="90">90 days</button><button data-range="365">1 year</button><button data-range="all">All history</button></div><div class="date-pair"><label class="field">From<input type="date" id="analysisStart"></label><label class="field">Through<input type="date" id="analysisEnd"></label></div><label class="field">Measure<select id="analysisMetric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports · ports</option><option value="5">Estimated exports · ports</option><option value="6">Passage capacity · chokepoints</option></select></label></section>
-  <section><h2>Reference</h2><label class="field">Reference window<select id="analysisReference"><option value="prior">Prior 28 days</option><option value="year">Same calendar range last year</option><option value="custom">Custom dates</option></select></label><div class="date-pair"><label class="field">From<input type="date" id="analysisRefStart"></label><label class="field">Through<input type="date" id="analysisRefEnd"></label></div><label class="field">Chart scale<select id="analysisScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · reference mean = 100</option></select></label></section>
+  <section><h2>Places</h2><div id="analysisPins" class="analysis-pins"></div><label class="field">Add a place<input id="analysisSearch" type="search" placeholder="Search places or countries" autocomplete="off"></label><div id="analysisMatches"></div><button id="analysisClear">Clear</button></section>
+  <section><h2>Observations</h2><div class="range-shortcuts"><button data-range="90">90 days</button><button data-range="365">1 year</button><button data-range="all">All history</button></div><div class="date-pair"><label class="field">From<input type="date" id="analysisStart"></label><label class="field">Through<input type="date" id="analysisEnd"></label></div><label class="field">Measure<select id="analysisMetric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports · ports</option><option value="5">Estimated exports · ports</option><option value="6">Passage capacity · chokepoints</option></select></label></section>
+  <section><h2>Reference</h2><label class="field">Reference<select id="analysisReference"><option value="prior">Prior 28 days</option><option value="year">Same dates last year</option><option value="custom">Custom dates</option></select></label><div class="date-pair"><label class="field">From<input type="date" id="analysisRefStart"></label><label class="field">Through<input type="date" id="analysisRefEnd"></label></div><label class="field">Scale<select id="analysisScale"><option value="absolute">Absolute daily values</option><option value="indexed">Indexed · reference mean = 100</option></select></label></section>
  </div>
- </details><div class="analysis-actions"><button id="analysisLoad">Load historical files for these places</button><label class="field">Plot span<select id="analysisSpan"><option value="reference">Reference + observations</option><option value="observations">Observations only</option></select></label><label class="field">Display<select id="analysisDisplay"><option value="chart">Chart</option><option value="table">Daily table</option></select></label></div>
- <p id="analysisStatus" role="status"></p><p id="analysisCoverage" class="hint"></p>
+ </details>
+ <p id="analysisStatus" role="status"></p>
  <div class="analysis-evidence"><div class="analysis-plot-column">
-<section id="analysisChartPanel"><h2>Daily observations</h2><p id="analysisReadout"></p><canvas id="analysisChart" tabindex="0" role="slider" aria-label="Analysis observation date" aria-orientation="horizontal" aria-describedby="analysisChartHelp"></canvas><p id="analysisChartHelp" class="hint">Drag horizontally or use arrow keys; Shift moves a week. Vertical swipes scroll. Lines and labels identify places; gaps stay missing. Shaded band = reference; amber marker = selected event/report or detected-window start, as identified in the context.</p></section>
+<section id="analysisChartPanel"><div class="analysis-plot-heading"><p id="analysisReadout"></p><label class="field inline">Plot<select id="analysisSpan"><option value="reference">Reference + observations</option><option value="observations">Observations only</option></select></label><label class="field inline">Display<select id="analysisDisplay"><option value="chart">Chart</option><option value="table">Daily table</option></select></label></div><canvas id="analysisChart" tabindex="0" role="slider" aria-label="Analysis observation date" aria-describedby="analysisChartHelp"></canvas><p id="analysisChartHelp" class="sr-only">Drag horizontally or use arrow keys; Shift moves a week. Vertical swipes scroll. Shaded band = reference; amber marker = selected event or detected-window start.</p></section>
 <section id="analysisDailyPanel" hidden><h2>Daily observations</h2><div class="table-scroll" tabindex="0" role="region" aria-label="Daily observation table"><table id="analysisDaily"></table></div><div class="analysis-actions"><button id="analysisPrev">Previous rows</button><span id="analysisPage"></span><button id="analysisNext">Next rows</button></div></section>
-</div><section class="analysis-result-column"><h2>Period comparison</h2><p class="hint">Means require every calendar day in each period. Net deviation is against the reference, not lost trade. Percentages need a positive reference; tiny references can produce large percentages.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Period comparison results"><table id="analysisResults"></table></div><div id="analysisQuality" class="hint"></div></section></div>
-<button id="analysisExport">Download results & observations · CSV</button><details id="analysisSensitivity"><summary>Does the reference change the conclusion?</summary><p class="hint">The same observation range compared with 28-day references ending immediately before it, one week earlier, and four weeks earlier. This is reference sensitivity, not significance testing.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Reference sensitivity"><table id="sensitivityResults"></table></div></details>
+</div><section class="analysis-result-column"><div class="analysis-result-heading"><h2>Period comparison</h2><div class="analysis-result-tools"><button id="analysisLoad" hidden>Retry history download</button><button id="analysisExport" title="Download results and daily observations as CSV">CSV</button><button id="analysisShare" title="Copy a link to this comparison">Copy link</button></div></div><div class="table-scroll" tabindex="0" role="region" aria-label="Period comparison results"><table id="analysisResults"></table></div><div id="analysisQuality" class="hint"></div><p id="analysisCoverage" class="hint method-hint"></p></section></div>
+<details id="analysisSensitivity"><summary>Does the reference change the conclusion?</summary><p class="hint">The same observation range compared with 28-day references ending immediately before it, one week earlier, and four weeks earlier. This is reference sensitivity, not significance testing.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Reference sensitivity"><table id="sensitivityResults"></table></div></details>
  <details id="analysisRecovery"><summary>Disruption & recovery</summary><label class="field">Disruption start (not necessarily the report date)<input id="analysisEventStart" type="date"></label><div class="date-pair"><label class="field">Recovery threshold<select id="analysisThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100%</option><option value="0.8">80%</option></select></label><label class="field">Consecutive days<select id="analysisSustain"><option value="7">7 days</option><option value="14">14 days</option></select></label></div><p class="hint">Uses its own 28 days immediately before the disruption start, not the comparison reference above. Follow-up ends at Through. Missing days break recovery runs; relapse remains possible.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Recovery results"><table id="recoveryResults"></table></div></details>
 </section>
 
@@ -2930,7 +2941,12 @@ function referenceArgs(id) {
   if (m) return ['prior', { baselineDays: Number(m[1]) }];
   if (state.baseline !== 'year') return [state.baseline, {}];
   const rows = historyCache[id];
-  if (!rows) return ['year', {}];
+  if (!rows) {
+    // The selected place fetches its own history; other places keep a null
+    // reference until theirs is loaded, so rankings never mix references.
+    if (id === state.selected && !historyRequests[id] && !historyErrors[id]) fetchHistory(id);
+    return ['year', {}];
+  }
   const byDate = new Map(rows.map((r) => [r[0], r.slice(1)]));
   return [
     'year',
@@ -3281,7 +3297,9 @@ function activityDetail() {
     'explanation',
     s.difference === null
       ? state.baseline === 'year' && !historyCache[state.selected]
-        ? 'Load history below to compare with the same dates last year.'
+        ? historyErrors[state.selected]
+          ? 'History download failed · open History below to retry.'
+          : 'Loading last year’s observations…'
         : `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
       : `vs ${fmt(s.baseline)} mean, ${baselineLabel()} (${baselineDates})`,
   );
@@ -4887,7 +4905,7 @@ function renderWorkspace() {
     ) && start <= end;
   text(
     'analysisSetupSummary',
-    `Edit comparison · ${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} · ${comparisonLabels[col - 1]}`,
+    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${start} → ${end} vs ${rs} → ${re} · ${comparisonLabels[col - 1]}`,
   );
   const plotStart =
     $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
@@ -4915,51 +4933,36 @@ function renderWorkspace() {
       comparisonMath.validDate(eventStart) ? comparisonMath.shift(eventStart, -28) : start,
     ].sort()[0],
     need = earliest < manifest.start;
-  $('analysisLoad').hidden = !need;
-  $('analysisLoad').disabled =
-    comparison.busy ||
-    !comparison.ids.length ||
-    !need ||
-    comparison.ids.every((id) => historyCache[id]);
-  text(
-    'analysisLoad',
-    comparison.busy
-      ? 'Loading selected historical files…'
-      : need
-        ? 'Load / retry selected historical files'
-        : 'Bundled activity already available',
-  );
-  $('analysisStatus').hidden =
-    valid &&
-    comparison.ids.length > 0 &&
-    !comparison.ids.some(
-      (id) => historyErrors[id] || historyRequests[id] || (need && !historyCache[id]),
-    );
+  // History files load on demand when a period reaches before the bundled
+  // 2026 activity; the button remains only as a retry after a failed download.
+  const missing = comparison.ids.filter((id) => need && !historyCache[id]);
+  const failed = missing.filter((id) => historyErrors[id]);
+  if (valid && !comparison.busy && missing.some((id) => !historyErrors[id] && !historyRequests[id]))
+    queueMicrotask(() => $('analysisLoad').onclick());
+  $('analysisLoad').hidden = !failed.length || comparison.busy;
+  $('analysisLoad').disabled = comparison.busy;
+  text('analysisLoad', 'Retry history download');
+  const loading = comparison.busy || missing.some((id) => historyRequests[id]);
+  $('analysisStatus').hidden = valid && comparison.ids.length > 0 && !loading && !failed.length;
   text(
     'analysisStatus',
     !valid
-      ? 'Choose an observation range within 2019 and the snapshot cutoff; invalid or overlapping references make comparisons unavailable.'
+      ? 'Choose an observation range within 2019 and the snapshot cutoff; references must end before the observations start.'
       : !comparison.ids.length
         ? 'Add up to four places to compare.'
-        : comparison.ids
-            .map(
-              (id) =>
-                placeById[id].name +
-                ': ' +
-                (historyErrors[id]
-                  ? 'history failed; retry'
-                  : historyRequests[id]
-                    ? 'loading'
-                    : need && !historyCache[id]
-                      ? 'earlier history not loaded'
-                      : 'requested files available'),
-            )
-            .join(' · '),
+        : loading
+          ? 'Loading history…'
+          : failed.length
+            ? `History download failed for ${failed.map((id) => placeById[id].name).join(', ')}.`
+            : '',
   );
-  text(
-    'analysisCoverage',
-    `Snapshot: ports ${manifest.Daily_Ports_Data_latest} · passages ${manifest.Daily_Chokepoints_Data_latest}. ${$('analysisScale').value === 'indexed' ? 'Index: positive complete reference = 100.' : 'Shared absolute scale.'} Missing ≠ zero.`,
-  );
+  $('analysisCoverage').title =
+    `Snapshot: ports through ${manifest.Daily_Ports_Data_latest}, passages through ${manifest.Daily_Chokepoints_Data_latest}. ` +
+    ($('analysisScale').value === 'indexed'
+      ? 'Indexed: each place relative to its complete reference mean = 100. '
+      : '') +
+    'Means require every calendar day in each period; missing is not zero. Net deviation is against the reference, not lost trade.';
+  text('analysisCoverage', 'How these numbers are computed');
   comparisonTable(
     'analysisResults',
     `${start} → ${end}; reference ${rs} → ${re} · means in ${comparisonUnit()}/day; net deviation in ${comparisonUnit()}`,
@@ -5099,7 +5102,6 @@ function bindWorkspace(q) {
     else comparisonShift(next.id);
     const details = $('eventContext').querySelector('details');
     if (details) details.open = true;
-    if (!$('analysisLoad').hidden && !$('analysisLoad').disabled) $('analysisLoad').onclick();
   };
   $('shiftPeriod').onchange = comparisonShiftCards;
   comparisonShiftCards();
@@ -5135,6 +5137,7 @@ function bindWorkspace(q) {
   $('analyzeView').onclick = () => {
     comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
     setMode('change');
+    $('analysisSetup').open = false;
     comparisonOpen();
   };
   $('eventsView').onclick = () => {
