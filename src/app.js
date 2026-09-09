@@ -757,11 +757,6 @@ function render() {
         : 'Country markers show trade exposure—not actual losses',
   );
   text(
-    'mobileExplore',
-    ($('analyst').checked ? 'More · All' : 'More') +
-      (document.body.classList.contains('explore-open') ? ' ▴' : ' ▾'),
-  );
-  text(
     'mobileMeasure',
     activity
       ? $('metric').options[state.metric].text +
@@ -789,15 +784,17 @@ function render() {
     $(id).disabled = !activity;
   $('rank').disabled = !activity;
   $('kind').disabled = state.mode === 'exposure';
-  text('play', state.playing ? 'Ⅱ Pause' : '▶ Play');
+  text('playLabel', state.playing ? 'Pause' : 'Play');
+  $('play').setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
+  $('play').classList.toggle('playing', state.playing);
   $('scrub').value = state.index;
   $('scrub').setAttribute('aria-valuetext', dates[state.index]);
   $('dateInput').value = dates[state.index];
   text(
     'clockNote',
     activity
-      ? 'Daily observations · snapshot, not live traffic'
-      : 'Observation clock paused · this layer has its own historical vintage',
+      ? 'Daily observations, not live traffic'
+      : 'Timeline paused · this layer has its own historical vintage',
   );
   text(
     'status',
@@ -942,7 +939,6 @@ function bind() {
   const closeMore = () => {
     document.body.classList.remove('explore-open');
     $('mobileExplore').setAttribute('aria-expanded', 'false');
-    text('mobileExplore', ($('analyst').checked ? 'More · All' : 'More') + ' ▾');
   };
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && document.body.classList.contains('explore-open')) {
@@ -956,11 +952,16 @@ function bind() {
   $('morePanel').addEventListener('click', (e) => {
     if (e.target.closest('[data-story],#sources')) closeMore();
   });
+  // Wide pointer layouts show playback settings inline; narrower ones use a popover.
+  const inlineSettings = matchMedia('(min-width: 1281px) and (pointer: fine)');
   const setTimeline = (open) => {
+    open = open && !inlineSettings.matches;
     document.body.classList.toggle('timeline-open', open);
-    $('timelineSettings').hidden = !open;
+    $('timelineSettings').hidden = !open && !inlineSettings.matches;
     $('mobileControls').setAttribute('aria-expanded', String(open));
   };
+  inlineSettings.addEventListener('change', () => setTimeline(false));
+  setTimeline(false);
   $('mobileControls').onclick = () => setTimeline($('timelineSettings').hidden);
   $('closeTimeline').onclick = () => {
     setTimeline(false);
@@ -978,7 +979,6 @@ function bind() {
   $('mobileExplore').onclick = () => {
     const open = document.body.classList.toggle('explore-open');
     $('mobileExplore').setAttribute('aria-expanded', String(open));
-    text('mobileExplore', ($('analyst').checked ? 'More · All' : 'More') + (open ? ' ▴' : ' ▾'));
   };
   $('detailsToggle').onclick = () =>
     document.querySelector('.detail').scrollIntoView({ block: 'start', behavior: 'auto' });
@@ -1362,7 +1362,8 @@ function updateFreshness() {
   const f = PassageFreshness.status(manifest);
   text(
     'freshness',
-    `${f.stale ? 'Data is aging · ' : ''}Observations: ports ${manifest.Daily_Ports_Data_latest}, passages ${manifest.Daily_Chokepoints_Data_latest}. Last published source check: ${manifest.refresh?.checked || 'not recorded'}. Context reviewed separately.`,
+    `${f.stale ? 'Data is aging · ' : ''}Observations: ports through ${manifest.Daily_Ports_Data_latest}, passages through ${manifest.Daily_Chokepoints_Data_latest} · source checked ${manifest.refresh?.checked || 'date not recorded'}`,
   );
   $('freshness').classList.toggle('stale', f.stale);
+  $('freshness').title = $('freshness').textContent;
 }

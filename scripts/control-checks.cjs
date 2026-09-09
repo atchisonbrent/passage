@@ -41,6 +41,20 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
     await js("document.getElementById('browseToggle').getBoundingClientRect().width>0"),
     'Search is visible at every viewport',
   );
+  if (width >= 901)
+    assert.ok(
+      await js(
+        "(()=>{const c=[...document.querySelectorAll('header > *')].filter(e=>e.getBoundingClientRect().width).map(e=>{const r=e.getBoundingClientRect();return r.top+r.height/2});return Math.max(...c)-Math.min(...c)<2})()",
+      ),
+      'header stays a single row on wide layouts',
+    );
+  assert.ok(
+    await js(
+      "(()=>{const h=document.querySelector('.header-tools').getBoundingClientRect();return innerWidth-h.right<=24})()",
+    ),
+    'Search and More sit at the trailing edge',
+  );
+  assert.equal(await js("document.getElementById('mobileExplore').textContent.trim()"), 'More');
   await click('#browseToggle');
   assert.equal(await js("document.getElementById('browseDialog').open"), true);
   await click('#closeBrowse');
@@ -83,148 +97,169 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   );
   await js("choose(places.find(p=>p.name==='Singapore').id)");
   await delay(100);
-  await click('#mobileControls');
-  assert.equal(await js("document.getElementById('timelineSettings').hidden"), false);
-  assert.notEqual(
-    await js('document.activeElement.tagName'),
-    'SELECT',
-    'opening Settings must not focus a native picker',
-  );
-  assert.deepEqual(await geometry(), before, 'settings must not resize the globe');
-  assert.ok(
-    await js(
-      "(()=>{const r=document.getElementById('timelineSettings').getBoundingClientRect();return r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight})()",
-    ),
-    'settings must fit the viewport',
-  );
-  if (width <= 360)
-    assert.ok(
-      await js("document.getElementById('speed').getBoundingClientRect().width>200"),
-      'narrow settings must give select labels a full row',
-    );
-  fs.writeFileSync(
-    path.join(out, `settings-${width}-${height}.png`),
-    Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
-  );
-  if (width <= 360) {
-    await call('Input.dispatchMouseEvent', {
-      type: 'mouseWheel',
-      x: width / 2,
-      y: 250,
-      deltaX: 0,
-      deltaY: 240,
-    });
-    await delay(300);
-    assert.ok(
-      await js("document.getElementById('timelineSettings').scrollTop>0"),
-      'narrow Settings scrolls through all fields',
-    );
+  const inlineSettings = await js("matchMedia('(min-width: 1281px) and (pointer: fine)').matches");
+  if (inlineSettings) {
+    // Wide pointer layouts keep playback settings in the bar; no disclosure, no popover.
+    assert.equal(await js("document.getElementById('mobileControls').offsetParent"), null);
     assert.ok(
       await js(
-        "(()=>{const r=document.getElementById('baseline').getBoundingClientRect(),p=document.getElementById('timelineSettings').getBoundingClientRect();return r.top>=p.top&&r.bottom<=p.bottom})()",
+        "(()=>{const s=document.getElementById('speed').getBoundingClientRect(),b=document.getElementById('scrub').getBoundingClientRect(),p=document.getElementById('play').getBoundingClientRect();return s.width>0&&s.bottom<=b.top&&Math.abs(s.top-p.top)<20})()",
       ),
-      'comparison control remains reachable',
+      'inline settings share the playback row above the scrubber',
+    );
+    assert.equal(
+      await js("document.getElementById('mobileMeasure').offsetParent"),
+      null,
+      'inline settings make the measure caption redundant',
     );
     fs.writeFileSync(
-      path.join(out, 'settings-narrow-scrolled.png'),
+      path.join(out, `settings-${width}-${height}.png`),
       Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
     );
-  }
-  await call('Input.dispatchKeyEvent', {
-    type: 'keyDown',
-    key: 'Escape',
-    code: 'Escape',
-    windowsVirtualKeyCode: 27,
-  });
-  await call('Input.dispatchKeyEvent', {
-    type: 'keyUp',
-    key: 'Escape',
-    code: 'Escape',
-    windowsVirtualKeyCode: 27,
-  });
-  assert.equal(
-    await js(
-      "document.getElementById('timelineSettings').hidden&&document.activeElement.id==='mobileControls'",
-    ),
-    true,
-  );
-  await click('#mobileControls');
-  await click('#closeTimeline');
-  // Exercise a real touch sequence, not mouse clicks with a mobile viewport.
-  if (width <= 1210) {
-    const b = await js(
-      "(()=>{const r=document.getElementById('mobileControls').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()",
-    );
-    await call('Input.dispatchTouchEvent', {
-      type: 'touchStart',
-      touchPoints: [{ ...b, id: 0, radiusX: 1, radiusY: 1 }],
-    });
-    await call('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await delay(150);
+  } else {
+    await click('#mobileControls');
     assert.equal(await js("document.getElementById('timelineSettings').hidden"), false);
     assert.notEqual(
       await js('document.activeElement.tagName'),
       'SELECT',
-      'Settings tap must not focus a picker',
+      'opening Settings must not focus a native picker',
     );
-    await click('#closeTimeline');
-  }
-  // Opening with Enter keeps focus on the disclosure; Tab reaches Close then Speed.
-  await call('Input.dispatchKeyEvent', {
-    type: 'keyDown',
-    key: 'Enter',
-    code: 'Enter',
-    windowsVirtualKeyCode: 13,
-    text: '\r',
-  });
-  await call('Input.dispatchKeyEvent', {
-    type: 'keyUp',
-    key: 'Enter',
-    code: 'Enter',
-    windowsVirtualKeyCode: 13,
-  });
-  assert.equal(await js("document.getElementById('timelineSettings').hidden"), false);
-  assert.equal(await js('document.activeElement.id'), 'mobileControls');
-  assert.notEqual(
-    await js("getComputedStyle(document.querySelector('.settings-chevron')).transform"),
-    'none',
-  );
-  const tab = async () => {
+    assert.deepEqual(await geometry(), before, 'settings must not resize the globe');
+    assert.ok(
+      await js(
+        "(()=>{const r=document.getElementById('timelineSettings').getBoundingClientRect();return r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight})()",
+      ),
+      'settings must fit the viewport',
+    );
+    if (width <= 360)
+      assert.ok(
+        await js("document.getElementById('metric').getBoundingClientRect().width>200"),
+        'narrow settings must give select labels a full row',
+      );
+    fs.writeFileSync(
+      path.join(out, `settings-${width}-${height}.png`),
+      Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+    );
+    if (width <= 360) {
+      await call('Input.dispatchMouseEvent', {
+        type: 'mouseWheel',
+        x: width / 2,
+        y: 250,
+        deltaX: 0,
+        deltaY: 240,
+      });
+      await delay(300);
+      assert.ok(
+        await js("document.getElementById('timelineSettings').scrollTop>0"),
+        'narrow Settings scrolls through all fields',
+      );
+      assert.ok(
+        await js(
+          "(()=>{const r=document.getElementById('baseline').getBoundingClientRect(),p=document.getElementById('timelineSettings').getBoundingClientRect();return r.top>=p.top&&r.bottom<=p.bottom})()",
+        ),
+        'comparison control remains reachable',
+      );
+      fs.writeFileSync(
+        path.join(out, 'settings-narrow-scrolled.png'),
+        Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+      );
+    }
     await call('Input.dispatchKeyEvent', {
       type: 'keyDown',
-      key: 'Tab',
-      code: 'Tab',
-      windowsVirtualKeyCode: 9,
+      key: 'Escape',
+      code: 'Escape',
+      windowsVirtualKeyCode: 27,
     });
     await call('Input.dispatchKeyEvent', {
       type: 'keyUp',
-      key: 'Tab',
-      code: 'Tab',
-      windowsVirtualKeyCode: 9,
+      key: 'Escape',
+      code: 'Escape',
+      windowsVirtualKeyCode: 27,
     });
-  };
-  await tab(); // Scrubber follows the disclosure in document order.
-  assert.equal(await js('document.activeElement.id'), 'scrub');
-  await tab();
-  assert.equal(await js('document.activeElement.id'), 'closeTimeline');
-  await tab();
-  assert.equal(await js('document.activeElement.id'), 'speed');
-  await click('#closeTimeline');
-  await click('#mobileControls');
-  await click('#reset');
-  assert.equal(
-    await js("document.getElementById('timelineSettings').hidden"),
-    true,
-    'outside click closes Settings',
-  );
-  assert.equal(
-    await js("getComputedStyle(document.querySelector('.settings-chevron')).transform"),
-    'none',
-  );
-  assert.equal(
-    await js("document.getElementById('mobileControls').getAttribute('aria-expanded')"),
-    'false',
-  );
+    assert.equal(
+      await js(
+        "document.getElementById('timelineSettings').hidden&&document.activeElement.id==='mobileControls'",
+      ),
+      true,
+    );
+    await click('#mobileControls');
+    await click('#closeTimeline');
+    // Exercise a real touch sequence, not mouse clicks with a mobile viewport.
+    if (width <= 1210) {
+      const b = await js(
+        "(()=>{const r=document.getElementById('mobileControls').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()",
+      );
+      await call('Input.dispatchTouchEvent', {
+        type: 'touchStart',
+        touchPoints: [{ ...b, id: 0, radiusX: 1, radiusY: 1 }],
+      });
+      await call('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await delay(150);
+      assert.equal(await js("document.getElementById('timelineSettings').hidden"), false);
+      assert.notEqual(
+        await js('document.activeElement.tagName'),
+        'SELECT',
+        'Settings tap must not focus a picker',
+      );
+      await click('#closeTimeline');
+    }
+    // Opening with Enter keeps focus on the disclosure; Tab reaches Close then Measure.
+    await call('Input.dispatchKeyEvent', {
+      type: 'keyDown',
+      key: 'Enter',
+      code: 'Enter',
+      windowsVirtualKeyCode: 13,
+      text: '\r',
+    });
+    await call('Input.dispatchKeyEvent', {
+      type: 'keyUp',
+      key: 'Enter',
+      code: 'Enter',
+      windowsVirtualKeyCode: 13,
+    });
+    assert.equal(await js("document.getElementById('timelineSettings').hidden"), false);
+    assert.equal(await js('document.activeElement.id'), 'mobileControls');
+    assert.notEqual(
+      await js("getComputedStyle(document.querySelector('.settings-chevron')).transform"),
+      'none',
+    );
+    const tab = async () => {
+      await call('Input.dispatchKeyEvent', {
+        type: 'keyDown',
+        key: 'Tab',
+        code: 'Tab',
+        windowsVirtualKeyCode: 9,
+      });
+      await call('Input.dispatchKeyEvent', {
+        type: 'keyUp',
+        key: 'Tab',
+        code: 'Tab',
+        windowsVirtualKeyCode: 9,
+      });
+    };
+    await tab(); // Scrubber follows the disclosure in document order.
+    assert.equal(await js('document.activeElement.id'), 'scrub');
+    await tab();
+    assert.equal(await js('document.activeElement.id'), 'closeTimeline');
+    await tab();
+    assert.equal(await js('document.activeElement.id'), 'metric');
+    await click('#closeTimeline');
+    await click('#mobileControls');
+    await click('#reset');
+    assert.equal(
+      await js("document.getElementById('timelineSettings').hidden"),
+      true,
+      'outside click closes Settings',
+    );
+    assert.equal(
+      await js("getComputedStyle(document.querySelector('.settings-chevron')).transform"),
+      'none',
+    );
+    assert.equal(
+      await js("document.getElementById('mobileControls').getAttribute('aria-expanded')"),
+      'false',
+    );
+  }
   await click('#mobileExplore');
   assert.deepEqual(await geometry(), before, 'More must not resize the globe');
   await click('#sources');
@@ -270,9 +305,9 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   if (width >= 1680)
     assert.ok(
       await js(
-        `(() => {const a=document.getElementById('analysisWorkspace').getBoundingClientRect(),v=document.querySelector('.view-switch').getBoundingClientRect(),h=document.querySelector('header');return Math.abs(a.left-v.left)<2&&Math.abs(parseFloat(getComputedStyle(h).paddingLeft)-a.left)<2;})()`,
+        `(() => {const a=document.getElementById('analysisWorkspace').getBoundingClientRect(),b=document.querySelector('.brand').getBoundingClientRect(),t=document.querySelector('.header-tools').getBoundingClientRect();return Math.abs(a.left-b.left)<2&&Math.abs(a.right-t.right)<2;})()`,
       ),
-      'wide header and view controls align with analysis',
+      'wide header edges align with the centered analysis rail',
     );
   const comparisonBefore = await js(
     'JSON.stringify([comparison.ids,...comparisonValueIds.map(id=>document.getElementById(id).value),passageEvents,passageShifts])',

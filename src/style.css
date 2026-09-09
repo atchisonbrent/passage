@@ -64,55 +64,8 @@ a:focus-visible {
   outline: 2px solid var(--up);
   outline-offset: 3px;
 }
-header {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  padding: 13px 25px;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-}
-.brand {
-  font-size: 25px;
-  letter-spacing: -1px;
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.orb {
-  font-size: 37px;
-  font-weight: 300;
-  color: var(--up);
-}
-nav {
-  display: flex;
-  gap: 6px;
-}
-.header-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  font-size: 12px;
-}
 main {
   padding: 0 20px 185px;
-}
-.promptbar {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  padding: 14px 0;
-  flex-wrap: wrap;
-}
-.promptbar button {
-  font-size: 12px;
-  padding: 6px 10px;
-  min-height: 34px;
-  background: transparent;
 }
 .eyebrow {
   font-size: 10px;
@@ -120,11 +73,6 @@ main {
   text-transform: uppercase;
   color: var(--muted);
   font-weight: 650;
-}
-#status {
-  font-size: 12px;
-  color: var(--muted);
-  padding: 0 0 10px;
 }
 .workspace {
   display: grid;
@@ -406,73 +354,6 @@ dd {
   margin-top: 6px;
   border-radius: 2px;
 }
-.timebar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  background: #10212cf5;
-  backdrop-filter: blur(16px);
-  border-top: 1px solid #415c64;
-  padding: 12px 25px max(12px, env(safe-area-inset-bottom));
-  box-shadow: 0 -10px 30px #0003;
-}
-.time-controls {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-wrap: wrap;
-}
-.time-controls label,
-.reference-controls label {
-  font-size: 11px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.time-controls select,
-.reference-controls select {
-  font-size: 11px;
-  min-height: 34px;
-  padding: 6px;
-}
-.time-controls button {
-  font-size: 12px;
-  min-height: 36px;
-}
-.time-controls input {
-  min-height: 36px;
-  font-size: 13px;
-}
-.scrubrow {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: 10px 0;
-}
-.scrubrow input {
-  flex: 1;
-  min-width: 50px;
-  accent-color: var(--up);
-  cursor: ew-resize;
-}
-.scrubrow span {
-  font-size: 10px;
-  color: var(--muted);
-}
-.reference-controls {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-#clockNote {
-  margin-left: auto;
-  color: var(--muted);
-  font-size: 11px;
-}
 .story {
   position: absolute;
   left: 20px;
@@ -536,9 +417,6 @@ dialog::backdrop {
   background: #000a;
   backdrop-filter: blur(6px);
 }
-.close {
-  float: right;
-}
 pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -550,14 +428,6 @@ pre {
 }
 body:not(.analyst) #rank {
   max-width: 100%;
-}
-body[data-mode='connections'] .time-controls,
-body[data-mode='exposure'] .time-controls,
-body[data-mode='connections'] .scrubrow,
-body[data-mode='exposure'] .scrubrow,
-body[data-mode='connections'] .reference-controls label,
-body[data-mode='exposure'] .reference-controls label {
-  display: none;
 }
 body[data-mode='connections'] main,
 body[data-mode='exposure'] main {
@@ -582,14 +452,6 @@ body[data-mode='exposure'] main {
   }
 }
 @media (max-width: 1100px) {
-  header {
-    gap: 15px;
-    padding: 10px 16px;
-  }
-  .header-actions {
-    font-size: 11px;
-    gap: 8px;
-  }
   .workspace {
     grid-template-columns: 205px minmax(0, 1fr) 245px;
   }
@@ -607,38 +469,8 @@ body[data-mode='exposure'] main {
   .map-tools {
     bottom: 15px;
   }
-  .promptbar .eyebrow {
-    display: none;
-  }
 }
 @media (max-width: 800px) {
-  header {
-    gap: 8px;
-  }
-  .brand {
-    font-size: 22px;
-  }
-  .orb {
-    font-size: 28px;
-  }
-  nav {
-    margin-left: auto;
-  }
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .header-actions button {
-    min-height: 32px;
-    font-size: 11px;
-  }
-  .promptbar {
-    flex-wrap: nowrap;
-    overflow: auto;
-  }
-  .promptbar button {
-    white-space: nowrap;
-  }
   main {
     padding: 0 10px 240px;
   }
@@ -667,52 +499,17 @@ body[data-mode='exposure'] main {
     bottom: 20px;
     max-width: 62%;
   }
-  .timebar {
-    padding: 9px 12px max(9px, env(safe-area-inset-bottom));
-  }
-  .reference-controls {
-    gap: 7px;
-  }
-  #clockNote {
-    margin: 0;
-    font-size: 10px;
-  }
-  .time-controls {
-    gap: 5px;
-  }
-  .time-controls label {
-    font-size: 0;
-  }
-  .time-controls select {
-    font-size: 10px;
-  }
-  .time-controls input {
-    width: 132px;
-  }
-  .scrubrow {
-    margin: 7px 0;
-  }
   .big {
     font-size: 36px;
   }
   .filterrow {
     grid-template-columns: 1fr;
   }
-  .promptbar button {
-    min-height: 40px;
-  }
   .story {
     bottom: 80px;
   }
-  .time-controls #latest {
-    display: none;
-  }
 }
 @media (max-width: 420px) {
-  nav button {
-    font-size: 12px;
-    padding: 7px;
-  }
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -737,15 +534,6 @@ body[data-mode='exposure'] main {
   .map-tools #reset {
     display: none;
   }
-  .reference-controls select {
-    max-width: 150px;
-  }
-  .time-controls input {
-    width: 125px;
-  }
-  .header-actions label {
-    font-size: 12px;
-  }
 }
 /* Touch-friendly, lower-density exploration. Native page pinch stays available. */
 body,
@@ -754,21 +542,6 @@ a,
 input,
 select {
   touch-action: manipulation;
-}
-header {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  background: #0b141bf2;
-  backdrop-filter: blur(12px);
-  padding: 9px 20px;
-}
-.orb {
-  font-size: 30px;
-  line-height: 1.2;
-}
-.brand {
-  font-size: 23px;
 }
 main {
   padding-bottom: 130px;
@@ -816,69 +589,11 @@ main {
 body:not(.analyst) #quality {
   display: none;
 }
-body:not(.analyst) .reference-controls label {
-  display: none;
-}
-.timebar {
-  padding: 10px 20px max(10px, env(safe-area-inset-bottom));
-}
-.time-controls button,
-.time-controls input,
-.time-controls select {
-  min-height: 40px;
-}
-.time-controls select {
-  font-size: 13px;
-}
-.time-controls #back,
-.time-controls #forward {
-  min-width: 40px;
-}
-#browseToggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.browse-dialog-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 18px;
-  border-bottom: 1px solid var(--line);
-}
-#browseDialog {
-  padding: 0;
-  max-width: 410px;
-  width: calc(100% - 24px);
-  max-height: 85dvh;
-  overflow: hidden;
-}
-#browseDialog .discovery {
-  display: block;
-  max-height: calc(85dvh - 70px);
-  overflow: auto;
-  border: 0;
-  padding: 16px 20px;
-}
-#browseDialog .panel-heading h1 {
-  display: none;
-}
-#browseDialog .field input,
-#browseDialog .field select {
-  font-size: 16px;
-  min-height: 44px;
-}
-#browseDialog button {
-  min-height: 44px;
-}
 body[data-mode='connections'] .filterrow,
 body[data-mode='exposure'] .filterrow {
   display: none;
 }
 @media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
-  #browseToggle {
-    display: inline-block;
-  }
   .workspace {
     grid-template-columns: minmax(0, 1fr) 260px;
   }
@@ -893,24 +608,6 @@ body[data-mode='exposure'] .filterrow {
     grid-column: 2;
     grid-row: 1;
     padding: 16px;
-  }
-  .promptbar {
-    padding: 8px 0;
-    flex-wrap: nowrap;
-    overflow: auto;
-  }
-  .promptbar .eyebrow {
-    display: none;
-  }
-  .promptbar button {
-    white-space: nowrap;
-    font-size: 11px;
-  }
-  .header-actions {
-    gap: 10px;
-  }
-  .header-actions button {
-    font-size: 12px;
   }
   .detail h2 {
     font-size: 23px;
@@ -934,19 +631,6 @@ body[data-mode='exposure'] .filterrow {
 }
 @media (max-width: 900px),
   (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
-  header {
-    padding: 8px 10px;
-  }
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 6px;
-  }
-  .header-actions button {
-    min-height: 38px;
-    padding: 7px 9px;
-    font-size: 11px;
-  }
   .workspace,
   .analyst .workspace,
   body[data-mode='connections'] .workspace,
@@ -966,34 +650,6 @@ body[data-mode='exposure'] .filterrow {
     max-height: none;
     border-left: 0;
     border-top: 1px solid var(--line);
-  }
-  .timebar {
-    padding: 8px 10px max(8px, env(safe-area-inset-bottom));
-  }
-  .time-controls {
-    gap: 5px;
-  }
-  .time-controls select {
-    font-size: 12px;
-  }
-  .time-controls label {
-    font-size: 0;
-  }
-  .time-controls #back,
-  .time-controls #forward {
-    display: none;
-  }
-  .scrubrow {
-    margin: 7px 0;
-  }
-  .scrubrow span {
-    font-size: 9px;
-  }
-  .reference-controls {
-    gap: 4px;
-  }
-  #clockNote {
-    font-size: 10px;
   }
   .legend {
     max-width: 62%;
@@ -1026,31 +682,13 @@ body[data-mode='exposure'] .filterrow {
   input:not([type='checkbox']):not([type='range']) {
     min-height: 44px;
   }
-  .time-controls input,
-  .time-controls select {
-    font-size: 16px;
-  }
-  .header-actions label {
-    font-size: 12px;
-  }
 }
-
 /* Let layout, not guessed browser-chrome offsets, allocate the map. */
 body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-header {
-  flex-shrink: 0;
-}
-.header-actions label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  min-height: 44px;
 }
 input[type='checkbox'] {
   min-height: 0;
@@ -1073,10 +711,6 @@ body[data-mode] main {
   overflow: auto;
   padding-bottom: 12px;
 }
-.promptbar,
-#status {
-  flex-shrink: 0;
-}
 body .workspace,
 body.analyst .workspace,
 body[data-mode] .workspace {
@@ -1084,13 +718,6 @@ body[data-mode] .workspace {
   min-height: 260px;
   max-height: none;
   flex: 1;
-}
-.timebar {
-  position: relative;
-  flex-shrink: 0;
-  bottom: auto;
-  left: auto;
-  right: auto;
 }
 .compare-panel {
   flex-shrink: 0;
@@ -1127,7 +754,6 @@ body[data-mode] .workspace {
     display: block;
   }
 }
-
 .detail {
   display: flex;
   flex-direction: column;
@@ -1156,11 +782,6 @@ body:not(.analyst) .chart-title {
 body:not(.analyst) #chart {
   height: 100px;
 }
-@media (min-width: 760px) and (max-width: 900px) {
-  .header-actions {
-    width: auto;
-  }
-}
 @media (max-width: 900px),
   (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
   #backToGlobe {
@@ -1187,11 +808,6 @@ body:not(.analyst) #chart {
   body.analyst .workspace > .map-panel {
     height: max(200px, min(50dvh, calc(100dvh - 440px)));
   }
-  .time-controls input[type='date'] {
-    width: 150px;
-    min-width: 150px;
-    font-size: 16px;
-  }
 }
 @media (min-width: 901px) and (max-height: 720px) {
   body:not(.analyst) .detail {
@@ -1215,106 +831,10 @@ body:not(.analyst) #chart {
     transition: none !important;
   }
 }
-
 /* Compact chrome: secondary controls are disclosed, not removed. */
-#mobileExplore,
-#mobileControls,
-#mobileMeasure {
-  display: none;
-}
 @media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
-  header {
-    gap: 6px;
-    padding: 4px 8px;
-    flex-wrap: wrap;
-  }
-  header .brand {
-    display: none;
-  }
-  header nav {
-    flex: 1;
-    gap: 4px;
-  }
-  header nav button {
-    flex: 1;
-    padding: 6px 4px;
-    font-size: 11px;
-    min-height: 44px;
-  }
-  header .header-actions {
-    display: contents;
-  }
-  #browseToggle {
-    font-size: 11px;
-    min-height: 44px;
-    padding: 6px 8px;
-  }
-  body:not(.explore-open) .header-actions > label,
-  body:not(.explore-open) #sources {
-    display: none;
-  }
-  .explore-open .header-actions > label {
-    flex: 1;
-  }
   body main {
     padding: 6px 8px 8px;
-  }
-  body:not(.explore-open) .promptbar,
-  body.snapshot-ready:not(.explore-open) #status:not([role='alert']) {
-    display: none;
-  }
-  #mobileControls {
-    display: block;
-    order: 3;
-    min-height: 44px;
-    font-size: 12px;
-    padding: 6px 9px;
-  }
-  .timebar {
-    padding: 5px 8px max(5px, env(safe-area-inset-bottom));
-    max-height: 50dvh;
-    overflow: auto;
-  }
-  .time-controls {
-    gap: 6px;
-    justify-content: space-between;
-  }
-  .time-controls #play {
-    min-height: 44px;
-    padding: 6px 10px;
-  }
-  .time-controls #dateInput {
-    width: 148px;
-    min-width: 148px;
-    min-height: 44px;
-    padding: 5px;
-    font-size: 16px;
-  }
-  .time-controls > label {
-    order: 4;
-  }
-  body:not(.timeline-open) .time-controls > label,
-  body:not(.timeline-open) .reference-controls {
-    display: none;
-  }
-  .timeline-open .time-controls > label {
-    font-size: 11px;
-  }
-  .timeline-open .reference-controls {
-    font-size: 11px;
-  }
-  #mobileMeasure {
-    display: block;
-    font-size: 10px;
-    line-height: 14px;
-    margin-top: 2px;
-  }
-  .scrubrow {
-    margin: 3px 0 0;
-    gap: 6px;
-  }
-  .scrubrow span {
-    font-size: 8px;
   }
   body .workspace > .map-panel,
   body.analyst .workspace > .map-panel {
@@ -1352,51 +872,10 @@ body:not(.analyst) #chart {
     bottom: 8px;
   }
 }
-
-@media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
-  #mobileExplore {
-    display: block;
-    flex-basis: 100%;
-    min-height: 38px;
-    padding: 5px 10px;
-    font-size: 12px;
-    text-align: left;
-    color: var(--up);
-  }
-  #mobileControls {
-    padding: 6px;
-    font-size: 11px;
-  }
-}
-
-/* More is local to the header; edge swipes belong to native scrolling. */
 .scroll-edge {
   display: none;
 }
 @media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
-  header nav {
-    order: 0;
-  }
-  #mobileExplore {
-    order: 2;
-    flex-basis: auto;
-    min-height: 44px;
-    max-width: 100px;
-    padding: 6px;
-    font-size: 11px;
-    text-align: center;
-  }
-  #browseToggle {
-    order: 2;
-    min-height: 38px;
-  }
-  .header-actions > label,
-  #sources {
-    order: 3;
-  }
-  header .header-actions > label {
-    font-size: 11px;
-  }
   body:not(.timeline-open):not(.explore-open) .workspace > .map-panel,
   body.analyst:not(.timeline-open):not(.explore-open) .workspace > .map-panel {
     height: calc(100dvh - 202px);
@@ -1434,28 +913,6 @@ body:not(.analyst) #chart {
     left: 22px;
   }
 }
-
-.search-icon {
-  display: none;
-}
-@media (max-width: 1280px), (max-width: 1440px) and (any-pointer: coarse) {
-  #browseToggle {
-    width: 44px;
-    min-width: 44px;
-    height: 44px;
-    padding: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #browseToggle .search-label {
-    display: none;
-  }
-  #browseToggle .search-icon {
-    display: block;
-  }
-}
-
 .depth-panel {
   margin: 18px 0;
   padding-top: 12px;
@@ -1507,7 +964,6 @@ body:not(.analyst) #chart {
 .category-row small {
   color: var(--muted);
 }
-
 #chart,
 body:not(.analyst) #chart {
   height: 160px;
@@ -1534,31 +990,7 @@ body:not(.analyst) #chart {
   font-size: 11px;
   margin: 6px 0;
 }
-
 /* Shared compact controls on tablets; keep roomier composition where it fits. */
-@media (min-width: 760px) and (max-width: 1280px),
-  (min-width: 760px) and (max-width: 1440px) and (any-pointer: coarse) {
-  header .brand {
-    display: flex;
-  }
-  header nav {
-    flex: 0 1 auto;
-  }
-  header nav button {
-    font-size: 13px;
-    padding: 8px 12px;
-  }
-  #browseToggle {
-    margin-left: auto;
-  }
-  #mobileExplore {
-    max-width: 120px;
-    font-size: 12px;
-  }
-  .explore-open .header-actions > label {
-    flex-basis: calc(100% - 180px);
-  }
-}
 @media (min-width: 901px) and (max-width: 1280px),
   (min-width: 901px) and (max-width: 1440px) and (any-pointer: coarse) {
   body .workspace > .map-panel,
@@ -1578,88 +1010,7 @@ body:not(.analyst) #chart {
     min-height: 300px;
   }
 }
-
-/* Secondary navigation belongs to More, not a full-width workspace band. */
-header {
-  position: relative;
-}
-#mobileExplore {
-  display: block;
-  min-height: 44px;
-  margin-left: auto;
-}
-.header-actions .promptbar {
-  flex-basis: 100%;
-  white-space: normal;
-  flex-wrap: wrap;
-}
-.header-actions #status {
-  flex-basis: 100%;
-  margin: 0;
-}
-body:not(.explore-open) .header-actions {
-  display: none;
-}
 @media (min-width: 901px) {
-  header {
-    padding: 8px 20px;
-    gap: 12px;
-    flex-wrap: nowrap;
-  }
-  header .brand {
-    display: flex;
-  }
-  header nav {
-    flex: 0 1 auto;
-  }
-  header nav button {
-    font-size: 13px;
-    padding: 8px 12px;
-  }
-  #browseToggle {
-    margin-left: auto;
-  }
-  #browseToggle + #morePanel + #mobileExplore {
-    margin-left: 0;
-  }
-  header .header-actions {
-    position: absolute;
-    right: 20px;
-    top: calc(100% + 6px);
-    width: 360px;
-    max-width: calc(100vw - 40px);
-    padding: 16px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: 0 12px 36px #0008;
-    z-index: 10;
-    display: none;
-    gap: 10px;
-    flex-wrap: wrap;
-    max-height: 70dvh;
-    overflow: auto;
-  }
-  body.explore-open header .header-actions {
-    display: flex;
-  }
-  .explore-open header .header-actions > label {
-    flex: 1 0 100%;
-  }
-  .header-actions .promptbar {
-    display: flex;
-    padding: 8px 0;
-    margin: 0;
-    border-top: 1px solid var(--line);
-    gap: 6px;
-  }
-  .header-actions .promptbar button {
-    text-align: left;
-    white-space: normal;
-  }
-  .header-actions .promptbar .eyebrow {
-    display: none;
-  }
   body main {
     padding: 10px 20px;
   }
@@ -1672,32 +1023,6 @@ body:not(.explore-open) .header-actions {
   #chart,
   body:not(.analyst) #chart {
     height: 200px;
-  }
-  .time-controls {
-    justify-content: flex-start;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  #mobileControls {
-    display: block;
-    order: 3;
-    margin-left: auto;
-    min-height: 44px;
-  }
-  body:not(.timeline-open) .time-controls > label,
-  body:not(.timeline-open) .reference-controls {
-    display: none;
-  }
-  .time-controls > label {
-    order: 4;
-  }
-  #mobileMeasure {
-    display: block;
-  }
-  .timebar {
-    padding: 8px 20px;
-    max-height: 40dvh;
-    overflow: auto;
   }
   body .workspace > .map-panel,
   body.analyst .workspace > .map-panel,
@@ -1720,63 +1045,12 @@ body:not(.explore-open) .header-actions {
     height: calc(100dvh - 202px);
   }
 }
-
-/* Keep disclosure ordering and anchoring consistent across input sizes. */
-header .header-actions > label,
-header #sources {
-  order: 0;
-}
-.header-actions .promptbar {
-  order: 1;
-}
-.header-actions #status {
-  order: 2;
-}
-@media (min-width: 1281px) and (pointer: fine) {
-  #browseToggle + #morePanel + #mobileExplore {
-    margin-left: auto;
-  }
-}
 @media (max-width: 900px) {
-  header .header-actions {
-    display: none;
-    position: absolute;
-    right: 8px;
-    top: calc(100% + 6px);
-    width: 360px;
-    max-width: calc(100vw - 16px);
-    padding: 14px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: 0 12px 36px #0008;
-    z-index: 10;
-    gap: 8px;
-    flex-wrap: wrap;
-    max-height: 65dvh;
-    overflow: auto;
-  }
-  body.explore-open header .header-actions {
-    display: flex;
-  }
-  .explore-open header .header-actions > label {
-    flex: 1 0 100%;
-  }
-  .header-actions .promptbar {
-    display: flex;
-    white-space: normal;
-    flex-wrap: wrap;
-  }
   body.explore-open:not(.timeline-open) .workspace > .map-panel {
     height: calc(100dvh - 202px);
   }
 }
-
 /* A failed snapshot must remain visible even with More closed. */
-body header .header-actions:has(#status[role='alert']) {
-  display: flex;
-}
-
 /* Portrait tablets show context and analysis together, not a phone-sized fold. */
 @media (min-width: 700px) and (max-width: 900px) and (orientation: portrait),
   (min-width: 901px) and (max-width: 1100px) and (orientation: portrait) and (any-pointer: coarse) {
@@ -1788,21 +1062,7 @@ body header .header-actions:has(#status[role='alert']) {
     height: clamp(280px, 36dvh, 440px);
     min-height: 280px;
   }
-  #browseToggle {
-    margin-left: auto;
-  }
-  #browseToggle + #morePanel + #mobileExplore {
-    margin-left: 0;
-  }
-  .time-controls {
-    justify-content: flex-start;
-    gap: 8px;
-  }
-  #mobileControls {
-    margin-left: auto;
-  }
 }
-
 /* Map density is not an analysis permission. */
 body .analytical {
   display: block;
@@ -1810,32 +1070,14 @@ body .analytical {
 body:not(.analyst) #quality {
   display: block;
 }
-body:not(.analyst) .reference-controls label {
-  display: inline-flex;
-}
 .analytical summary {
   padding: 12px 0;
   cursor: pointer;
   color: var(--up);
 }
-
 /* Dedicated analysis view: shared controls, no nested sidebar squeeze. */
-.view-switch {
-  display: flex;
-  gap: 6px;
-  padding: 4px 0 8px;
-  flex-shrink: 0;
-}
-.view-switch button {
-  min-height: 44px;
-}
-.view-switch [aria-pressed='true'] {
-  border-color: var(--up);
-  color: var(--up);
-}
 body.analysis-open .workspace,
-body.analysis-open #comparePanel,
-body.analysis-open .timebar {
+body.analysis-open #comparePanel {
   display: none;
 }
 #analysisWorkspace {
@@ -2001,12 +1243,6 @@ body.analysis-open .timebar {
   white-space: normal;
   min-width: 200px;
 }
-body.analysis-open .view-switch {
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  z-index: 5;
-}
 @media (max-width: 1000px) {
   .analysis-controls {
     grid-template-columns: 1fr 1fr;
@@ -2021,13 +1257,6 @@ body.analysis-open .view-switch {
   }
   .analysis-controls > section:first-child {
     grid-column: auto;
-  }
-  .view-switch button {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-  .view-switch {
-    gap: 4px;
   }
   #analysisWorkspace {
     padding-top: 4px;
@@ -2045,7 +1274,6 @@ body.analysis-open .view-switch {
     gap: 6px;
   }
 }
-
 #analysisWorkspace .event-context {
   padding: 0;
   border: 0;
@@ -2065,7 +1293,6 @@ body.analysis-open .view-switch {
 .analysis-heading h1 {
   margin-bottom: 4px;
 }
-
 #eventCatalog:not([open]) {
   display: none;
 }
@@ -2106,7 +1333,6 @@ body.analysis-open .view-switch {
     font-size: 13px;
   }
 }
-
 .event-jumps {
   display: flex;
   gap: 20px;
@@ -2120,7 +1346,6 @@ body.analysis-open .view-switch {
 .signal-method summary {
   padding: 8px 0;
 }
-
 .analysis-plot-column,
 .analysis-result-column {
   min-width: 0;
@@ -2135,7 +1360,6 @@ body.analysis-open .view-switch {
     margin-top: 8px;
   }
 }
-
 .analysis-result-column th,
 .analysis-result-column td {
   white-space: normal;
@@ -2144,123 +1368,7 @@ body.analysis-open .view-switch {
 .analysis-result-column td:nth-child(n + 2):nth-child(-n + 6) {
   white-space: nowrap;
 }
-
-#freshness {
-  margin: 0;
-  padding: 6px 12px;
-  font-size: 11px;
-  flex-shrink: 0;
-}
-#freshness.stale {
-  color: #f4c397;
-  border-left: 3px solid #f4c397;
-}
-
-/* Settings overlay the chart; opening them never reallocates the workspace. */
-body .timebar {
-  overflow: visible;
-  max-height: none;
-}
-.timeline-settings {
-  position: absolute;
-  right: 12px;
-  bottom: calc(100% + 8px);
-  z-index: 8;
-  width: 400px;
-  max-width: calc(100vw - 24px);
-  max-height: 60dvh;
-  overflow: auto;
-  padding: 16px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  box-shadow: 0 12px 36px #0008;
-}
-.timeline-settings[hidden] {
-  display: none;
-}
-.settings-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.settings-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media (max-width: 360px) {
-  .settings-fields {
-    grid-template-columns: 1fr;
-  }
-}
-.settings-fields label {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 12px;
-  color: var(--muted);
-  min-width: 0;
-}
-.settings-fields select {
-  width: 100%;
-  min-width: 0;
-  font-size: 16px;
-  color: var(--text);
-}
-.timeline-settings #clockNote {
-  margin: 12px 0 0;
-  display: block;
-}
-body #mobileControls {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 12px;
-  order: 3;
-  margin-left: auto;
-  white-space: nowrap;
-}
-#mobileControls svg {
-  flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.settings-icon {
-  width: 18px;
-  height: 18px;
-}
-.settings-chevron {
-  width: 14px;
-  height: 14px;
-}
-#mobileControls[aria-expanded='true'] .settings-chevron {
-  transform: rotate(180deg);
-}
-body #mobileMeasure {
-  display: block;
-}
-body[data-mode='connections'] .time-controls,
-body[data-mode='connections'] .scrubrow,
-body[data-mode='exposure'] .time-controls,
-body[data-mode='exposure'] .scrubrow {
-  display: none;
-}
 /* Keep the heading in the scroll flow: no opaque strip over charts. */
-.detail #placeName {
-  position: static;
-}
-#randomEvent {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
 #analysisWorkspace #eventContext {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 44px;
@@ -2298,48 +1406,595 @@ body[data-mode='exposure'] .scrubrow {
   border-radius: 6px;
   font-size: 13px;
 }
-#randomEvent svg {
+
+/* ---------- Chrome: header, workspace switch, timeline bar ---------- */
+/* One layout system. Wide (>=1281px): everything on one header row, timeline
+   settings inline. Medium (901-1280px): same header, settings in a popover.
+   Narrow (<=900px): lens tabs + tools row, workspace switch as a grid below. */
+.ico {
   width: 18px;
   height: 18px;
   flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-@media (max-width: 480px) {
-  .view-switch {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-  .view-switch button {
-    justify-content: center;
-    white-space: nowrap;
-  }
+.icon-button {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+header {
+  position: relative;
+  z-index: 6;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+  white-space: nowrap;
+}
+.orb {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 300;
+  color: var(--up);
+}
+header nav {
+  display: flex;
+  gap: 4px;
+}
+header nav button {
+  font-size: 13px;
+  padding: 8px 12px;
+  min-height: 38px;
+  white-space: nowrap;
+}
+header .view-switch {
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+.view-switch [aria-pressed='true'] {
+  color: var(--up);
+  border-color: #6eb89f;
+  background: #25423e;
+}
+#randomEvent {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.header-tools {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+#browseToggle,
+#mobileExplore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  padding: 8px 12px;
+  min-height: 38px;
+  white-space: nowrap;
+}
+#mobileExplore > span {
+  display: none;
+}
+#mobileExplore[aria-expanded='true'] {
+  color: var(--up);
+  border-color: #6eb89f;
+}
+/* More: a small menu, not a toolbar. */
+.header-actions {
+  position: absolute;
+  right: 20px;
+  top: calc(100% + 6px);
+  z-index: 10;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: 70dvh;
+  overflow: auto;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px #0008;
+  font-size: 13px;
+}
+body.explore-open .header-actions,
+body .header-actions:has(#status[role='alert']) {
+  display: flex;
+}
+.header-actions button {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  text-align: left;
+  background: transparent;
+  border-color: transparent;
+  font-size: 13px;
+}
+.header-actions button:hover {
+  background: #25434c;
+}
+.promptbar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.promptbar .eyebrow {
+  padding: 4px 10px 6px;
+}
+#status {
+  margin-top: 4px;
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+}
+#status[role='alert'] {
+  color: #f4c397;
+}
+#freshness {
+  margin: 0;
+  padding: 5px 20px;
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+#freshness.stale {
+  color: #f4c397;
+}
+.analyst-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 2px 0 10px;
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 24px;
+  cursor: pointer;
+}
+body.analysis-open .workspace,
+body.analysis-open #comparePanel,
+body.analysis-open .timebar {
+  display: none;
+}
+.detail #placeName {
+  position: static;
 }
 
+/* Timeline bar */
+.timebar {
+  position: relative;
+  flex-shrink: 0;
+  padding: 8px 20px max(8px, env(safe-area-inset-bottom));
+  background: #10212cf5;
+  border-top: 1px solid #415c64;
+}
+.time-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.time-controls button,
+.time-controls input {
+  min-height: 38px;
+  font-size: 13px;
+}
+.time-controls #back,
+.time-controls #forward {
+  min-width: 38px;
+  padding: 6px 10px;
+  font-size: 16px;
+  line-height: 1;
+}
+#play {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 92px;
+}
+#play .ico-pause,
+#play.playing .ico-play {
+  display: none;
+}
+#play.playing .ico-pause {
+  display: block;
+}
+#mobileControls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+#mobileControls svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.settings-icon {
+  width: 18px;
+  height: 18px;
+}
+.settings-chevron {
+  width: 14px;
+  height: 14px;
+}
+#mobileControls[aria-expanded='true'] .settings-chevron {
+  transform: rotate(180deg);
+}
+#mobileMeasure {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 14px;
+}
+.scrubrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 0;
+}
+.scrubrow input {
+  flex: 1;
+  min-width: 50px;
+  accent-color: var(--up);
+  cursor: ew-resize;
+}
+.scrubrow span {
+  font-size: 10px;
+  color: var(--muted);
+}
+.timeline-settings {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 8px);
+  z-index: 8;
+  width: 400px;
+  max-width: calc(100vw - 24px);
+  max-height: 60dvh;
+  overflow: auto;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px #0008;
+}
+.timeline-settings[hidden] {
+  display: none;
+}
+.settings-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.settings-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.settings-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 0;
+}
+.settings-fields select {
+  width: 100%;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--text);
+}
+#clockNote {
+  margin: 12px 0 0;
+}
+body[data-mode='connections'] .time-controls,
+body[data-mode='connections'] .scrubrow,
+body[data-mode='exposure'] .time-controls,
+body[data-mode='exposure'] .scrubrow {
+  display: none;
+}
+.browse-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 10px 18px;
+  border-bottom: 1px solid var(--line);
+}
+#browseDialog {
+  padding: 0;
+  max-width: 410px;
+  width: calc(100% - 24px);
+  max-height: 85dvh;
+  overflow: hidden;
+}
+#browseDialog .discovery {
+  display: block;
+  max-height: calc(85dvh - 70px);
+  overflow: auto;
+  border: 0;
+  padding: 16px 20px;
+}
+#browseDialog .panel-heading h1 {
+  display: none;
+}
+#browseDialog .field input,
+#browseDialog .field select {
+  font-size: 16px;
+  min-height: 44px;
+}
+#sourceDialog .close {
+  float: right;
+}
+
+/* Wide: settings live in the bar; no popover, no caption. */
+@media (min-width: 1281px) and (pointer: fine) {
+  #mobileControls,
+  #mobileMeasure {
+    display: none;
+  }
+  .timeline-settings {
+    display: contents;
+  }
+  .settings-heading,
+  .timeline-settings #clockNote {
+    display: none;
+  }
+  .timebar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'controls settings'
+      'scrub scrub';
+    column-gap: 20px;
+    align-items: center;
+  }
+  .time-controls {
+    grid-area: controls;
+  }
+  .settings-fields {
+    grid-area: settings;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .settings-fields label {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .settings-fields select {
+    width: auto;
+    min-height: 38px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .scrubrow {
+    grid-area: scrub;
+  }
+}
+@media (max-width: 1440px) and (min-width: 901px) {
+  #browseToggle .search-label {
+    display: none;
+  }
+  #browseToggle {
+    padding: 8px 10px;
+  }
+}
+/* Medium: keep one header row; hide the brand text before wrapping. */
+@media (max-width: 1100px) and (min-width: 901px) {
+  header {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .brand {
+    display: none;
+  }
+  header nav button {
+    padding: 8px 9px;
+  }
+  header .view-switch {
+    padding-left: 6px;
+  }
+  #randomEvent > span {
+    display: none;
+  }
+}
+/* Narrow: lens tabs and tools on top, workspace switch as a grid below. */
+@media (max-width: 900px) {
+  header {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .brand {
+    display: none;
+  }
+  header nav:not(.view-switch) {
+    flex: 1;
+  }
+  header nav:not(.view-switch) button {
+    flex: 1;
+    padding: 6px 4px;
+    font-size: 12px;
+    min-height: 44px;
+  }
+  header .view-switch {
+    order: 5;
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 0;
+    border: 0;
+  }
+  header .view-switch button {
+    justify-content: center;
+    min-height: 40px;
+    padding: 6px;
+    font-size: 12px;
+  }
+  #browseToggle,
+  #mobileExplore {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+  }
+  #browseToggle .search-label {
+    display: none;
+  }
+  .header-actions {
+    right: 8px;
+  }
+  #freshness {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .timebar {
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+  }
+  .time-controls {
+    justify-content: space-between;
+  }
+  .time-controls #back,
+  .time-controls #forward,
+  .time-controls #latest {
+    display: none;
+  }
+  .time-controls #dateInput {
+    width: 148px;
+    min-width: 148px;
+    min-height: 44px;
+    padding: 5px;
+    font-size: 16px;
+  }
+  .time-controls #play,
+  #mobileControls {
+    min-height: 44px;
+  }
+  #mobileMeasure {
+    font-size: 10px;
+  }
+  .scrubrow {
+    gap: 6px;
+    margin-top: 3px;
+  }
+  .scrubrow span {
+    font-size: 8px;
+  }
+  .settings-fields select {
+    font-size: 16px;
+  }
+}
+@media (max-width: 480px) {
+  header .view-switch {
+    grid-template-columns: 1fr 1fr;
+  }
+  header nav:not(.view-switch) {
+    min-width: 0;
+  }
+  header nav:not(.view-switch) button {
+    padding: 6px 2px;
+    font-size: 11px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  header nav:not(.view-switch) #connections {
+    font-size: 10.5px;
+    letter-spacing: -0.2px;
+  }
+  #browseToggle,
+  #mobileExplore {
+    width: 40px;
+    min-width: 40px;
+  }
+  #freshness {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #play {
+    min-width: 44px;
+    padding: 6px 12px;
+  }
+  #play span {
+    display: none;
+  }
+  #mobileControls span {
+    display: none;
+  }
+  #mobileControls {
+    padding: 6px 10px;
+  }
+}
+@media (max-width: 360px) {
+  .settings-fields {
+    grid-template-columns: 1fr;
+  }
+}
+@media (pointer: coarse) {
+  #browseToggle,
+  #mobileExplore,
+  header nav button,
+  .time-controls button,
+  .time-controls input {
+    min-height: 44px;
+  }
+}
 /* Keep analysis navigation on the same rail as its centered content. */
 @media (min-width: 1680px) {
   body.analysis-open main {
     scrollbar-gutter: stable both-edges;
   }
-  body.analysis-open header {
-    padding-left: calc((100% - 1600px) / 2);
-    padding-right: calc((100% - 1600px) / 2);
-  }
-  body.analysis-open .view-switch {
-    width: 1600px;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
+  body.analysis-open header,
   body.analysis-open #freshness {
     padding-left: calc((100% - 1600px) / 2);
     padding-right: calc((100% - 1600px) / 2);
   }
-}
-
-@media (min-width: 1441px) {
-  header .header-actions {
-    margin-left: 0;
-  }
-  header #browseToggle {
-    margin-left: auto;
+  body.analysis-open .header-actions {
+    right: calc((100% - 1600px) / 2);
   }
 }
