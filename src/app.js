@@ -55,8 +55,8 @@ function text(id, s) {
 function pinState() {
   const pinned = state.pins.includes(state.selected);
   $('pin').setAttribute('aria-pressed', String(pinned));
-  $('pin').setAttribute('aria-label', pinned ? 'Remove from comparison' : 'Add to comparison');
-  $('pin').title = pinned ? 'Remove from comparison' : 'Add to comparison';
+  $('pin').setAttribute('aria-label', 'Compare this place');
+  $('pin').title = pinned ? 'In comparison · click to remove' : 'Add to comparison';
 }
 // Brief confirmation next to an icon button; the button itself stays put.
 function flash(id, message) {
@@ -247,6 +247,15 @@ function referenceArgs(id) {
       yearAgo: dates.map((d) => byDate.get(String(Number(d.slice(0, 4)) - 1) + d.slice(4)) || null),
     },
   ];
+}
+// Calendar dates of the reference actually used; year mode reports last year.
+function referenceDates(s) {
+  if (!s) return [null, null];
+  if (state.baseline === 'year') {
+    const shift = (d) => (d ? String(Number(d.slice(0, 4)) - 1) + d.slice(4) : null);
+    return [shift(dates[s.start]), shift(dates[state.index])];
+  }
+  return [dates[s.baseStart] || null, dates[s.baseEnd] || null];
 }
 function baselineLabel() {
   const m = /^prior(\d+)$/.exec(state.baseline);
@@ -577,15 +586,8 @@ function activityDetail() {
   );
   $('delta').className =
     'delta ' + (s.percent === null ? 'muted' : s.percent < 0 ? 'negative' : 'positive');
-  const yearAgoDate = (d) => String(Number(d.slice(0, 4)) - 1) + d.slice(4);
-  const baselineDates =
-    state.baseline === 'year'
-      ? s.start >= 0
-        ? yearAgoDate(dates[s.start]) + ' → ' + yearAgoDate(dates[state.index])
-        : 'not available'
-      : s.baseStart >= 0 && s.baseEnd < dates.length
-        ? dates[s.baseStart] + ' → ' + dates[s.baseEnd]
-        : 'not available';
+  const [refStart, refEnd] = referenceDates(s);
+  const baselineDates = refStart && refEnd ? refStart + ' → ' + refEnd : 'not available';
   text(
     'explanation',
     s.difference === null
@@ -795,7 +797,9 @@ function render() {
   text(
     'mapSubtitle',
     activity
-      ? dates[state.index] + ' · ' + (state.window === 7 ? '7-day means' : 'daily values')
+      ? dates[state.index] +
+          ' · ' +
+          (state.window === 1 ? 'daily values' : state.window + '-day means')
       : state.mode === 'connections'
         ? 'Previous / next port calls · not final cargo destinations'
         : 'Country markers show trade exposure—not actual losses',
@@ -868,14 +872,23 @@ function render() {
     text(
       'indexNote',
       $('comparisonScale').value === 'indexed'
-        ? 'Each series indexed to its complete Jan 1–28, 2026 mean = 100; incomplete references omitted.'
+        ? 'Each series indexed to its complete Jan 1–28, 2026 mean = 100; zero or incomplete references omitted. January values overlap the reference: this is retrospective normalization, not a real-time signal.'
         : 'Daily values, one shared scale. Coincident changes do not establish rerouting or causation.',
     );
     const colors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
+    const focused = document.activeElement?.closest?.('#pinLabels .pin-chip');
+    const restoreFocus = focused && {
+      id: focused.dataset.id,
+      remove:
+        focused.contains(document.activeElement) &&
+        document.activeElement.classList.contains('pin-remove'),
+      index: [...$('pinLabels').children].indexOf(focused),
+    };
     $('pinLabels').replaceChildren(
       ...state.pins.map((id, i) => {
         const name = placeById[id]?.name || id;
         const chip = element('span', 'pin-chip', '');
+        chip.dataset.id = id;
         chip.style.color = colors[i];
         const label = element('button', 'pin-name', name);
         label.title = 'Show ' + name;
@@ -891,6 +904,15 @@ function render() {
         return chip;
       }),
     );
+    if (restoreFocus) {
+      const chips = [...$('pinLabels').children];
+      const same = chips.find((c) => c.dataset.id === restoreFocus.id);
+      const target = same || chips[Math.min(restoreFocus.index, chips.length - 1)];
+      (target
+        ? target.querySelector(same && restoreFocus.remove ? '.pin-remove' : '.pin-name')
+        : $('clearPins')
+      )?.focus({ preventScroll: true });
+    }
     plot(
       $('comparison'),
       state.pins.map((id, i) => ({ id, color: colors[i] })),
@@ -1255,8 +1277,7 @@ function bind() {
         state.baseline,
         dates[state.index],
         dates[stats[state.selected]?.start] || null,
-        dates[stats[state.selected]?.baseStart] || null,
-        dates[stats[state.selected]?.baseEnd] || null,
+        ...referenceDates(stats[state.selected]),
       ]),
     ]);
   };

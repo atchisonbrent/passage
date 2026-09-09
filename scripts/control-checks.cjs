@@ -73,11 +73,16 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   await delay(150);
   assert.equal(await js('state.pins.length'), 2);
   assert.equal(await js("document.querySelectorAll('#pinLabels .pin-remove').length"), 2);
+  await js("document.querySelector('#pinLabels .pin-chip:last-child .pin-remove').focus()");
   await click('#pinLabels .pin-chip:last-child .pin-remove');
   assert.deepEqual(
     await js('state.pins'),
     [await js('state.selected')],
     'x removes only that place',
+  );
+  assert.ok(
+    await js("document.activeElement.closest('#pinLabels, #clearPins')!==null"),
+    'keyboard focus stays in the compare strip after removing a chip',
   );
   await click('#pin');
   assert.equal(await js("document.getElementById('pin').getAttribute('aria-pressed')"), 'false');

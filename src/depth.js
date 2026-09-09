@@ -191,7 +191,7 @@ function renderDepth() {
   const entries = [];
   for (let m = 0; m < 7; m++) {
     if (m >= 4 && (m < 6 ? place().kind !== 'port' : place().kind !== 'chokepoint')) continue;
-    const s = M.summarize(series[id] || [], state.index, m, state.window, state.baseline);
+    const s = M.summarize(series[id] || [], state.index, m, state.window, ...referenceArgs(id));
     entries.push({ m, s });
   }
   const total = entries[0]?.s.current;
@@ -206,10 +206,7 @@ function renderDepth() {
           '',
           s.percent === null
             ? 'No complete reference'
-            : (s.percent > 0 ? '+' : '') +
-                fmt(s.percent) +
-                '% vs ' +
-                (state.baseline === 'january' ? 'Jan 1–28' : 'preceding 28 days'),
+            : (s.percent > 0 ? '+' : '') + fmt(s.percent) + '% vs ' + baselineLabel(),
         ),
       );
       if (m > 0 && m < 4 && total > 0 && s.current !== null)
@@ -301,7 +298,7 @@ function renderDepth() {
     depthExport.push(['observation', row[0], row[col] ?? null, id, labels[metric], end]);
   depthExport.push(
     ['method', 'window_days', state.window],
-    ['method', 'category_reference', state.baseline],
+    ['method', 'category_reference', baselineLabel()],
     [
       'source',
       'activity',

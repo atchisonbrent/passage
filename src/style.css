@@ -2046,10 +2046,23 @@ body[data-mode='exposure'] .scrubrow {
   background: #25434c;
 }
 @media (pointer: coarse) {
+  .pin-chip .pin-remove,
+  .pin-chip .pin-name,
+  .compare-bar select,
+  .compare-bar button,
+  .detail-tools .icon-button,
+  .analysis-result-tools button,
+  .field.inline select {
+    min-height: 44px;
+  }
   .pin-chip .pin-remove {
     opacity: 0.9;
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 44px;
+  }
+  .detail-tools .icon-button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
   }
 }
 
@@ -2109,10 +2122,23 @@ body[data-mode='exposure'] .scrubrow {
   gap: 10px;
   margin-top: 8px;
 }
-.method-hint {
-  cursor: help;
-  text-decoration: underline dotted;
-  text-underline-offset: 3px;
+.method-note {
+  margin: 8px 0 0;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.method-note summary {
+  font-size: 11px;
+  color: var(--muted);
+  min-height: 32px !important;
+  padding: 6px 0 !important;
+}
+.method-note .hint {
+  margin: 0 0 6px;
+}
+.compare-note {
+  margin: 4px 0 0;
+  font-size: 11px;
 }
 #analysisStatus:empty,
 #analysisStatus[hidden] {

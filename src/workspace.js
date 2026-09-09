@@ -320,13 +320,14 @@ function renderWorkspace() {
             ? `History download failed for ${failed.map((id) => placeById[id].name).join(', ')}.`
             : '',
   );
-  $('analysisCoverage').title =
+  text(
+    'analysisCoverage',
     `Snapshot: ports through ${manifest.Daily_Ports_Data_latest}, passages through ${manifest.Daily_Chokepoints_Data_latest}. ` +
-    ($('analysisScale').value === 'indexed'
-      ? 'Indexed: each place relative to its complete reference mean = 100. '
-      : '') +
-    'Means require every calendar day in each period; missing is not zero. Net deviation is against the reference, not lost trade.';
-  text('analysisCoverage', 'How these numbers are computed');
+      ($('analysisScale').value === 'indexed'
+        ? 'Indexed: each place relative to its complete reference mean = 100. '
+        : '') +
+      'Means require every calendar day in each period; missing is not zero. Net deviation is against the reference, not lost trade. Percentages need a positive reference; tiny references produce large percentages.',
+  );
   comparisonTable(
     'analysisResults',
     `${start} → ${end}; reference ${rs} → ${re} · means in ${comparisonUnit()}/day; net deviation in ${comparisonUnit()}`,
