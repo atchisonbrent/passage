@@ -153,13 +153,29 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   await setValue('baseline', 'prior');
   await setValue('window', '7');
   if (!settingsInline) await click('#closeTimeline');
+  // Dense-port hit testing must not depend on the daily top-80 activity ranking.
+  // Use the real Show all places control, preserving the default ranked view.
+  assert.equal(await js("document.getElementById('analyst').checked"), false);
+  await click('#browseToggle');
+  await click('#analyst');
+  assert.equal(await js("document.getElementById('analyst').checked"), true);
+  await click('#closeBrowse');
   // Real pointer hover and selection at dense-port zoom, then restore landing.
   for (let i = 0; i < 26; i++) await click('#zoomin');
   assert.equal(await js('state.zoom'), 32);
   const points = await js(
-    `(() => {const b=document.getElementById('globe').getBoundingClientRect();return hitpoints.filter(p=>!p.id.startsWith('country-')&&p.x>20&&p.y>20&&p.x<b.width-20&&p.y<b.height-20).slice(0,3).map(p=>({...p,x:p.x+b.left,y:p.y+b.top}));})()`,
+    `(() => {const canvas=document.getElementById('globe'),b=canvas.getBoundingClientRect();return hitpoints.filter(p=>!p.id.startsWith('country-')&&p.x>20&&p.y>20&&p.x<b.width-20&&p.y<b.height-20).map(p=>({...p,x:p.x+b.left,y:p.y+b.top})).filter(p=>document.elementFromPoint(p.x,p.y)===canvas).slice(0,3);})()`,
   );
-  assert.ok(points.length >= 2, 'dense Singapore view exposes multiple selectable ports');
+  const denseView = { width, height, points, geometry: await js('globeGeometry') };
+  fs.writeFileSync(
+    path.join(out, `dense-map-${width}-${height}.json`),
+    JSON.stringify(denseView, null, 2),
+  );
+  assert.ok(
+    points.length >= 2,
+    'dense Singapore view in Show all places mode exposes multiple selectable ports: ' +
+      JSON.stringify(denseView),
+  );
   for (const point of points) {
     await call('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y });
     await delay(80);
@@ -190,6 +206,10 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
     path.join(out, `dense-map-${width}-${height}.png`),
     Buffer.from((await call('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
   );
+  await click('#browseToggle');
+  await click('#analyst');
+  assert.equal(await js("document.getElementById('analyst').checked"), false);
+  await click('#closeBrowse');
   await js("choose(places.find(p=>p.name==='Singapore').id)");
   await delay(100);
   const inlineSettings = await js("matchMedia('(min-width: 1281px) and (pointer: fine)').matches");
