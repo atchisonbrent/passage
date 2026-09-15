@@ -8,7 +8,12 @@ For a production code release, manually dispatch `release.yml` with `publish=tru
 
 ## Scheduled data refresh
 
-`.github/workflows/refresh.yml` checks daily at 11:23 UTC. Activation is explicit:
+`.github/workflows/refresh.yml` checks daily at 01:23 UTC (the preceding evening
+at 8:23 PM US Central in daylight time, 7:23 PM in standard time). This gives
+[PortWatch's Tuesday 9 AM Eastern updates](https://portwatch.imf.org/pages/data-and-methodology)
+time to settle; it does not guarantee source completeness. Daily coverage and
+publication gates remain unchanged. Monthly reconciliation follows the UTC date.
+Activation is explicit:
 `PASSAGE_REFRESH_ENABLED=true`, main branch only. The repository variable is the on/off switch; check Actions for the latest run.
 Standard hosted runners in this public repository have free Actions execution;
 no premium runners or persistent artifact/cache uploads are configured.

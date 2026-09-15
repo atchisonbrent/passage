@@ -1,7 +1,8 @@
 name: Refresh observed activity
 on:
   schedule:
-    - cron: '23 11 * * *'
+    # Evening US Central: 20:23 CDT / 19:23 CST, after Tuesday source updates.
+    - cron: '23 1 * * *'
   workflow_dispatch:
     inputs:
       publish:
