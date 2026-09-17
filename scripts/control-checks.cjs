@@ -176,7 +176,13 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
     'dense Singapore view in Show all places mode exposes multiple selectable ports: ' +
       JSON.stringify(denseView),
   );
-  for (const point of points) {
+  for (const original of points) {
+    // A selected-place panel can resize the canvas. Resolve the same intended
+    // marker again instead of reusing screen coordinates from the previous layout.
+    const point = await js(
+      `(() => {const p=hitpoints.find(p=>p.id===${JSON.stringify(original.id)}),b=document.getElementById('globe').getBoundingClientRect();return p&&{...p,x:p.x+b.left,y:p.y+b.top};})()`,
+    );
+    assert.ok(point, 'intended marker remains rendered: ' + original.id);
     await call('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y });
     await delay(80);
     assert.equal(await js("document.getElementById('globe').style.cursor"), 'pointer');
@@ -200,7 +206,11 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
       clickCount: 1,
     });
     await delay(80);
-    assert.equal(await js('state.selected'), point.id);
+    assert.equal(
+      await js('state.selected'),
+      point.id,
+      JSON.stringify({ width, height, original, point, geometry: await js('globeGeometry') }),
+    );
   }
   fs.writeFileSync(
     path.join(out, `dense-map-${width}-${height}.png`),
