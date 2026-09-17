@@ -4,7 +4,7 @@ Passage is an independent presentation of IMF PortWatch data, not an IMF product
 
 ## Coverage and historical research
 
-Both daily source APIs begin on 2019-01-01. Passage keeps 2019–2025 in per-place historical files and 2026 onward in monthly activity partitions. The globe uses the recent partitions; historical analysis loads only the selected places. This split is a loading boundary, not the start of the source dataset. Historical files are a separately assembled snapshot, not refreshed by the daily activity job; see their assembly date and source hash in exported comparison CSVs.
+Both daily source APIs begin on 2019-01-01. Passage keeps 2019–2025 in per-place historical files and 2026 onward in monthly activity partitions. The globe spans the full date range. Historical values are repacked by measure/year for efficient downloads; the active measure is resident before scrubbing. This storage split does not limit the timeline. Historical files are a separately assembled snapshot, not refreshed by the daily activity job; see their assembly date and source hash in exported comparison CSVs.
 
 The Red Sea 2023–24 preset compares December 2023 through March 2024 against November 1–28, 2023. These are editable study windows, not a claimed disruption onset or the IMF article’s year-on-year calculation. Suez and Bab el-Mandeb describe the affected corridor; the Cape is the documented alternative route; Hormuz supplies regional context, not a bypass of the Red Sea.
 

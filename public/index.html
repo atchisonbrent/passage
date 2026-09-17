@@ -1460,32 +1460,6 @@ body .header-actions:has(#status[role='alert']) {
   height: 12px;
   flex: none;
 }
-.history-entry {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  gap: 6px 12px;
-  padding: 4px 20px 8px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.history-entry[hidden] {
-  display: none;
-}
-.history-entry button {
-  min-height: 44px;
-  padding: 6px 10px;
-  font-size: 12px;
-}
-@media (max-width: 600px) {
-  .history-entry {
-    padding: 4px 12px 8px;
-  }
-  .history-entry > span {
-    flex-basis: 100%;
-  }
-}
 #freshness.stale {
   color: #f4c397;
 }
@@ -2326,8 +2300,6 @@ body[data-mode='exposure'] .timebar {
 <body>
 <header><a class="brand" href="/" aria-label="Passage home"><span class="orb">◎</span> passage</a><nav aria-label="Data lens"><button id="change" class="active">Change</button><button id="connections">Connections</button><button id="exposure">Exposure</button></nav><nav class="view-switch" aria-label="Workspace"><button id="exploreView" aria-pressed="true">Explore</button><button id="analyzeView" aria-pressed="false">Analyze</button><button id="eventsView" aria-expanded="false" aria-controls="eventCatalog">Events</button><button id="randomEvent" title="Open a random sourced event or qualifying data shift"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 4-3 6-6s4-6 6-6h3m-4-4 4 4-4 4"/></svg><span>Random</span></button></nav><div class="header-tools"><button id="browseToggle" aria-haspopup="dialog" aria-label="Find a place" title="Find a place"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="search-label">Find a place</span></button><button id="mobileExplore" aria-controls="morePanel" aria-expanded="false" aria-haspopup="true" aria-label="More" title="More"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>More</span></button></div><div class="header-actions" id="morePanel"><button id="sources">Sources &amp; methods</button><section class="promptbar" aria-label="Starting points"><span class="eyebrow">Start with a question</span><button data-story="hormuz">What changed at Hormuz?</button><button data-story="routes">Who connects to Jebel Ali?</button><button data-story="cape">Suez vs the Cape</button><button data-story="exposure">Who depends on Singapore?</button></section><div id="status" role="status">Loading the dated PortWatch snapshot…</div></div></header>
 <main>
-<p id="freshness" class="hint" role="status"></p>
-<nav id="historyEntry" class="history-entry" aria-label="Historical research"><span>Daily data since 2019</span><button id="historyExplore">Choose dates</button><button id="redSeaStudy">Red Sea 2023–24</button></nav>
 <section id="analysisWorkspace" hidden aria-label="Comparison analysis">
  <p class="hint">Compare up to four ports or passages over the same dates. History loads automatically. Open Edit comparison below to change the selection, measure or reference.</p>
  <details id="eventCatalog"><summary>Events & context</summary><p class="hint">Curated context, not a live or exhaustive news feed. Review dates appear with each source. Recent reporting and historical context are labeled separately. Follow the original sources for developments after publication.</p><nav class="event-jumps" aria-label="Discovery sections"><a href="#shiftHeading">Data shifts</a><a href="#eventHeading">Reported events</a></nav><h2 id="shiftHeading">Notable shifts in the data</h2><details class="signal-method"><summary>How shifts are selected</summary><p class="hint">Calls screened across the bundled activity catalog: complete 7-day mean versus preceding 28 days, reference ≥20 calls/day, shift ≥50%, all seven days on the same side of the reference. One strongest absolute shift per place; ranked retrospectively, not statistically significant anomalies. Context is separately researched. Unmatched shifts remain unexplained.</p></details><label class="field">Discovery period<select id="shiftPeriod"><option value="recent">Recent · last 30 observed days</option><option value="archive">Historical discoveries</option></select></label><p id="shiftPeriodNote" class="hint"></p><div id="shiftCards" class="event-cards"></div><h2 id="eventHeading">Reported events & historical context</h2><div id="eventCards" class="event-cards"></div></details>
@@ -2352,9 +2324,9 @@ body[data-mode='exposure'] .timebar {
 <section class="workspace">
 <aside class="discovery"><div class="panel-heading"><h1 id="listTitle">Find the change</h1><span id="coverage" class="muted"></span></div><label class="analyst-toggle"><input id="analyst" type="checkbox"> Show all places</label><label class="field">Find a port or passage<input id="search" type="search" placeholder="Try Rotterdam, Panama, Japan…" autocomplete="off"></label><div class="filterrow"><label class="field">Places<select id="kind"><option value="all">Ports + passages</option><option value="port">Ports</option><option value="chokepoint">Chokepoints</option></select></label><label class="field">Rank by<select id="rank"><option value="absolute" title="Largest absolute shifts first; search includes places with missing comparisons">Size of change</option><option value="percent" title="Percentage change; reference floor 10 calls/day or 1,000 tonnes/day, complete windows only">Percentage change</option><option value="activity" title="Highest current activity first; complete windows only">Activity</option></select></label></div><div id="locations" class="locations" aria-label="Search results and ranked places"></div></aside>
 <section class="map-panel" aria-label="Interactive maritime globe"><div class="map-heading"><button id="detailsToggle">Details</button><span id="lensBadge" class="badge">Observed · AIS-derived estimates</span><h2 id="mapTitle">A world of changing activity</h2><p id="mapSubtitle">Color reveals the change. Select a place to understand it.</p></div><div class="scroll-edge left" aria-hidden="true"></div><div class="scroll-edge right" aria-hidden="true"></div><canvas id="globe" tabindex="0" aria-label="Maritime globe. Drag to rotate; arrow keys rotate; plus and minus zoom. Select places using the searchable list as an accessible alternative."></canvas><div class="map-tools"><button id="zoomout" aria-label="Zoom out">−</button><button id="zoomin" aria-label="Zoom in">+</button><button id="reset">Reset view</button></div><div class="legend" id="legend"><span class="dot down"></span> Below baseline <span class="dot up"></span> Above <span class="dot missing"></span> No comparison<br><small>Ring = baseline · filled circle = current activity</small></div><div id="story" class="story" hidden></div></section>
-<aside class="detail"><div class="detail-heading"><div class="detail-title"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p></div><div class="detail-tools"><button id="backToGlobe" class="icon-button" aria-label="Back to globe" title="Back to globe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button id="pin" class="icon-button" aria-label="Compare this place" title="Add to comparison" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16M6 15V9m6 6V5m6 10v-4"/></svg></button><button id="share" class="icon-button" aria-label="Copy view link" title="Copy view link"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button></div></div><section id="activityDetail"><div class="big-row"><div class="big" id="value">—</div><div id="unit" class="muted"></div></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="sr-only">Drag horizontally or tap to select a date. Arrow keys move a day; Shift moves a week.</p><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, separate from the globe’s 2026 timeline.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><label class="field">Direction<select id="direction"><option value="out">Next port after this one</option><option value="in">Previous port before this one</option></select></label><p id="networkSummary"></p><div id="routes"></div><details class="method-note"><summary>About these links</summary><p class="hint">Historical previous/next port calls, 2019–2024, weighted by the daily loaded capacity that would be affected if this port stopped. Schematic great-circle links, not shipping routes or final cargo destinations; concentration, not resilience.</p></details><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><div class="date-pair"><label class="field">Trade<select id="trade"><option value="daily_import_value_at_risk">Imports via this port</option><option value="daily_export_value_at_risk">Exports via this port</option></select></label><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label></div><p id="exposureSummary"></p><div id="countries"></div><details class="method-note"><summary>About this model</summary><p class="hint">Modeled 2022 trade value (USD/day) that passes through this port for each partner country, from the Oxford/IMF spillover model. Exposure, not predicted loss. Only the source Total row is used for All sectors; missing values are excluded, not zero. Top 40 shown; the export keeps every row.</p></details><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
+<aside class="detail"><div class="detail-heading"><div class="detail-title"><div class="eyebrow" id="placeKind">Selected place</div><h2 id="placeName">—</h2><p class="muted" id="placeCountry"></p></div><div class="detail-tools"><button id="backToGlobe" class="icon-button" aria-label="Back to globe" title="Back to globe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button id="pin" class="icon-button" aria-label="Compare this place" title="Add to comparison" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16M6 15V9m6 6V5m6 10v-4"/></svg></button><button id="share" class="icon-button" aria-label="Copy view link" title="Copy view link"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg></button></div></div><section id="activityDetail"><div class="big-row"><div class="big" id="value">—</div><div id="unit" class="muted"></div></div><div id="delta" class="delta"></div><p id="explanation"></p><p class="hint" id="quality"></p><p id="chartReadout" class="chart-readout"></p><canvas id="chart" role="slider" tabindex="0" aria-label="Selected daily history date" aria-describedby="chartHelp" aria-orientation="horizontal"></canvas><p id="globeEventContext" hidden></p><p id="chartHelp" class="sr-only">Drag horizontally or tap to select a date. Arrow keys move a day; Shift moves a week.</p><details id="depthPanel" class="depth-panel"><summary>History & disruption analysis</summary><p class="hint">Selected-place context, using the same full historical coverage as the globe.</p><button id="loadHistory">Load 2019–2025 history</button><p id="historyStatus" role="status" class="hint"></p><h3>Same time in previous years</h3><p id="seasonSummary"></p><div id="seasonYears"></div><canvas id="historyChart" aria-label="Monthly activity means, historical context; gaps remain missing"></canvas><p id="historyRange" class="hint"></p><h3>Disruption & recovery</h3><label class="field">Event start<input id="eventStart" type="date" value="2026-02-28"></label><div class="filterrow"><label class="field">Recovery threshold<select id="recoveryThreshold"><option value="0.9">90% of pre-event mean</option><option value="1">100% of pre-event mean</option><option value="0.8">80% of pre-event mean</option></select></label><label class="field">Sustained for<select id="recoveryDays"><option value="7">7 consecutive days</option><option value="14">14 consecutive days</option></select></label></div><p class="hint">Reference = 28 days immediately before the event. Follow-up ends at the selected observation date. Recovery is confirmed after consecutive observed days above the threshold, following a decline. A later relapse remains possible.</p><dl id="eventResults"></dl><h3>What changed inside the total?</h3><div id="categoryResults"></div><p class="hint">Vessel classes use call counts. Tonnes and calls are different measures; neither proves cargo value or identifies rerouted ships.</p><button id="downloadDepth">Download analysis & references · CSV</button></details><details class="analytical"><summary>Calculation & data</summary><dl id="calculation"></dl><p class="hint">Not seasonally adjusted. A deviation from a selected reference is not a causal estimate or measured economic loss.</p><button id="download">Download selected observations · CSV</button></details></section><section id="networkDetail" hidden><label class="field">Direction<select id="direction"><option value="out">Next port after this one</option><option value="in">Previous port before this one</option></select></label><p id="networkSummary"></p><div id="routes"></div><details class="method-note"><summary>About these links</summary><p class="hint">Historical previous/next port calls, 2019–2024, weighted by the daily loaded capacity that would be affected if this port stopped. Schematic great-circle links, not shipping routes or final cargo destinations; concentration, not resilience.</p></details><button id="downloadNetwork">Download these connections · CSV</button></section><section id="exposureDetail" hidden><div class="date-pair"><label class="field">Trade<select id="trade"><option value="daily_import_value_at_risk">Imports via this port</option><option value="daily_export_value_at_risk">Exports via this port</option></select></label><label class="field">Sector<select id="sector"><option value="all">All sectors</option></select></label></div><p id="exposureSummary"></p><div id="countries"></div><details class="method-note"><summary>About this model</summary><p class="hint">Modeled 2022 trade value (USD/day) that passes through this port for each partner country, from the Oxford/IMF spillover model. Exposure, not predicted loss. Only the source Total row is used for All sectors; missing values are excluded, not zero. Top 40 shown; the export keeps every row.</p></details><button id="downloadExposure">Download selected model rows · CSV</button></section></aside>
 </section>
-<section id="comparePanel" class="compare-panel" hidden><div class="compare-bar"><h2>Compared</h2><div id="pinLabels"></div><select id="comparisonScale" aria-label="Comparison scale" title="Indexed: each series relative to its complete Jan 1–28, 2026 mean = 100"><option value="absolute">Daily values</option><option value="indexed">Indexed · Jan = 100</option></select><button id="openAnalyze" title="Open these places in Analyze with adjustable periods and references">Analyze</button><button id="clearPins" title="Clear comparison">Clear</button></div><p id="indexNote" class="hint compare-note"></p><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
+<section id="comparePanel" class="compare-panel" hidden><div class="compare-bar"><h2>Compared</h2><div id="pinLabels"></div><select id="comparisonScale" aria-label="Comparison scale" title="Indexed: each series relative to its complete Jan 1–28, selected year mean = 100"><option value="absolute">Daily values</option><option value="indexed">Indexed · Jan = 100</option></select><button id="openAnalyze" title="Open these places in Analyze with adjustable periods and references">Analyze</button><button id="clearPins" title="Clear comparison">Clear</button></div><p id="indexNote" class="hint compare-note"></p><p id="comparisonReadout" class="chart-readout"></p><canvas id="comparison" role="slider" tabindex="0" aria-orientation="horizontal" aria-label="Pinned daily histories date" aria-describedby="chartHelp"></canvas></section>
 </main>
 <section class="timebar" aria-label="Playback and date controls">
  <div class="time-controls"><button id="play" aria-label="Play"><svg class="ico ico-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 5v14l12-7z" fill="currentColor" stroke="none"/></svg><svg class="ico ico-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14" stroke-width="2.6"/></svg><span id="playLabel">Play</span></button><button id="back" aria-label="Previous day">‹</button><input id="dateInput" type="date" aria-label="Observation date"><button id="forward" aria-label="Next day">›</button><button id="latest">Latest</button><button id="mobileControls" aria-controls="timelineSettings" aria-expanded="false"><svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3m0 13v3M2.5 12h3m13 0h3M5.3 5.3l2.1 2.1m9.2 9.2 2.1 2.1M5.3 18.7l2.1-2.1m9.2-9.2 2.1-2.1"/></svg><span>Settings</span><svg class="settings-chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4 10 4-4 4 4"/></svg></button></div>
@@ -2362,13 +2334,13 @@ body[data-mode='exposure'] .timebar {
  <div class="scrubrow"><span id="startLabel">JAN 2026</span><input type="range" id="scrub" min="0" max="1" value="0" aria-label="Observation timeline"><span id="endLabel">Latest available</span></div>
  <div id="timelineSettings" class="timeline-settings" role="region" aria-label="Playback settings" hidden>
   <div class="settings-heading"><strong>Playback settings</strong><button id="closeTimeline" class="icon-button" aria-label="Close playback settings"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
-  <div class="settings-fields"><label id="metricLabel">Measure <select id="metric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports</option><option value="5">Estimated exports</option><option value="6">Passage capacity</option></select></label><label>Window <select id="window"><option value="1">Daily value</option><option value="7" selected>7-day mean</option><option value="14">14-day mean</option><option value="28">28-day mean</option></select></label><label>Compare with <select id="baseline"><option value="prior">Prior 28 days</option><option value="prior14">Prior 14 days</option><option value="prior56">Prior 56 days</option><option value="prior91">Prior 91 days</option><option value="january">Jan 1–28, 2026</option><option value="year">Same dates last year</option></select></label><label>Speed <select id="speed"><option value="1">1 day / sec</option><option value="7" selected>1 week / sec</option><option value="28">4 weeks / sec</option></select></label></div>
+  <div class="settings-fields"><label id="metricLabel">Measure <select id="metric"><option value="0">All calls</option><option value="1">Tanker calls</option><option value="2">Container calls</option><option value="3">Dry-bulk calls</option><option value="4">Estimated imports</option><option value="5">Estimated exports</option><option value="6">Passage capacity</option></select></label><label>Window <select id="window"><option value="1">Daily value</option><option value="7" selected>7-day mean</option><option value="14">14-day mean</option><option value="28">28-day mean</option></select></label><label>Compare with <select id="baseline"><option value="prior">Prior 28 days</option><option value="prior14">Prior 14 days</option><option value="prior56">Prior 56 days</option><option value="prior91">Prior 91 days</option><option value="january">Jan 1–28, selected year</option><option value="year">Same dates last year</option></select></label><label>Speed <select id="speed"><option value="1">1 day / sec</option><option value="7" selected>1 week / sec</option><option value="28">4 weeks / sec</option></select></label></div>
   <p id="clockNote" class="hint">Daily observations, not live traffic.</p>
  </div>
 </section>
 <div id="actionTip" class="action-tip" role="status" hidden></div>
 <dialog id="browseDialog" aria-label="Find a port or passage"><div class="browse-dialog-heading"><strong>Find a place</strong><button id="closeBrowse" class="icon-button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div></dialog>
-<dialog id="sourceDialog"><button id="closeDialog" class="close icon-button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button><h2>What this atlas can—and cannot—tell you</h2><p>Independent, noncommercial visualization of <a href="https://portwatch.imf.org/" target="_blank" rel="noopener noreferrer">IMF PortWatch</a>. Not an IMF product or endorsement.</p><h3>Coverage &amp; history</h3><p>Daily source data begins January 1, 2019. The globe plays the recent 2026-onward snapshot; Choose dates opens historical analysis. Entering an older date in the timeline also opens analysis, with history loaded for the selected places. Pre-2026 files are a separately assembled snapshot, not updated by the daily refresh. The comparison CSV records their assembly date and source hash. See <a href="https://portwatch.imf.org/pages/data-and-methodology" target="_blank" rel="noopener noreferrer">IMF methodology and revisions</a>.</p><h3>Observed activity</h3><p>Sources: UN Global Platform; IMF PortWatch (portwatch.imf.org). Network and economic-model sources: University of Oxford; IMF PortWatch.</p><p>Daily AIS-derived port calls, transit calls and estimated trade/capacity. Ports and passages count different events; do not sum their calls as unique ships. Tonnes are estimates, not customs declarations or trade value. AIS gaps, spoofing and revisions can affect observations. Zero recorded activity is not proof of no physical traffic.</p><p>Current means require every day in the selected window. References use the selected length (14–91 prior days, January 1–28, or the same dates last year) and must be complete; prior references end the day before the current window. Missing or incomplete windows are excluded from change rankings. Percentage rankings require a baseline of at least 10 calls/day or 1,000 estimated tonnes/day. These are screening thresholds, not significance tests. Rankings follow the filters; they are not a global trade index. Colors use a ±5% neutral band, not a statistical-significance threshold. Reference rings are shown for passages and the selected port; marker sizes are bounded for legibility. The default globe shows up to 80 ranked matches plus the selected location. Enable Show all places for the full filtered map catalog. Measure, window and reference controls sit with the timeline.</p><h3>Reading the comparisons</h3><p>Recent changes, historical context and disruption recovery answer different questions. Inspect the reference dates before interpreting a percentage. Historical ranges are descriptive, not statistical significance tests.</p><p>Share a view link to preserve the selected place, date, lens, metric, reference, pins and analyst setting. These comparisons are descriptive—not causal identification or statistically tested anomalies.</p><h3>Historical connections · 2019–2024</h3><p>Previous/next port-call connections and average transit days. Capacity at risk is a historical network/model measure, not today's cargo or an ETA. Incoming reverses the selected endpoint, not the source's meaning of relative exposure. Only the strongest 20 links are drawn; full filtered links are downloadable. Self-connections are excluded from the diagram.</p><h3>Modeled exposure · 2022 base year</h3><p>Country/sector trade allocations from OxMarTrans, available here for explicitly listed selected ports. No adaptation or actual loss is inferred. The model and observed timeline do not share a clock. We do not apply port exposure tables directly to Hormuz, add up exposures across ports, or animate a claimed shock arrival.</p><p><a href="https://portwatch.imf.org/pages/data-and-methodology" target="_blank" rel="noopener noreferrer">Methodology</a> · <a href="https://www.arcgis.com/home/item.html?id=9d2ad0a4c5c5460bbd95cfe933464b7a" target="_blank" rel="noopener noreferrer">Port network</a> · <a href="https://www.arcgis.com/home/item.html?id=86842d9b6e8948f29200710a8df206f5" target="_blank" rel="noopener noreferrer">Country model</a> · <a href="https://www.imf.org/external/terms.htm" target="_blank" rel="noopener noreferrer">IMF reuse terms</a></p><p>Geography: Natural Earth, public domain. Links are schematic and may cross land. Browser processing stays on your device; no analytics are included by this application.</p><pre id="provenance"></pre><a href="/data/manifest.json" download>Download snapshot manifest</a></dialog>
+<dialog id="sourceDialog"><button id="closeDialog" class="close icon-button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button><h2>What this atlas can—and cannot—tell you</h2><p>Independent, noncommercial visualization of <a href="https://portwatch.imf.org/" target="_blank" rel="noopener noreferrer">IMF PortWatch</a>. Not an IMF product or endorsement.</p><h3>Coverage &amp; history</h3><p id="freshness" class="hint" role="status"></p><p>Daily source data begins January 1, 2019. The globe timeline covers all available dates. The active measure loads across the full historical timeline for all ports and passages before scrubbing; selected-place charts load their complete history. Pre-2026 files are a separately assembled snapshot, not updated by the daily refresh. The comparison CSV records their assembly date and source hash. See <a href="https://portwatch.imf.org/pages/data-and-methodology" target="_blank" rel="noopener noreferrer">IMF methodology and revisions</a>.</p><h3>Observed activity</h3><p>Sources: UN Global Platform; IMF PortWatch (portwatch.imf.org). Network and economic-model sources: University of Oxford; IMF PortWatch.</p><p>Daily AIS-derived port calls, transit calls and estimated trade/capacity. Ports and passages count different events; do not sum their calls as unique ships. Tonnes are estimates, not customs declarations or trade value. AIS gaps, spoofing and revisions can affect observations. Zero recorded activity is not proof of no physical traffic.</p><p>Current means require every day in the selected window. References use the selected length (14–91 prior days, January 1–28, or the same dates last year) and must be complete; prior references end the day before the current window. Missing or incomplete windows are excluded from change rankings. Percentage rankings require a baseline of at least 10 calls/day or 1,000 estimated tonnes/day. These are screening thresholds, not significance tests. Rankings follow the filters; they are not a global trade index. Colors use a ±5% neutral band, not a statistical-significance threshold. Reference rings are shown for passages and the selected port; marker sizes are bounded for legibility. The default globe shows up to 80 ranked matches plus the selected location. Enable Show all places for the full filtered map catalog. Measure, window and reference controls sit with the timeline.</p><h3>Reading the comparisons</h3><p>Recent changes, historical context and disruption recovery answer different questions. Inspect the reference dates before interpreting a percentage. Historical ranges are descriptive, not statistical significance tests.</p><p>Share a view link to preserve the selected place, date, lens, metric, reference, pins and analyst setting. These comparisons are descriptive—not causal identification or statistically tested anomalies.</p><h3>Historical connections · 2019–2024</h3><p>Previous/next port-call connections and average transit days. Capacity at risk is a historical network/model measure, not today's cargo or an ETA. Incoming reverses the selected endpoint, not the source's meaning of relative exposure. Only the strongest 20 links are drawn; full filtered links are downloadable. Self-connections are excluded from the diagram.</p><h3>Modeled exposure · 2022 base year</h3><p>Country/sector trade allocations from OxMarTrans, available here for explicitly listed selected ports. No adaptation or actual loss is inferred. The model and observed timeline do not share a clock. We do not apply port exposure tables directly to Hormuz, add up exposures across ports, or animate a claimed shock arrival.</p><p><a href="https://portwatch.imf.org/pages/data-and-methodology" target="_blank" rel="noopener noreferrer">Methodology</a> · <a href="https://www.arcgis.com/home/item.html?id=9d2ad0a4c5c5460bbd95cfe933464b7a" target="_blank" rel="noopener noreferrer">Port network</a> · <a href="https://www.arcgis.com/home/item.html?id=86842d9b6e8948f29200710a8df206f5" target="_blank" rel="noopener noreferrer">Country model</a> · <a href="https://www.imf.org/external/terms.htm" target="_blank" rel="noopener noreferrer">IMF reuse terms</a></p><p>Geography: Natural Earth, public domain. Links are schematic and may cross land. Browser processing stays on your device; no analytics are included by this application.</p><pre id="provenance"></pre><a href="/data/manifest.json" download>Download snapshot manifest</a></dialog>
 <script>/* Pure calculations shared by the browser and deterministic tests. */
 (function (root) {
   // baselineMode: 'prior' (reference ends the day before the window), 'january'
@@ -2379,24 +2351,36 @@ body[data-mode='exposure'] .timebar {
       yearAgo = options.yearAgo || null;
     const start = index - windowSize + 1;
     const source = baselineMode === 'year' ? yearAgo || [] : rows;
-    const baseEnd = baselineMode === 'january' ? 27 : baselineMode === 'year' ? index : start - 1;
+    const baseEnd =
+      baselineMode === 'january'
+        ? (options.januaryStart || 0) + 27
+        : baselineMode === 'year'
+          ? index
+          : start - 1;
     const baseStart = baselineMode === 'year' ? start : baseEnd - baselineDays + 1;
     const expectedBase = baselineMode === 'year' ? windowSize : baselineDays;
-    function windowMean(data, a, b, expected) {
-      if (a < 0 || b >= data.length || b < a) return { mean: null, count: 0 };
-      const values = data
-        .slice(a, b + 1)
-        .map((r) => r?.[metric])
-        .filter(Number.isFinite);
+    function windowMean(data, a, b, expected, read) {
+      if (a < 0 || (!read && b >= data.length) || b < a) return { mean: null, count: 0 };
+      const values = [];
+      for (let i = a; i <= b; i++) {
+        const value = read ? read(i) : data[i]?.[metric];
+        if (Number.isFinite(value)) values.push(value);
+      }
       return {
         mean: values.length === expected ? values.reduce((a, b) => a + b, 0) / expected : null,
         count: values.length,
       };
     }
-    const current = windowMean(rows, start, index, windowSize);
+    const current = windowMean(rows, start, index, windowSize, options.valueAt);
     const baseline =
       baselineMode === 'year' || baseEnd < start
-        ? windowMean(source, baseStart, baseEnd, expectedBase)
+        ? windowMean(
+            source,
+            baseStart,
+            baseEnd,
+            expectedBase,
+            baselineMode === 'year' ? options.yearValueAt : options.valueAt,
+          )
         : { mean: null, count: 0 };
     const difference =
       current.mean !== null && baseline.mean !== null ? current.mean - baseline.mean : null;
@@ -2927,6 +2911,16 @@ if (typeof module !== 'undefined') module.exports = passageEvents;
   else root.PassageChartInput = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Calendar-safe year-ago alignment; February 29 never rolls into March. */
+(function (root) {
+  function yearAgo(d) {
+    const prior = String(Number(d.slice(0, 4)) - 1) + d.slice(4);
+    return new Date(prior + 'T00:00:00Z').toISOString().slice(0, 10) === prior ? prior : null;
+  }
+  if (typeof module !== 'undefined') module.exports = { yearAgo };
+  else root.PassageTimeline = { yearAgo };
+})(typeof window !== 'undefined' ? window : globalThis);
+
 const passageShifts=[{"id":"chokepoint6:2026-03-02","place":"chokepoint6","name":"Strait of Hormuz","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":2.5714285714285716,"reference":77.25,"difference":-74.67857142857143,"percent":-96.67128987517337,"context":{"place":"chokepoint6","start":"2026-03-02","end":"2026-03-08","source":"IMF PortWatch","url":"https://portwatch.imf.org/pages/cc317ba850e34c4dadbead6f7b336fb1","published":null,"reportedDate":"2026-02-28","summary":"IMF PortWatch reports reduced Hormuz traffic from February 28 amid attacks on commercial ships, with warnings about GPS jamming, AIS spoofing and vessels going dark.","caveat":"The rolling reference includes February 28\u2013March 1; it is not a wholly pre-conflict baseline. Recorded calls do not establish complete physical closure or causal impact."},"qualifies":true,"recent":false},{"id":"port744:2026-03-02","place":"port744","name":"Jebel Ali","start":"2026-03-02","end":"2026-03-08","referenceStart":"2026-02-02","referenceEnd":"2026-03-01","mean":1.4285714285714286,"reference":23.857142857142858,"difference":-22.42857142857143,"percent":-94.0119760479042,"context":{"place":"port744","start":"2026-03-02","end":"2026-03-08","source":"Inchcape Shipping Services \u00b7 port advisory","url":"https://www.iss-shipping.com/wp-content/uploads/2026/03/Middle-East-Port-Advisory-02032026-1800.pdf","published":"2026-03-02","reportedDate":"2026-03-02","summary":"Inchcape's March 2 advisory described Jebel Ali terminal operations as normal while reporting sharply reduced commercial traffic through Hormuz amid regional risk.","caveat":"This corroborates regional disruption, not a week-long Jebel Ali closure. Lower measured calls and normal terminal operations can coexist; no causal attribution is established."},"qualifies":true,"recent":false},{"id":"chokepoint27:2026-05-11","place":"chokepoint27","name":"Mindoro Strait","start":"2026-05-11","end":"2026-05-17","referenceStart":"2026-04-13","referenceEnd":"2026-05-10","mean":57.0,"reference":37.82142857142857,"difference":19.17857142857143,"percent":50.70821529745043,"context":null,"qualifies":true,"recent":false},{"id":"port1253:2026-07-08","place":"port1253","name":"Suzhou (Taicang)","start":"2026-07-08","end":"2026-07-14","referenceStart":"2026-06-10","referenceEnd":"2026-07-07","mean":5.428571428571429,"reference":21.035714285714285,"difference":-15.607142857142856,"percent":-74.19354838709677,"context":{"place":"port1253","start":"2026-07-08","end":"2026-07-14","source":"Kuehne+Nagel \u00b7 dated operational updates","url":"https://mykn.kuehne-nagel.com/news/article/two-tropical-storms-strengthen-china","published":"2026-07-14","reportedDate":"2026-07-09","summary":"Kuehne+Nagel's July 9 update reported Taicang restrictions; its July 11 update listed Taicang among suspended barge and feeder locations during Typhoon Bavi. July 14 reported regional operations resuming.","caveat":"The advisory supplies contemporaneous operational context. It does not quantify how much of the weekly call decline was caused by the storm or establish this port's exact reopening time."},"qualifies":true,"recent":false},{"id":"port494:2026-03-18","place":"port494","name":"Incheon","start":"2026-03-18","end":"2026-03-24","referenceStart":"2026-02-18","referenceEnd":"2026-03-17","mean":9.428571428571429,"reference":20.964285714285715,"difference":-11.535714285714286,"percent":-55.02555366269165,"context":null,"qualifies":true,"recent":false}];
 'use strict';
 const $ = (id) => document.getElementById(id),
@@ -2975,8 +2969,8 @@ let manifest,
   bootFailed = false;
 let globeGeometry = { cx: 0, cy: 0, r: 1, w: 1, h: 1 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-async function load(file) {
-  const response = await fetch('/data/' + file);
+async function load(file, options = {}) {
+  const response = await fetch('/data/' + file, options);
   if (!response.ok) throw new Error(file + ' HTTP ' + response.status);
   return response.json();
 }
@@ -3026,6 +3020,7 @@ function refresh() {
   });
 }
 function setDate(i) {
+  timelineInteraction = performance.now();
   stop();
   state.index = Math.max(0, Math.min(dates.length - 1, i));
   refresh();
@@ -3042,13 +3037,17 @@ function play() {
     state.index = 0;
   state.playing = true;
   const start = state.index,
-    t = performance.now(),
     rate = Number($('speed').value);
+  let tick = performance.now(),
+    elapsed = 0;
   clock = setInterval(() => {
-    const next = Math.min(
-      dates.length - 1,
-      start + Math.floor(((performance.now() - t) * rate) / 1000),
-    );
+    const now = performance.now(),
+      delta = now - tick;
+    tick = now;
+    if (!ensureTimeline(state.index)) return;
+    const next = Math.min(dates.length - 1, start + Math.floor(((elapsed + delta) * rate) / 1000));
+    if (!ensureTimeline(next)) return;
+    elapsed += delta;
     if (next !== state.index) {
       state.index = next;
       if (next === dates.length - 1) stop();
@@ -3157,25 +3156,25 @@ function recompute() {
         ...referenceArgs(p.id),
       );
 }
-// 'prior14' … 'prior91' set the reference length; 'year' aligns last year's rows
-// to the 2026 axis. Year-ago rows come from each place's lazily loaded history
-// file, so only places with loaded history get a year-ago comparison.
-function referenceArgs(id) {
+// References follow the selected calendar year, including historical globe dates.
+function referenceArgs(id, metric = state.metric) {
+  const valueAt = (i) => activityValue(id, i, metric);
   const m = /^prior(\d+)$/.exec(state.baseline);
-  if (m) return ['prior', { baselineDays: Number(m[1]) }];
-  if (state.baseline !== 'year') return [state.baseline, {}];
-  const rows = historyCache[id];
-  if (!rows) {
-    // The selected place fetches its own history; other places keep a null
-    // reference until theirs is loaded, so rankings never mix references.
-    if (id === state.selected && !historyRequests[id] && !historyErrors[id]) fetchHistory(id);
-    return ['year', {}];
-  }
-  const byDate = new Map(rows.map((r) => [r[0], r.slice(1)]));
+  if (m) return ['prior', { valueAt, baselineDays: Number(m[1]) }];
+  if (state.baseline === 'january')
+    return [
+      'january',
+      { valueAt, januaryStart: dateIndex[dates[state.index].slice(0, 4) + '-01-01'] },
+    ];
+  if (state.baseline !== 'year') return [state.baseline, { valueAt }];
   return [
     'year',
     {
-      yearAgo: dates.map((d) => byDate.get(String(Number(d.slice(0, 4)) - 1) + d.slice(4)) || null),
+      valueAt,
+      yearValueAt: (i) => {
+        const day = dates[i] && PassageTimeline.yearAgo(dates[i]);
+        return day ? activityValue(id, dateIndex[day], metric) : undefined;
+      },
     },
   ];
 }
@@ -3183,7 +3182,7 @@ function referenceArgs(id) {
 function referenceDates(s) {
   if (!s) return [null, null];
   if (state.baseline === 'year') {
-    const shift = (d) => (d ? String(Number(d.slice(0, 4)) - 1) + d.slice(4) : null);
+    const shift = (d) => (d ? PassageTimeline.yearAgo(d) : null);
     return [shift(dates[s.start]), shift(dates[state.index])];
   }
   return [dates[s.baseStart] || null, dates[s.baseEnd] || null];
@@ -3584,11 +3583,8 @@ function activityDetail() {
   text(
     'explanation',
     s.difference === null
-      ? state.baseline === 'year' && !historyCache[state.selected]
-        ? historyErrors[state.selected]
-          ? 'History download failed · open History below to retry.'
-          : 'Loading last year’s observations…'
-        : `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
+      ? timelineNotice() ||
+          `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
       : `vs ${fmt(s.baseline)} mean, ${baselineLabel()} (${baselineDates})`,
   );
   $('explanation').title =
@@ -3605,11 +3601,8 @@ function activityDetail() {
             ? `${s.currentCount}/${state.window} current · ${s.baselineCount}/${s.baselineExpected} reference days`
             : '',
   );
-  const data = series[state.selected] || [];
-  let last = -1;
-  data.forEach((r, i) => {
-    if (Number.isFinite(r?.[state.metric])) last = i;
-  });
+  let last = dates.length - 1;
+  while (last >= 0 && !Number.isFinite(activityValue(state.selected, last))) last--;
   plot($('chart'), [{ id: state.selected, color: '#83dbc1' }]);
   const dl = $('calculation');
   dl.replaceChildren();
@@ -3619,7 +3612,10 @@ function activityDetail() {
     ['Current / reference mean', fmt(s.current) + ' / ' + fmt(s.baseline)],
     ['Formula', '100 × (current mean − reference mean) / reference mean'],
     ['Selected source ID', state.selected],
-    ['Dataset snapshot', manifest.retrieved],
+    [
+      'Dataset snapshot',
+      state.index < timelineManifest.days ? timelineManifest.assembled : manifest.retrieved,
+    ],
     ['Latest selected observation', last >= 0 ? dates[last] : 'none'],
     ['Reference length', s.baselineExpected + ' days · ' + baselineLabel()],
   ])
@@ -3761,6 +3757,10 @@ function exposureDetail() {
 }
 function render() {
   if (!manifest || !land) return;
+  if (state.mode === 'change') {
+    ensureTimeline();
+    ensureChartHistory();
+  }
   document.body.dataset.mode = state.mode;
   recompute();
   makeList();
@@ -3774,7 +3774,6 @@ function render() {
     $(m).setAttribute('aria-pressed', String(state.mode === m));
   }
   const activity = state.mode === 'change';
-  $('historyEntry').hidden = !activity || comparison.open;
   $('activityDetail').hidden = !activity;
   $('networkDetail').hidden = state.mode !== 'connections';
   $('exposureDetail').hidden = state.mode !== 'exposure';
@@ -3803,13 +3802,16 @@ function render() {
   text(
     'mapSubtitle',
     activity
-      ? dates[state.index] +
+      ? (timelineNotice() || dates[state.index]) +
           ' · ' +
           (state.window === 1 ? 'daily values' : state.window + '-day means')
       : state.mode === 'connections'
         ? 'Previous / next port calls · not final cargo destinations'
         : 'Country markers show trade exposure—not actual losses',
   );
+  const failed = timelineErrors.has(state.metric);
+  $('mapSubtitle').setAttribute('role', failed ? 'button' : 'status');
+  $('mapSubtitle').tabIndex = failed ? 0 : -1;
   text(
     'mobileMeasure',
     activity
@@ -3835,8 +3837,12 @@ function render() {
     'baseline',
     'scrub',
   ])
-    $(id).disabled = !activity;
+    $(id).disabled =
+      !activity ||
+      (!timelineMetrics.has(state.metric) &&
+        ['play', 'back', 'forward', 'dateInput', 'latest', 'scrub'].includes(id));
   $('rank').disabled = !activity;
+  $('download').disabled = !timelineMetrics.has(state.metric);
   $('kind').disabled = state.mode === 'exposure';
   text('playLabel', state.playing ? 'Pause' : 'Play');
   $('play').setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
@@ -3854,7 +3860,7 @@ function render() {
     'status',
     $('analyst').checked
       ? `${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ports through ${manifest.Daily_Ports_Data_latest} · passages through ${manifest.Daily_Chokepoints_Data_latest}`
-      : `${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ${manifest.start} → ${dates.at(-1)}`,
+      : `${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ${dates[0]} → ${dates.at(-1)}`,
   );
   text(
     'legend',
@@ -3889,7 +3895,7 @@ function render() {
     text(
       'indexNote',
       $('comparisonScale').value === 'indexed'
-        ? 'Each series indexed to its complete Jan 1–28, 2026 mean = 100; zero or incomplete references omitted. January values overlap the reference: this is retrospective normalization, not a real-time signal.'
+        ? `Each series indexed to its complete Jan 1–28, ${dates[state.index].slice(0, 4)} mean = 100; zero or incomplete references omitted. January values overlap the reference: this is retrospective normalization, not a real-time signal.`
         : 'Daily values, one shared scale. Coincident changes do not establish rerouting or causation.',
     );
     const colors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
@@ -4112,20 +4118,19 @@ function bind() {
   $('back').onclick = () => setDate(state.index - 1);
   $('forward').onclick = () => setDate(state.index + 1);
   $('latest').onclick = () => {
-    const rows = series[state.selected] || [];
     let last = dates.length - 1;
-    while (last > 0 && !Number.isFinite(rows[last]?.[state.metric])) last--;
+    while (last > 0 && !Number.isFinite(activityValue(state.selected, last))) last--;
     setDate(last);
   };
-  $('historyExplore').onclick = () => comparisonExplore();
-  $('redSeaStudy').onclick = () => comparisonEvent('red-sea-2023');
   $('dateInput').onchange = () => {
     const day = $('dateInput').value;
     const i = dates.indexOf(day);
     if (i >= 0) setDate(i);
-    else if (comparisonMath.validDate(day) && day >= '2019-01-01' && day < manifest.start)
-      comparisonExplore(day);
     else refresh();
+  };
+  $('mapSubtitle').onclick = retryTimeline;
+  $('mapSubtitle').onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') retryTimeline();
   };
   $('direction').onchange = refresh;
   $('sector').onchange = refresh;
@@ -4304,6 +4309,7 @@ function bind() {
       'current_start_date',
       'reference_start_date',
       'reference_end_date',
+      'history_manifest_sha256',
     ];
     const service = place().kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data';
     download(state.selected + '-' + manifest.fields[state.metric] + '.csv', [
@@ -4313,15 +4319,16 @@ function bind() {
         state.selected,
         place().name,
         manifest.fields[state.metric],
-        series[state.selected]?.[i]?.[state.metric] ?? null,
+        Number.isFinite(activityValue(state.selected, i)) ? activityValue(state.selected, i) : null,
         state.metric < 4 ? 'calls/day' : 'estimated metric tonnes/day',
-        manifest.retrieved,
+        i < timelineManifest.days ? timelineManifest.assembled : manifest.retrieved,
         manifest.sources[service],
         state.window,
         state.baseline,
         dates[state.index],
         dates[stats[state.selected]?.start] || null,
         ...referenceDates(stats[state.selected]),
+        i < timelineManifest.days ? timelineManifest.source_sha256 : null,
       ]),
     ]);
   };
@@ -4375,22 +4382,24 @@ function bind() {
 }
 async function boot() {
   try {
-    [manifest, places, land] = await Promise.all([
+    [manifest, places, land, timelineManifest] = await Promise.all([
       load('manifest.json'),
       load('places.json'),
       load('land.json'),
+      load('timeline-manifest.json'),
     ]);
     placeById = Object.fromEntries(places.map((p) => [p.id, p]));
+    timelinePlaceIndex = Object.fromEntries(timelineManifest.ids.map((id, i) => [id, i]));
     const end = [manifest.Daily_Ports_Data_latest, manifest.Daily_Chokepoints_Data_latest]
       .sort()
       .at(-1);
     for (
-      let t = Date.parse(manifest.start + 'T00:00:00Z');
+      let t = Date.parse(timelineManifest.start + 'T00:00:00Z');
       t <= Date.parse(end + 'T00:00:00Z');
       t += 86400000
     )
       dates.push(new Date(t).toISOString().slice(0, 10));
-    const dateIndex = Object.fromEntries(dates.map((d, i) => [d, i]));
+    dateIndex = Object.fromEntries(dates.map((d, i) => [d, i]));
     let complete = 0;
     for (let batch = 0; batch < manifest.activity.length; batch += 3)
       await Promise.all(
@@ -4432,14 +4441,15 @@ async function boot() {
     if (q.get('trade') === 'daily_export_value_at_risk') $('trade').value = q.get('trade');
     $('scrub').max = dates.length - 1;
     $('dateInput').min = '2019-01-01';
-    $('dateInput').title = 'Dates before ' + manifest.start + ' open historical analysis';
-    text('startLabel', 'Globe · ' + dates[0]);
+    text('startLabel', dates[0]);
     $('dateInput').max = end;
     text('endLabel', end);
     text(
       'provenance',
       `Snapshot retrieved: ${manifest.retrieved}\nCatalog: ${manifest.ports} ports, ${manifest.chokepoints} chokepoints\nActivity rows: ${Object.values(manifest.rows).reduce((a, b) => a + b, 0)}\nHistorical connection rows: ${manifest.network.rows}\nCountry-model selected ports: ${manifest.exposure.map((p) => p.name).join(', ')}\nActivity sources: UN Global Platform; IMF PortWatch.\nNetwork/model sources: University of Oxford; IMF PortWatch (portwatch.imf.org).`,
     );
+    ensureTimeline();
+    await timelineLoading;
     restoreDepth(q);
     bind();
     bindWorkspace(q);
@@ -4460,6 +4470,7 @@ async function boot() {
       $('eventCatalog').open = true;
     }
     document.body.classList.add('snapshot-ready');
+    warmTimeline();
     window.passageSnapshot = () => ({
       state: { ...state },
       date: dates[state.index],
@@ -4491,6 +4502,112 @@ function updateFreshness() {
   );
   $('freshness').classList.toggle('stale', f.stale);
   $('freshness').title = $('freshness').textContent;
+}
+
+/* All dates of the active measure are resident before the globe can scrub. */
+let timelineInteraction = 0;
+let timelineManifest,
+  dateIndex = {},
+  timelinePlaceIndex = {},
+  timelineLoading = null;
+const timelineMetrics = new Map(),
+  timelineErrors = new Map();
+function ensureTimeline() {
+  const metric = state.metric;
+  if (timelineMetrics.has(metric)) return true;
+  if (timelineLoading || timelineErrors.has(metric)) return false;
+  timelineLoading = (async () => {
+    const data = new Float64Array(timelineManifest.ids.length * timelineManifest.days);
+    data.fill(NaN);
+    const parts = timelineManifest.files.filter((p) => p.metric === metric);
+    // Bounded parsing/transfers; an obsolete measure stops after its current pair.
+    for (let i = 0; i < parts.length; i += 2) {
+      if (state.metric !== metric) return;
+      await Promise.all(
+        parts.slice(i, i + 2).map(async (part) => {
+          const values = await load(part.file + '?v=' + part.sha256, { cache: 'force-cache' });
+          if (values.length !== part.values) throw new Error('Historical value count mismatch');
+          for (let p = 0; p < timelineManifest.ids.length; p++) {
+            const destination = p * timelineManifest.days + part.offset;
+            for (let d = 0; d < part.days; d++) {
+              const value = values[p * part.days + d];
+              if (value !== null && !Number.isFinite(value))
+                throw new Error('Invalid historical value');
+              data[destination + d] = value === null ? NaN : value;
+            }
+          }
+        }),
+      );
+    }
+    if (state.metric !== metric) return;
+    timelineMetrics.set(metric, data);
+    // One previous measure can be revisited instantly; memory stays bounded.
+    while (timelineMetrics.size > 2) timelineMetrics.delete(timelineMetrics.keys().next().value);
+  })()
+    .catch((e) => {
+      if (state.metric === metric) timelineErrors.set(metric, e.message);
+    })
+    .finally(() => {
+      timelineLoading = null;
+      depthKey = '';
+      refresh();
+    });
+  return false;
+}
+function timelineNotice() {
+  if (timelineErrors.has(state.metric)) return 'History unavailable · tap to retry';
+  return timelineMetrics.has(state.metric) ? '' : 'Loading timeline…';
+}
+function retryTimeline() {
+  timelineErrors.delete(state.metric);
+  ensureTimeline();
+  refresh();
+}
+function activityValue(id, index, metric = state.metric) {
+  if (index < 0 || index >= dates.length) return undefined;
+  if (index >= timelineManifest.days) return series[id]?.[index]?.[metric];
+  const p = timelinePlaceIndex[id];
+  return p === undefined
+    ? undefined
+    : (timelineMetrics.get(metric)?.[p * timelineManifest.days + index] ??
+        historyCache[id]?.[index]?.[metric + 1]);
+}
+function chartRows(id) {
+  const rows = [...(series[id] || Array(dates.length).fill(null))];
+  for (const [day, ...values] of historyCache[id] || []) rows[dateIndex[day]] = values;
+  return rows;
+}
+function warmTimeline() {
+  if (navigator.connection?.saveData) return;
+  const queue = timelineManifest.files.filter((p) => !timelineMetrics.has(p.metric));
+  const idle = (fn) =>
+    window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 5000 }) : setTimeout(fn, 1000);
+  const next = async () => {
+    if (!queue.length) return;
+    if (document.hidden || timelineLoading || performance.now() - timelineInteraction < 1500) {
+      setTimeout(() => idle(next), 2000);
+      return;
+    }
+    const part = queue.shift();
+    if (!timelineMetrics.has(part.metric)) {
+      try {
+        const response = await fetch('/data/' + part.file + '?v=' + part.sha256, {
+          cache: 'force-cache',
+          priority: 'low',
+        });
+        if (response.ok) await response.arrayBuffer();
+      } catch {
+        /* Optional cache warming never changes observed values. */
+      }
+    }
+    idle(next);
+  };
+  setTimeout(() => idle(next), 3000);
+}
+function ensureChartHistory() {
+  for (const id of new Set([state.selected, ...state.pins])) {
+    if (id && !historyCache[id] && !historyRequests[id] && !historyErrors[id]) fetchHistory(id);
+  }
 }
 
 /* Selected-place analysis. Historical files load only on explicit request. */
@@ -4550,10 +4667,8 @@ async function fetchHistory(id) {
   await historyRequests[id];
 }
 function combinedHistory(id) {
-  return [
-    ...(historyCache[id] || []),
-    ...dates.map((d, i) => [d, ...(series[id]?.[i] || Array(7).fill(null))]),
-  ];
+  const rows = chartRows(id);
+  return dates.map((d, i) => [d, ...(rows[i] || Array(7).fill(null))]);
 }
 function renderDepth() {
   if (!$('depthPanel').open) return;
@@ -4596,10 +4711,16 @@ function renderDepth() {
       ? 'History unavailable: ' + historyErrors[id] + '. Tap Load to retry.'
       : historyCache[id]
         ? `${historyCache[id].length.toLocaleString()} dated source rows loaded. Coverage depends on measure and period.`
-        : 'Historical context loads only for this selected place. Current analysis uses the bundled 2026 observations.',
+        : 'History is loading for this selected place; the globe loads all places for the selected dates.',
   );
   const seasonal = M.seasonalReference(rows, col, end, state.window),
-    current = M.summarize(series[id] || [], state.index, metric, state.window).current;
+    current = M.summarize(
+      series[id] || [],
+      state.index,
+      metric,
+      state.window,
+      ...referenceArgs(id),
+    ).current;
   text(
     'seasonSummary',
     seasonal.mean === null
@@ -4686,7 +4807,7 @@ function renderDepth() {
   const entries = [];
   for (let m = 0; m < 7; m++) {
     if (m >= 4 && (m < 6 ? place().kind !== 'port' : place().kind !== 'chokepoint')) continue;
-    const s = M.summarize(series[id] || [], state.index, m, state.window, ...referenceArgs(id));
+    const s = M.summarize(series[id] || [], state.index, m, state.window, ...referenceArgs(id, m));
     entries.push({ m, s });
   }
   const total = entries[0]?.s.current;
@@ -4872,6 +4993,7 @@ function drawHistory(rows, column) {
 }
 
 /* Readable daily charts share date geometry with pointer/keyboard selection. */
+const plotCache = new WeakMap();
 function plot(canvas, items) {
   const { ctx, w, h } = sizeCanvas(canvas),
     { left, right } = PassageChartInput.bounds(w),
@@ -4879,74 +5001,104 @@ function plot(canvas, items) {
     bottom = h - 30,
     metric = state.metric,
     indexMode = canvas.id === 'comparison' && $('comparisonScale').value === 'indexed';
+  // Hidden panels have no backing pixels; redraw when they become visible.
+  if (!w || !h || !canvas.width || !canvas.height) return;
   ctx.clearRect(0, 0, w, h);
-  const values = {};
-  let max = 1;
-  for (const item of items) {
-    const raw = (series[item.id] || []).map((r) => r?.[metric]),
-      ref = raw.slice(0, 28),
-      base =
-        ref.length === 28 && ref.every(Number.isFinite)
-          ? ref.reduce((a, b) => a + b, 0) / 28
-          : null;
-    values[item.id] = indexMode ? M.indexed(raw, base) : raw;
-    for (const v of values[item.id]) if (Number.isFinite(v)) max = Math.max(max, v);
-  }
+  const key = [
+    w,
+    h,
+    devicePixelRatio,
+    state.metric,
+    indexMode,
+    indexMode ? dates[state.index].slice(0, 4) : '',
+    comparison.event,
+    comparison.signal,
+    ...items.map((item) => item.id + ':' + item.color + ':' + !!historyCache[item.id]),
+  ].join('|');
+  const cached = plotCache.get(canvas);
+  let values, max;
   const xAt = (i) => left + (i / Math.max(1, dates.length - 1)) * (right - left),
     yAt = (v) => bottom - (v / max) * (bottom - top);
-  ctx.font = '11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
-  ctx.textBaseline = 'middle';
-  ctx.textAlign = 'right';
-  for (let i = 0; i < 3; i++) {
-    const value = (max * i) / 2,
-      y = yAt(value);
-    ctx.strokeStyle = '#52737b66';
-    ctx.beginPath();
-    ctx.moveTo(left, y);
-    ctx.lineTo(right, y);
-    ctx.stroke();
-    ctx.fillStyle = '#a9bdc4';
-    ctx.fillText(short(value), left - 8, y);
-  }
-  const ticks = [0];
-  for (let i = 1; i < dates.length - 1; i++)
-    if (dates[i].endsWith('-01') && xAt(i) - xAt(ticks.at(-1)) >= 65 && right - xAt(i) >= 55)
-      ticks.push(i);
-  if (dates.length > 1) ticks.push(dates.length - 1);
-  const dateLabel = new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
-  for (const i of ticks) {
-    const x = xAt(i);
-    ctx.strokeStyle = '#52737b44';
-    ctx.beginPath();
-    ctx.moveTo(x, bottom);
-    ctx.lineTo(x, bottom + 5);
-    ctx.stroke();
-    ctx.fillStyle = '#a9bdc4';
-    ctx.textAlign = i === 0 ? 'left' : i === dates.length - 1 ? 'right' : 'center';
-    ctx.fillText(dateLabel.format(new Date(dates[i] + 'T00:00:00Z')), x, h - 12);
-  }
-  for (const item of items) {
-    ctx.strokeStyle = item.color;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    let pen = false;
-    for (let i = 0; i < dates.length; i++) {
-      const v = values[item.id]?.[i];
-      if (!Number.isFinite(v)) {
-        pen = false;
-        continue;
-      }
-      if (pen) ctx.lineTo(xAt(i), yAt(v));
-      else ctx.moveTo(xAt(i), yAt(v));
-      pen = true;
+  if (cached?.key === key) {
+    values = cached.values;
+    max = cached.max;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(cached.image, 0, 0);
+    ctx.restore();
+  } else {
+    values = {};
+    max = 1;
+    for (const item of items) {
+      const raw = chartRows(item.id).map((r) => r?.[metric]),
+        january = dateIndex[dates[state.index].slice(0, 4) + '-01-01'],
+        ref = raw.slice(january, january + 28),
+        base =
+          ref.length === 28 && ref.every(Number.isFinite)
+            ? ref.reduce((a, b) => a + b, 0) / 28
+            : null;
+      values[item.id] = indexMode ? M.indexed(raw, base) : raw;
+      for (const v of values[item.id]) if (Number.isFinite(v)) max = Math.max(max, v);
     }
-    ctx.stroke();
+    ctx.font = '11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'right';
+    for (let i = 0; i < 3; i++) {
+      const value = (max * i) / 2,
+        y = yAt(value);
+      ctx.strokeStyle = '#52737b66';
+      ctx.beginPath();
+      ctx.moveTo(left, y);
+      ctx.lineTo(right, y);
+      ctx.stroke();
+      ctx.fillStyle = '#a9bdc4';
+      ctx.fillText(short(value), left - 8, y);
+    }
+    const ticks = [0];
+    for (let i = 1; i < dates.length - 1; i++)
+      if (dates[i].endsWith('-01') && xAt(i) - xAt(ticks.at(-1)) >= 65 && right - xAt(i) >= 55)
+        ticks.push(i);
+    if (dates.length > 1) ticks.push(dates.length - 1);
+    const dateLabel = new Intl.DateTimeFormat('en', {
+      month: 'short',
+      year: '2-digit',
+      timeZone: 'UTC',
+    });
+    for (const i of ticks) {
+      const x = xAt(i);
+      ctx.strokeStyle = '#52737b44';
+      ctx.beginPath();
+      ctx.moveTo(x, bottom);
+      ctx.lineTo(x, bottom + 5);
+      ctx.stroke();
+      ctx.fillStyle = '#a9bdc4';
+      ctx.textAlign = i === 0 ? 'left' : i === dates.length - 1 ? 'right' : 'center';
+      ctx.fillText(dateLabel.format(new Date(dates[i] + 'T00:00:00Z')), x, h - 12);
+    }
+    for (const item of items) {
+      ctx.strokeStyle = item.color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      let pen = false;
+      for (let i = 0; i < dates.length; i++) {
+        const v = values[item.id]?.[i];
+        if (!Number.isFinite(v)) {
+          pen = false;
+          continue;
+        }
+        if (pen) ctx.lineTo(xAt(i), yAt(v));
+        else ctx.moveTo(xAt(i), yAt(v));
+        pen = true;
+      }
+      ctx.stroke();
+    }
+    if (canvas.id === 'chart') comparisonGlobeAnnotation(ctx, left, right, top, bottom);
+    const image = document.createElement('canvas');
+    image.width = canvas.width;
+    image.height = canvas.height;
+    image.getContext('2d').drawImage(canvas, 0, 0);
+    plotCache.set(canvas, { key, image, values, max });
   }
-  if (canvas.id === 'chart') comparisonGlobeAnnotation(ctx, left, right, top, bottom);
   const x = xAt(state.index);
   ctx.strokeStyle = '#f4c397';
   ctx.lineWidth = 1;
@@ -5129,33 +5281,6 @@ function comparisonOpen(open = true) {
   document.querySelector('main').scrollTop = 0;
   comparisonInvalidate();
   refresh();
-}
-
-// Enter research from the globe without inheriting a previous event's dates.
-// Only selected/pinned places load history; the global map keeps its recent axis.
-function comparisonExplore(end = dates[state.index]) {
-  if (!comparisonMath.validDate(end) || end < '2019-01-01' || end > dates.at(-1)) return;
-  comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
-  comparison.event = null;
-  comparison.signal = null;
-  setMode('change');
-  $('analysisMetric').value = String(state.metric);
-  $('analysisEnd').value = end;
-  $('analysisStart').value = ['2019-01-01', comparisonMath.shift(end, 1 - state.window)]
-    .sort()
-    .at(-1);
-  $('analysisReference').value = 'prior';
-  $('analysisScale').value = 'absolute';
-  $('analysisSpan').value = 'reference';
-  $('analysisDisplay').value = 'chart';
-  $('analysisEventStart').value = '';
-  comparison.recoveryAuto = true;
-  comparison.pendingDay = end;
-  comparisonReference();
-  $('eventCatalog').open = false;
-  $('analysisSetup').open = true;
-  comparisonOpen();
-  $('analysisStart').focus({ preventScroll: true });
 }
 
 function comparisonSearch() {

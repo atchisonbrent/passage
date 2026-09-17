@@ -138,33 +138,6 @@ function comparisonOpen(open = true) {
   refresh();
 }
 
-// Enter research from the globe without inheriting a previous event's dates.
-// Only selected/pinned places load history; the global map keeps its recent axis.
-function comparisonExplore(end = dates[state.index]) {
-  if (!comparisonMath.validDate(end) || end < '2019-01-01' || end > dates.at(-1)) return;
-  comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
-  comparison.event = null;
-  comparison.signal = null;
-  setMode('change');
-  $('analysisMetric').value = String(state.metric);
-  $('analysisEnd').value = end;
-  $('analysisStart').value = ['2019-01-01', comparisonMath.shift(end, 1 - state.window)]
-    .sort()
-    .at(-1);
-  $('analysisReference').value = 'prior';
-  $('analysisScale').value = 'absolute';
-  $('analysisSpan').value = 'reference';
-  $('analysisDisplay').value = 'chart';
-  $('analysisEventStart').value = '';
-  comparison.recoveryAuto = true;
-  comparison.pendingDay = end;
-  comparisonReference();
-  $('eventCatalog').open = false;
-  $('analysisSetup').open = true;
-  comparisonOpen();
-  $('analysisStart').focus({ preventScroll: true });
-}
-
 function comparisonSearch() {
   const q = $('analysisSearch').value.trim().toLowerCase();
   $('analysisMatches').replaceChildren();

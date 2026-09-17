@@ -116,11 +116,10 @@ exports.checkControls = async ({ call, js, click, delay, out, width, height }) =
   );
   assert.ok(await js("document.getElementById('unit').textContent.startsWith('14-day mean')"));
   await setValue('baseline', 'year');
-  // The selected place fetches its own history; until then the reference is
-  // null (never silently zero), and other places stay null too.
-  const other = await js('Object.keys(stats).find(id=>id!==state.selected&&!historyCache[id])');
-  assert.equal(await js(`stats[${JSON.stringify(other)}].baseline`), null);
-  for (let i = 0; i < 100 && !(await js('!!historyCache[state.selected]')); i++) await delay(100);
+  // The globe now loads the same reference months for the entire catalog.
+  for (let i = 0; i < 200 && !(await js('ensureTimeline()')); i++) await delay(100);
+  assert.equal(await js('ensureTimeline()'), true);
+  assert.ok(await js('Object.values(stats).filter(s=>Number.isFinite(s.baseline)).length>1000'));
   await delay(200);
   assert.ok(
     await js('Number.isFinite(stats[state.selected].baseline)'),

@@ -1459,32 +1459,6 @@ body .header-actions:has(#status[role='alert']) {
   height: 12px;
   flex: none;
 }
-.history-entry {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  gap: 6px 12px;
-  padding: 4px 20px 8px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.history-entry[hidden] {
-  display: none;
-}
-.history-entry button {
-  min-height: 44px;
-  padding: 6px 10px;
-  font-size: 12px;
-}
-@media (max-width: 600px) {
-  .history-entry {
-    padding: 4px 12px 8px;
-  }
-  .history-entry > span {
-    flex-basis: 100%;
-  }
-}
 #freshness.stale {
   color: #f4c397;
 }

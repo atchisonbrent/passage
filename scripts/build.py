@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 from signals import discovery as signal_candidates
+from timeline import build_timeline
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,9 +19,11 @@ APP_HELPERS = (
     "discovery.js",
     "events.js",
     "chart-input.js",
+    "timeline-math.js",
 )
 APP_VIEWS = (
     "app.js",
+    "timeline.js",
     "depth.js",
     "chart-plot.js",
     "workspace.js",
@@ -42,6 +45,7 @@ def script_bundles(source):
 def build():
     source = ROOT / "src"
     data = ROOT / "public/data"
+    build_timeline(data)
     manifest = json.loads((data / "manifest.json").read_text())
     manifest["assets"] = []
     for name in ["places.json", "land.json"]:

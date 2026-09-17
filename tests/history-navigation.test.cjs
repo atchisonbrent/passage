@@ -1,50 +1,73 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const math = require('../src/workspace-math.js');
-const fields = {};
-const field = (id) => (fields[id] ||= { value: '', open: false, focus() {} });
-let opened = false;
+let fail = false;
 const context = vm.createContext({
-  PassageWorkspaceMath: math,
-  state: { selected: 'chokepoint6', pins: ['chokepoint1'], metric: 2, index: 1, window: 7 },
-  dates: ['2026-01-01', '2026-08-28'],
-  manifest: { start: '2026-01-01' },
-  $: field,
-  setMode() {},
+  dates: ['2019-01-01', '2019-01-02', '2019-01-03', '2026-01-01'],
+  state: { metric: 0 },
+  series: { port1: [null, null, null, [99]] },
+  depthKey: '',
+  refresh() {},
+  historyCache: {},
+  historyRequests: {},
+  historyErrors: {},
+  load: async () => {
+    if (fail) throw Error('offline');
+    return [10, null, 30, 20, 0, 40];
+  },
 });
-vm.runInContext(fs.readFileSync('src/workspace.js', 'utf8'), context);
-vm.runInContext(
-  'comparisonOpen = () => { globalThis.opened = true; }; comparisonReference = () => {};',
-  context,
+vm.runInContext(fs.readFileSync('src/timeline.js', 'utf8'), context);
+const run = (code) => vm.runInContext(code, context);
+run(
+  `timelineManifest={days:3,ids:['port1','port2'],files:[0,1,2,3].map(metric=>({metric,file:'fixture-'+metric,values:6,days:3,offset:0}))};timelinePlaceIndex={port1:0,port2:1}`,
 );
-vm.runInContext("comparisonExplore('2023-12-01')", context);
-opened = context.opened;
-assert.equal(opened, true);
-assert.equal(field('analysisEnd').value, '2023-12-01');
-assert.equal(field('analysisStart').value, '2023-11-25');
-assert.equal(field('analysisMetric').value, '2');
-assert.equal(field('analysisSetup').open, true);
-assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(comparison.ids)', context)), [
-  'chokepoint1',
-]);
-context.state.pins = ['chokepoint1', 'chokepoint4', 'chokepoint7', 'chokepoint2'];
-vm.runInContext("comparisonExplore('2023-12-01')", context);
-assert.deepEqual(
-  JSON.parse(vm.runInContext('JSON.stringify(comparison.ids)', context)),
-  context.state.pins,
-);
-context.state.pins = [];
-vm.runInContext("comparisonExplore('2023-12-01')", context);
-assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(comparison.ids)', context)), [
-  'chokepoint6',
-]);
-assert.equal(vm.runInContext('comparison.event', context), null);
-vm.runInContext("comparisonExplore('2019-01-01')", context);
-assert.equal(field('analysisStart').value, '2019-01-01');
-context.opened = false;
-vm.runInContext("comparisonExplore('2018-12-31')", context);
-assert.equal(context.opened, false);
-console.log(
-  'history navigation: selected places, metric, historical dates and lower boundary passed',
-);
+(async () => {
+  assert.equal(run('ensureTimeline()'), false);
+  await run('timelineLoading');
+  assert.equal(run('ensureTimeline()'), true);
+  assert.equal(run("activityValue('port2',0)"), 20, 'unselected places are resident');
+  assert.equal(run("activityValue('port2',1)"), 0, 'real zeros survive');
+  assert.ok(Number.isNaN(run("activityValue('port1',1)")), 'missing is not zero');
+  assert.equal(run("activityValue('port1',3)"), 99, 'recent rows retain their original values');
+  for (const metric of [1, 2]) {
+    context.state.metric = metric;
+    run('ensureTimeline()');
+    await run('timelineLoading');
+  }
+  assert.equal(run('timelineMetrics.size'), 2, 'resident measures are bounded');
+  assert.equal(run('timelineMetrics.has(0)'), false);
+  fail = true;
+  context.state.metric = 3;
+  run('ensureTimeline()');
+  await run('timelineLoading');
+  assert.match(run('timelineNotice()'), /unavailable/);
+  assert.equal(run("activityValue('port1',0)"), undefined);
+  fail = false;
+  run('retryTimeline()');
+  await run('timelineLoading');
+  assert.equal(run('ensureTimeline()'), true);
+  assert.equal(run("activityValue('port1',0)"), 10);
+  run("historyCache.port1=[['2019-01-01',10,3,2,1,null,null,null]]");
+  assert.equal(
+    run("activityValue('port1',0,0)"),
+    10,
+    'evicted measure falls back to selected-place history',
+  );
+  context.state.metric = 0;
+  fail = true;
+  run('ensureTimeline()');
+  context.state.metric = 3;
+  await run('timelineLoading');
+  assert.equal(
+    run('timelineErrors.has(0)'),
+    false,
+    'abandoned measure does not retain an irrelevant error',
+  );
+  fail = false;
+  console.log(
+    'timeline loader: whole catalog, resident date range, null/zero, cache bound, failure and retry passed',
+  );
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

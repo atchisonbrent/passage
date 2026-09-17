@@ -55,10 +55,8 @@ async function fetchHistory(id) {
   await historyRequests[id];
 }
 function combinedHistory(id) {
-  return [
-    ...(historyCache[id] || []),
-    ...dates.map((d, i) => [d, ...(series[id]?.[i] || Array(7).fill(null))]),
-  ];
+  const rows = chartRows(id);
+  return dates.map((d, i) => [d, ...(rows[i] || Array(7).fill(null))]);
 }
 function renderDepth() {
   if (!$('depthPanel').open) return;
@@ -101,10 +99,16 @@ function renderDepth() {
       ? 'History unavailable: ' + historyErrors[id] + '. Tap Load to retry.'
       : historyCache[id]
         ? `${historyCache[id].length.toLocaleString()} dated source rows loaded. Coverage depends on measure and period.`
-        : 'Historical context loads only for this selected place. Current analysis uses the bundled 2026 observations.',
+        : 'History is loading for this selected place; the globe loads all places for the selected dates.',
   );
   const seasonal = M.seasonalReference(rows, col, end, state.window),
-    current = M.summarize(series[id] || [], state.index, metric, state.window).current;
+    current = M.summarize(
+      series[id] || [],
+      state.index,
+      metric,
+      state.window,
+      ...referenceArgs(id),
+    ).current;
   text(
     'seasonSummary',
     seasonal.mean === null
@@ -191,7 +195,7 @@ function renderDepth() {
   const entries = [];
   for (let m = 0; m < 7; m++) {
     if (m >= 4 && (m < 6 ? place().kind !== 'port' : place().kind !== 'chokepoint')) continue;
-    const s = M.summarize(series[id] || [], state.index, m, state.window, ...referenceArgs(id));
+    const s = M.summarize(series[id] || [], state.index, m, state.window, ...referenceArgs(id, m));
     entries.push({ m, s });
   }
   const total = entries[0]?.s.current;

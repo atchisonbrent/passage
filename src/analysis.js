@@ -8,24 +8,36 @@
       yearAgo = options.yearAgo || null;
     const start = index - windowSize + 1;
     const source = baselineMode === 'year' ? yearAgo || [] : rows;
-    const baseEnd = baselineMode === 'january' ? 27 : baselineMode === 'year' ? index : start - 1;
+    const baseEnd =
+      baselineMode === 'january'
+        ? (options.januaryStart || 0) + 27
+        : baselineMode === 'year'
+          ? index
+          : start - 1;
     const baseStart = baselineMode === 'year' ? start : baseEnd - baselineDays + 1;
     const expectedBase = baselineMode === 'year' ? windowSize : baselineDays;
-    function windowMean(data, a, b, expected) {
-      if (a < 0 || b >= data.length || b < a) return { mean: null, count: 0 };
-      const values = data
-        .slice(a, b + 1)
-        .map((r) => r?.[metric])
-        .filter(Number.isFinite);
+    function windowMean(data, a, b, expected, read) {
+      if (a < 0 || (!read && b >= data.length) || b < a) return { mean: null, count: 0 };
+      const values = [];
+      for (let i = a; i <= b; i++) {
+        const value = read ? read(i) : data[i]?.[metric];
+        if (Number.isFinite(value)) values.push(value);
+      }
       return {
         mean: values.length === expected ? values.reduce((a, b) => a + b, 0) / expected : null,
         count: values.length,
       };
     }
-    const current = windowMean(rows, start, index, windowSize);
+    const current = windowMean(rows, start, index, windowSize, options.valueAt);
     const baseline =
       baselineMode === 'year' || baseEnd < start
-        ? windowMean(source, baseStart, baseEnd, expectedBase)
+        ? windowMean(
+            source,
+            baseStart,
+            baseEnd,
+            expectedBase,
+            baselineMode === 'year' ? options.yearValueAt : options.valueAt,
+          )
         : { mean: null, count: 0 };
     const difference =
       current.mean !== null && baseline.mean !== null ? current.mean - baseline.mean : null;

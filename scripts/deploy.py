@@ -45,6 +45,15 @@ def assets():
         assert re.fullmatch(r"(port|chokepoint|fso)\d+", ident)
         assert row["file"] == "history-" + ident + ".json"
         names.add("data/" + row["file"])
+    timeline = json.loads((public / "data/timeline-manifest.json").read_text())
+    names.add("data/timeline-manifest.json")
+    for row in timeline["files"]:
+        assert re.fullmatch(r"timeline-[0-6]-\d{4}\.json", row["file"])
+        assert (
+            hashlib.sha256((public / "data" / row["file"]).read_bytes()).hexdigest()
+            == row["sha256"]
+        )
+        names.add("data/" + row["file"])
     for row in manifest["activity"]:
         assert re.fullmatch(r"activity-\d{4}-\d{2}\.json", row["file"])
         names.add("data/" + row["file"])

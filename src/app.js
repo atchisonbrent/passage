@@ -45,8 +45,8 @@ let manifest,
   bootFailed = false;
 let globeGeometry = { cx: 0, cy: 0, r: 1, w: 1, h: 1 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-async function load(file) {
-  const response = await fetch('/data/' + file);
+async function load(file, options = {}) {
+  const response = await fetch('/data/' + file, options);
   if (!response.ok) throw new Error(file + ' HTTP ' + response.status);
   return response.json();
 }
@@ -96,6 +96,7 @@ function refresh() {
   });
 }
 function setDate(i) {
+  timelineInteraction = performance.now();
   stop();
   state.index = Math.max(0, Math.min(dates.length - 1, i));
   refresh();
@@ -112,13 +113,17 @@ function play() {
     state.index = 0;
   state.playing = true;
   const start = state.index,
-    t = performance.now(),
     rate = Number($('speed').value);
+  let tick = performance.now(),
+    elapsed = 0;
   clock = setInterval(() => {
-    const next = Math.min(
-      dates.length - 1,
-      start + Math.floor(((performance.now() - t) * rate) / 1000),
-    );
+    const now = performance.now(),
+      delta = now - tick;
+    tick = now;
+    if (!ensureTimeline(state.index)) return;
+    const next = Math.min(dates.length - 1, start + Math.floor(((elapsed + delta) * rate) / 1000));
+    if (!ensureTimeline(next)) return;
+    elapsed += delta;
     if (next !== state.index) {
       state.index = next;
       if (next === dates.length - 1) stop();
@@ -227,25 +232,25 @@ function recompute() {
         ...referenceArgs(p.id),
       );
 }
-// 'prior14' … 'prior91' set the reference length; 'year' aligns last year's rows
-// to the 2026 axis. Year-ago rows come from each place's lazily loaded history
-// file, so only places with loaded history get a year-ago comparison.
-function referenceArgs(id) {
+// References follow the selected calendar year, including historical globe dates.
+function referenceArgs(id, metric = state.metric) {
+  const valueAt = (i) => activityValue(id, i, metric);
   const m = /^prior(\d+)$/.exec(state.baseline);
-  if (m) return ['prior', { baselineDays: Number(m[1]) }];
-  if (state.baseline !== 'year') return [state.baseline, {}];
-  const rows = historyCache[id];
-  if (!rows) {
-    // The selected place fetches its own history; other places keep a null
-    // reference until theirs is loaded, so rankings never mix references.
-    if (id === state.selected && !historyRequests[id] && !historyErrors[id]) fetchHistory(id);
-    return ['year', {}];
-  }
-  const byDate = new Map(rows.map((r) => [r[0], r.slice(1)]));
+  if (m) return ['prior', { valueAt, baselineDays: Number(m[1]) }];
+  if (state.baseline === 'january')
+    return [
+      'january',
+      { valueAt, januaryStart: dateIndex[dates[state.index].slice(0, 4) + '-01-01'] },
+    ];
+  if (state.baseline !== 'year') return [state.baseline, { valueAt }];
   return [
     'year',
     {
-      yearAgo: dates.map((d) => byDate.get(String(Number(d.slice(0, 4)) - 1) + d.slice(4)) || null),
+      valueAt,
+      yearValueAt: (i) => {
+        const day = dates[i] && PassageTimeline.yearAgo(dates[i]);
+        return day ? activityValue(id, dateIndex[day], metric) : undefined;
+      },
     },
   ];
 }
@@ -253,7 +258,7 @@ function referenceArgs(id) {
 function referenceDates(s) {
   if (!s) return [null, null];
   if (state.baseline === 'year') {
-    const shift = (d) => (d ? String(Number(d.slice(0, 4)) - 1) + d.slice(4) : null);
+    const shift = (d) => (d ? PassageTimeline.yearAgo(d) : null);
     return [shift(dates[s.start]), shift(dates[state.index])];
   }
   return [dates[s.baseStart] || null, dates[s.baseEnd] || null];
@@ -654,11 +659,8 @@ function activityDetail() {
   text(
     'explanation',
     s.difference === null
-      ? state.baseline === 'year' && !historyCache[state.selected]
-        ? historyErrors[state.selected]
-          ? 'History download failed · open History below to retry.'
-          : 'Loading last year’s observations…'
-        : `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
+      ? timelineNotice() ||
+          `Needs ${state.window} complete current days and ${s.baselineExpected} reference days.`
       : `vs ${fmt(s.baseline)} mean, ${baselineLabel()} (${baselineDates})`,
   );
   $('explanation').title =
@@ -675,11 +677,8 @@ function activityDetail() {
             ? `${s.currentCount}/${state.window} current · ${s.baselineCount}/${s.baselineExpected} reference days`
             : '',
   );
-  const data = series[state.selected] || [];
-  let last = -1;
-  data.forEach((r, i) => {
-    if (Number.isFinite(r?.[state.metric])) last = i;
-  });
+  let last = dates.length - 1;
+  while (last >= 0 && !Number.isFinite(activityValue(state.selected, last))) last--;
   plot($('chart'), [{ id: state.selected, color: '#83dbc1' }]);
   const dl = $('calculation');
   dl.replaceChildren();
@@ -689,7 +688,10 @@ function activityDetail() {
     ['Current / reference mean', fmt(s.current) + ' / ' + fmt(s.baseline)],
     ['Formula', '100 × (current mean − reference mean) / reference mean'],
     ['Selected source ID', state.selected],
-    ['Dataset snapshot', manifest.retrieved],
+    [
+      'Dataset snapshot',
+      state.index < timelineManifest.days ? timelineManifest.assembled : manifest.retrieved,
+    ],
     ['Latest selected observation', last >= 0 ? dates[last] : 'none'],
     ['Reference length', s.baselineExpected + ' days · ' + baselineLabel()],
   ])
@@ -831,6 +833,10 @@ function exposureDetail() {
 }
 function render() {
   if (!manifest || !land) return;
+  if (state.mode === 'change') {
+    ensureTimeline();
+    ensureChartHistory();
+  }
   document.body.dataset.mode = state.mode;
   recompute();
   makeList();
@@ -844,7 +850,6 @@ function render() {
     $(m).setAttribute('aria-pressed', String(state.mode === m));
   }
   const activity = state.mode === 'change';
-  $('historyEntry').hidden = !activity || comparison.open;
   $('activityDetail').hidden = !activity;
   $('networkDetail').hidden = state.mode !== 'connections';
   $('exposureDetail').hidden = state.mode !== 'exposure';
@@ -873,13 +878,16 @@ function render() {
   text(
     'mapSubtitle',
     activity
-      ? dates[state.index] +
+      ? (timelineNotice() || dates[state.index]) +
           ' · ' +
           (state.window === 1 ? 'daily values' : state.window + '-day means')
       : state.mode === 'connections'
         ? 'Previous / next port calls · not final cargo destinations'
         : 'Country markers show trade exposure—not actual losses',
   );
+  const failed = timelineErrors.has(state.metric);
+  $('mapSubtitle').setAttribute('role', failed ? 'button' : 'status');
+  $('mapSubtitle').tabIndex = failed ? 0 : -1;
   text(
     'mobileMeasure',
     activity
@@ -905,8 +913,12 @@ function render() {
     'baseline',
     'scrub',
   ])
-    $(id).disabled = !activity;
+    $(id).disabled =
+      !activity ||
+      (!timelineMetrics.has(state.metric) &&
+        ['play', 'back', 'forward', 'dateInput', 'latest', 'scrub'].includes(id));
   $('rank').disabled = !activity;
+  $('download').disabled = !timelineMetrics.has(state.metric);
   $('kind').disabled = state.mode === 'exposure';
   text('playLabel', state.playing ? 'Pause' : 'Play');
   $('play').setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
@@ -924,7 +936,7 @@ function render() {
     'status',
     $('analyst').checked
       ? `${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ports through ${manifest.Daily_Ports_Data_latest} · passages through ${manifest.Daily_Chokepoints_Data_latest}`
-      : `${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ${manifest.start} → ${dates.at(-1)}`,
+      : `${manifest.ports.toLocaleString()} ports · ${manifest.chokepoints} chokepoints · ${dates[0]} → ${dates.at(-1)}`,
   );
   text(
     'legend',
@@ -959,7 +971,7 @@ function render() {
     text(
       'indexNote',
       $('comparisonScale').value === 'indexed'
-        ? 'Each series indexed to its complete Jan 1–28, 2026 mean = 100; zero or incomplete references omitted. January values overlap the reference: this is retrospective normalization, not a real-time signal.'
+        ? `Each series indexed to its complete Jan 1–28, ${dates[state.index].slice(0, 4)} mean = 100; zero or incomplete references omitted. January values overlap the reference: this is retrospective normalization, not a real-time signal.`
         : 'Daily values, one shared scale. Coincident changes do not establish rerouting or causation.',
     );
     const colors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
@@ -1182,20 +1194,19 @@ function bind() {
   $('back').onclick = () => setDate(state.index - 1);
   $('forward').onclick = () => setDate(state.index + 1);
   $('latest').onclick = () => {
-    const rows = series[state.selected] || [];
     let last = dates.length - 1;
-    while (last > 0 && !Number.isFinite(rows[last]?.[state.metric])) last--;
+    while (last > 0 && !Number.isFinite(activityValue(state.selected, last))) last--;
     setDate(last);
   };
-  $('historyExplore').onclick = () => comparisonExplore();
-  $('redSeaStudy').onclick = () => comparisonEvent('red-sea-2023');
   $('dateInput').onchange = () => {
     const day = $('dateInput').value;
     const i = dates.indexOf(day);
     if (i >= 0) setDate(i);
-    else if (comparisonMath.validDate(day) && day >= '2019-01-01' && day < manifest.start)
-      comparisonExplore(day);
     else refresh();
+  };
+  $('mapSubtitle').onclick = retryTimeline;
+  $('mapSubtitle').onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') retryTimeline();
   };
   $('direction').onchange = refresh;
   $('sector').onchange = refresh;
@@ -1374,6 +1385,7 @@ function bind() {
       'current_start_date',
       'reference_start_date',
       'reference_end_date',
+      'history_manifest_sha256',
     ];
     const service = place().kind === 'port' ? 'Daily_Ports_Data' : 'Daily_Chokepoints_Data';
     download(state.selected + '-' + manifest.fields[state.metric] + '.csv', [
@@ -1383,15 +1395,16 @@ function bind() {
         state.selected,
         place().name,
         manifest.fields[state.metric],
-        series[state.selected]?.[i]?.[state.metric] ?? null,
+        Number.isFinite(activityValue(state.selected, i)) ? activityValue(state.selected, i) : null,
         state.metric < 4 ? 'calls/day' : 'estimated metric tonnes/day',
-        manifest.retrieved,
+        i < timelineManifest.days ? timelineManifest.assembled : manifest.retrieved,
         manifest.sources[service],
         state.window,
         state.baseline,
         dates[state.index],
         dates[stats[state.selected]?.start] || null,
         ...referenceDates(stats[state.selected]),
+        i < timelineManifest.days ? timelineManifest.source_sha256 : null,
       ]),
     ]);
   };
@@ -1445,22 +1458,24 @@ function bind() {
 }
 async function boot() {
   try {
-    [manifest, places, land] = await Promise.all([
+    [manifest, places, land, timelineManifest] = await Promise.all([
       load('manifest.json'),
       load('places.json'),
       load('land.json'),
+      load('timeline-manifest.json'),
     ]);
     placeById = Object.fromEntries(places.map((p) => [p.id, p]));
+    timelinePlaceIndex = Object.fromEntries(timelineManifest.ids.map((id, i) => [id, i]));
     const end = [manifest.Daily_Ports_Data_latest, manifest.Daily_Chokepoints_Data_latest]
       .sort()
       .at(-1);
     for (
-      let t = Date.parse(manifest.start + 'T00:00:00Z');
+      let t = Date.parse(timelineManifest.start + 'T00:00:00Z');
       t <= Date.parse(end + 'T00:00:00Z');
       t += 86400000
     )
       dates.push(new Date(t).toISOString().slice(0, 10));
-    const dateIndex = Object.fromEntries(dates.map((d, i) => [d, i]));
+    dateIndex = Object.fromEntries(dates.map((d, i) => [d, i]));
     let complete = 0;
     for (let batch = 0; batch < manifest.activity.length; batch += 3)
       await Promise.all(
@@ -1502,14 +1517,15 @@ async function boot() {
     if (q.get('trade') === 'daily_export_value_at_risk') $('trade').value = q.get('trade');
     $('scrub').max = dates.length - 1;
     $('dateInput').min = '2019-01-01';
-    $('dateInput').title = 'Dates before ' + manifest.start + ' open historical analysis';
-    text('startLabel', 'Globe · ' + dates[0]);
+    text('startLabel', dates[0]);
     $('dateInput').max = end;
     text('endLabel', end);
     text(
       'provenance',
       `Snapshot retrieved: ${manifest.retrieved}\nCatalog: ${manifest.ports} ports, ${manifest.chokepoints} chokepoints\nActivity rows: ${Object.values(manifest.rows).reduce((a, b) => a + b, 0)}\nHistorical connection rows: ${manifest.network.rows}\nCountry-model selected ports: ${manifest.exposure.map((p) => p.name).join(', ')}\nActivity sources: UN Global Platform; IMF PortWatch.\nNetwork/model sources: University of Oxford; IMF PortWatch (portwatch.imf.org).`,
     );
+    ensureTimeline();
+    await timelineLoading;
     restoreDepth(q);
     bind();
     bindWorkspace(q);
@@ -1530,6 +1546,7 @@ async function boot() {
       $('eventCatalog').open = true;
     }
     document.body.classList.add('snapshot-ready');
+    warmTimeline();
     window.passageSnapshot = () => ({
       state: { ...state },
       date: dates[state.index],

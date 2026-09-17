@@ -95,6 +95,8 @@ def verify(base="https://passage.batchison.dev/"):
     # Static reference datasets are fully validated before deploy; sample their live delivery.
     history = json.loads((ROOT / "public/data/history-manifest.json").read_text())
     names += ["data/" + history["files"]["chokepoint6"]["file"]]
+    timeline = json.loads((ROOT / "public/data/timeline-manifest.json").read_text())
+    names += ["data/timeline-manifest.json"] + ["data/" + p["file"] for p in timeline["files"]]
     expected_csp = next(
         line.split(":", 1)[1].strip()
         for line in (ROOT / "public/_headers").read_text().splitlines()
