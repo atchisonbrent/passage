@@ -201,6 +201,12 @@ h3 {
   font-size: 12px;
   color: var(--muted);
 }
+#mapSubtitle[role='button'] {
+  pointer-events: auto;
+  cursor: pointer;
+  text-decoration: underline;
+  min-height: 44px;
+}
 .badge {
   font-size: 10px;
   color: var(--up);

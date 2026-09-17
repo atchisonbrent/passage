@@ -202,17 +202,30 @@ exports.checkHistory = async ({ call, js, click, navigate, until, base, out }) =
     JSON.stringify(await js('({ids:comparison.ids,summaries:comparison.summaries})'), null, 2),
   );
   // A failed initial measure leaves the app usable and can be retried in place.
-  await call('Network.enable');
-  await call('Network.clearBrowserCache');
-  await call('Network.setBlockedURLs', { urls: ['*timeline-0-*.json*'] });
-  await navigate(base);
-  assert.equal(await js('bootFailed'), false);
-  assert.equal(await js('timelineMetrics.has(0)'), false);
-  assert.ok(await js("document.getElementById('mapSubtitle').textContent.includes('unavailable')"));
-  await click('#connections');
-  assert.equal(await js('state.mode'), 'connections');
-  await click('#change');
-  await call('Network.setBlockedURLs', { urls: [] });
-  await click('#mapSubtitle');
-  await until(() => js("timelineMetrics.has(0) && !document.getElementById('scrub').disabled"));
+  for (const [width, height] of [
+    [390, 844],
+    [1440, 900],
+  ]) {
+    await call('Emulation.setDeviceMetricsOverride', {
+      width,
+      height,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    await call('Network.enable');
+    await call('Network.clearBrowserCache');
+    await call('Network.setBlockedURLs', { urls: ['*timeline-0-*.json*'] });
+    await navigate(base);
+    assert.equal(await js('bootFailed'), false);
+    assert.equal(await js('timelineMetrics.has(0)'), false);
+    assert.ok(
+      await js("document.getElementById('mapSubtitle').textContent.includes('unavailable')"),
+    );
+    await click('#connections');
+    assert.equal(await js('state.mode'), 'connections');
+    await click('#change');
+    await call('Network.setBlockedURLs', { urls: [] });
+    await click('#mapSubtitle');
+    await until(() => js("timelineMetrics.has(0) && !document.getElementById('scrub').disabled"));
+  }
 };

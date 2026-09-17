@@ -885,7 +885,7 @@ function render() {
         ? 'Previous / next port calls · not final cargo destinations'
         : 'Country markers show trade exposure—not actual losses',
   );
-  const failed = timelineErrors.has(state.metric);
+  const failed = activity && timelineErrors.has(state.metric);
   $('mapSubtitle').setAttribute('role', failed ? 'button' : 'status');
   $('mapSubtitle').tabIndex = failed ? 0 : -1;
   text(
@@ -1206,7 +1206,10 @@ function bind() {
   };
   $('mapSubtitle').onclick = retryTimeline;
   $('mapSubtitle').onkeydown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') retryTimeline();
+    if ((e.key === 'Enter' || e.key === ' ') && timelineErrors.has(state.metric)) {
+      e.preventDefault();
+      retryTimeline();
+    }
   };
   $('direction').onchange = refresh;
   $('sector').onchange = refresh;

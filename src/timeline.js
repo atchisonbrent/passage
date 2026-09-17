@@ -53,6 +53,7 @@ function timelineNotice() {
   return timelineMetrics.has(state.metric) ? '' : 'Loading timeline…';
 }
 function retryTimeline() {
+  if (!timelineErrors.has(state.metric)) return;
   timelineErrors.delete(state.metric);
   ensureTimeline();
   refresh();
