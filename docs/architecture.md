@@ -26,7 +26,7 @@ Passage is a static application: Python assembles same-origin snapshots and HTML
 
 The frontend currently uses ordered classic scripts, not ES modules. Pure helper APIs are available to Node tests and the browser. UI files share application state and DOM helpers. The lexical `comparison` object owns comparison state; access the similarly named DOM element through `$('comparison')`, not a bare global. `scripts/build.py` is the authoritative dependency order; do not reorder files casually. Bootstrap loads the snapshot before binding views.
 
-The globe clock and comparison date range are separate. The comparison workspace may use historical dates not available in the globe snapshot. History caches are keyed by place; errors remain visible and retryable.
+The globe clock and comparison date range are separate. The comparison workspace may use historical dates not available in the globe snapshot. The landing-page research controls open editable dates or a sourced multi-passage preset; entering a pre-snapshot date in the globe date field opens historical analysis for the selected/pinned places. The scrubber remains explicitly labeled as the recent globe axis. History caches are keyed by place; errors remain visible and retryable.
 
 Both public HTML entrypoints are generated from one template. The build hashes the exact inline scripts into the Content Security Policy. Do not hand-edit generated HTML or loosen CSP to accommodate a change.
 

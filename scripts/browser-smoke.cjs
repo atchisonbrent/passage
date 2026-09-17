@@ -127,6 +127,15 @@ async function until(fn) {
     await call('Page.enable');
     await call('Runtime.enable');
     fs.mkdirSync(out, { recursive: true });
+    await require('./history-checks.cjs').checkHistory({
+      call,
+      js,
+      click,
+      navigate,
+      until,
+      base,
+      out,
+    });
     const results = [];
     for (const [width, height] of [
       [320, 568],

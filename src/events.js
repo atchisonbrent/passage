@@ -1,5 +1,24 @@
-/* Curated source context, reviewed 2026-09-07. Not a live or exhaustive feed. */
+/* Curated source context. Entries without a review date were reviewed 2026-09-07. */
 const passageEvents = [
+  {
+    id: 'red-sea-2023',
+    title: 'Red Sea 2023–24: compare the alternatives',
+    date: '2024-03-07',
+    dateKind: 'IMF report publication, not disruption onset',
+    published: '2024-03-07',
+    reviewed: '2026-09-17',
+    source: 'IMF',
+    url: 'https://www.imf.org/en/blogs/articles/2024/03/07/red-sea-attacks-disrupt-global-trade',
+    summary:
+      'The IMF reports that Red Sea attacks reduced Suez traffic while shipping companies diverted around the Cape of Good Hope. Compare Suez and Bab el-Mandeb with the Cape, with Hormuz as regional context.',
+    places: ['chokepoint1', 'chokepoint4', 'chokepoint7', 'chokepoint6'],
+    start: '2023-12-01',
+    end: '2024-03-31',
+    referenceStart: '2023-11-01',
+    referenceEnd: '2023-11-28',
+    caveat:
+      'December–March and the November reference are editable study windows, not a claimed disruption onset or the IMF report’s year-on-year comparison. Hormuz is regional context, not a bypass of the Red Sea. Aggregate changes do not identify the same ships or cargo rerouting. Default measure: transit calls, not the article’s trade-volume estimate.',
+  },
   {
     id: 'hormuz-2026',
     title: 'Hormuz: the February break',

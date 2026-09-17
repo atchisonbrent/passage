@@ -10,6 +10,9 @@ function comparisonEvent(id) {
   state.pins = [...event.places];
   setMode('change');
   $('analysisMetric').value = '0';
+  $('analysisScale').value = 'absolute';
+  $('analysisSpan').value = 'reference';
+  $('analysisDisplay').value = 'chart';
   $('analysisStart').value = event.start;
   $('analysisEnd').value = event.end;
   $('analysisReference').value = 'custom';
@@ -47,7 +50,8 @@ function comparisonEventContext() {
         event.dateKind +
         ' · ' +
         (event.published ? 'Published ' + event.published : 'Publication date not supplied') +
-        ' · reviewed 2026-09-07',
+        ' · reviewed ' +
+        (event.reviewed || '2026-09-07'),
     ),
   );
   const link = element('a', '', event.source + ' · original source ↗');
@@ -103,7 +107,11 @@ function comparisonGlobeContext() {
     const b = element(
       'button',
       '',
-      'Violet marker · ' + e.date + ' · ' + e.title + ' · source & comparison',
+      (dates.includes(e.date) ? 'Violet marker · ' : 'Historical comparison · ') +
+        e.date +
+        ' · ' +
+        e.title +
+        ' · source & comparison',
     );
     b.onclick = () => comparisonOpen();
     $('globeEventContext').append(b);

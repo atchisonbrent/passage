@@ -2,6 +2,28 @@
 
 function comparisonRenderChart() {
   const canvas = $('analysisChart');
+  $('analysisLegend').replaceChildren(
+    ...comparison.ids.map((id, j) => {
+      const item = element('span', 'legend-item');
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 32 12');
+      svg.setAttribute('aria-hidden', 'true');
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      for (const [key, value] of Object.entries({
+        x1: 0,
+        x2: 32,
+        y1: 6,
+        y2: 6,
+        stroke: comparisonColors[j],
+        'stroke-width': 2,
+        'stroke-dasharray': comparisonDashes[j].join(' '),
+      }))
+        line.setAttribute(key, value);
+      svg.append(line);
+      item.append(svg, element('span', '', placeById[id].name));
+      return item;
+    }),
+  );
   if (!$('analysisChartPanel').hidden && comparison.axis.length) {
     const { ctx, w, h } = sizeCanvas(canvas);
     if (!w || !h) return;
@@ -56,7 +78,7 @@ function comparisonRenderChart() {
     }
     values.forEach((row, j) => {
       ctx.strokeStyle = comparisonColors[j];
-      ctx.setLineDash(j === 0 ? [] : j === 1 ? [7, 3] : j === 2 ? [2, 3] : [9, 3, 2, 3]);
+      ctx.setLineDash(comparisonDashes[j]);
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       let pen = false;

@@ -6,7 +6,9 @@ Explore shipping activity on an interactive globe, using [IMF PortWatch](https:/
 
 Pick a port or passage to see how its traffic has changed. Look back at the Red Sea disruptions, compare ports over time, or download the numbers for your own analysis. You can share a link to the view you're looking at.
 
-The data goes back to 2019. It records daily activity and is usually published weekly, so this isn't a live ship tracker. Dates and sources are shown alongside the charts.
+The data goes back to 2019. Use **Choose dates** to open historical analysis, or **Red Sea 2023–24** for a four-passage comparison. The globe plays the recent snapshot; entering an older date opens analysis and loads the selected places automatically.
+
+Observations are daily and usually published weekly, so this isn't a live ship tracker. Dates and sources are shown alongside the charts.
 
 ## Run locally
 

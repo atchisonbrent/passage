@@ -15,6 +15,7 @@ const comparison = {
   busy: false,
 };
 const comparisonColors = ['#83dbc1', '#ffa77b', '#85bce8', '#d8a7e7'];
+const comparisonDashes = [[], [7, 3], [2, 3], [9, 3, 2, 3]];
 const comparisonValueIds = [
   'analysisStart',
   'analysisEnd',
@@ -135,6 +136,33 @@ function comparisonOpen(open = true) {
   document.querySelector('main').scrollTop = 0;
   comparisonInvalidate();
   refresh();
+}
+
+// Enter research from the globe without inheriting a previous event's dates.
+// Only selected/pinned places load history; the global map keeps its recent axis.
+function comparisonExplore(end = dates[state.index]) {
+  if (!comparisonMath.validDate(end) || end < '2019-01-01' || end > dates.at(-1)) return;
+  comparison.ids = state.pins.length ? [...new Set(state.pins)] : [state.selected];
+  comparison.event = null;
+  comparison.signal = null;
+  setMode('change');
+  $('analysisMetric').value = String(state.metric);
+  $('analysisEnd').value = end;
+  $('analysisStart').value = ['2019-01-01', comparisonMath.shift(end, 1 - state.window)]
+    .sort()
+    .at(-1);
+  $('analysisReference').value = 'prior';
+  $('analysisScale').value = 'absolute';
+  $('analysisSpan').value = 'reference';
+  $('analysisDisplay').value = 'chart';
+  $('analysisEventStart').value = '';
+  comparison.recoveryAuto = true;
+  comparison.pendingDay = end;
+  comparisonReference();
+  $('eventCatalog').open = false;
+  $('analysisSetup').open = true;
+  comparisonOpen();
+  $('analysisStart').focus({ preventScroll: true });
 }
 
 function comparisonSearch() {
@@ -381,7 +409,7 @@ function renderWorkspace() {
                   : '';
   text(
     'analysisSetupSummary',
-    `${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${comparisonSpanLabel(start, end)} vs ${comparisonReferenceLabel(rs, re)} · ${comparisonLabels[col - 1]}`,
+    `Edit comparison · ${comparison.ids.map((id) => placeById[id].name).join(' / ') || 'Add places'} · ${comparisonSpanLabel(start, end)} vs ${comparisonReferenceLabel(rs, re)} · ${comparisonLabels[col - 1]}`,
   );
   const plotStart =
     $('analysisSpan').value === 'reference' && comparisonMath.validDate(rs) && rs < start
@@ -458,7 +486,10 @@ function renderWorkspace() {
   );
   text(
     'analysisCoverage',
-    `Snapshot: ports through ${manifest.Daily_Ports_Data_latest}, passages through ${manifest.Daily_Chokepoints_Data_latest}. ` +
+    `Daily source coverage begins 2019-01-01. Recent snapshot: ports through ${manifest.Daily_Ports_Data_latest}, passages through ${manifest.Daily_Chokepoints_Data_latest}. ` +
+      (comparison.ids.some((id) => historyCache[id])
+        ? `2019–2025 history assembled ${historyManifest?.assembled?.slice(0, 10) || 'date unavailable'}; not part of the daily refresh. `
+        : '') +
       ($('analysisScale').value === 'indexed'
         ? 'Indexed: each place relative to its complete reference mean = 100. '
         : '') +

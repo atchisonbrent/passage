@@ -844,6 +844,7 @@ function render() {
     $(m).setAttribute('aria-pressed', String(state.mode === m));
   }
   const activity = state.mode === 'change';
+  $('historyEntry').hidden = !activity || comparison.open;
   $('activityDetail').hidden = !activity;
   $('networkDetail').hidden = state.mode !== 'connections';
   $('exposureDetail').hidden = state.mode !== 'exposure';
@@ -1067,6 +1068,10 @@ async function story(name) {
       );
     return;
   }
+  if (name === 'cape') {
+    comparisonEvent('red-sea-2023');
+    return;
+  }
   await setMode('change');
   state.metric = 0;
   state.window = 7;
@@ -1077,7 +1082,6 @@ async function story(name) {
   state.zoom = 1;
   state.index = dates.indexOf(name === 'hormuz' ? '2026-02-20' : '2026-03-31');
   state.story = name;
-  if (name === 'cape') state.pins = ['chokepoint1', 'chokepoint7'];
   refresh();
 }
 function download(name, rows) {
@@ -1183,9 +1187,14 @@ function bind() {
     while (last > 0 && !Number.isFinite(rows[last]?.[state.metric])) last--;
     setDate(last);
   };
+  $('historyExplore').onclick = () => comparisonExplore();
+  $('redSeaStudy').onclick = () => comparisonEvent('red-sea-2023');
   $('dateInput').onchange = () => {
-    const i = dates.indexOf($('dateInput').value);
+    const day = $('dateInput').value;
+    const i = dates.indexOf(day);
     if (i >= 0) setDate(i);
+    else if (comparisonMath.validDate(day) && day >= '2019-01-01' && day < manifest.start)
+      comparisonExplore(day);
     else refresh();
   };
   $('direction').onchange = refresh;
@@ -1492,7 +1501,9 @@ async function boot() {
     if (q.get('direction') === 'in') $('direction').value = 'in';
     if (q.get('trade') === 'daily_export_value_at_risk') $('trade').value = q.get('trade');
     $('scrub').max = dates.length - 1;
-    $('dateInput').min = dates[0];
+    $('dateInput').min = '2019-01-01';
+    $('dateInput').title = 'Dates before ' + manifest.start + ' open historical analysis';
+    text('startLabel', 'Globe · ' + dates[0]);
     $('dateInput').max = end;
     text('endLabel', end);
     text(
